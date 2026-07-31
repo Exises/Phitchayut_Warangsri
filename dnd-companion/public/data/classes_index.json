@@ -1,0 +1,14 @@
+[
+    { "id": "barbarian", "name": "Barbarian", "icon": "fa-solid fa-gavel"},
+    { "id": "bard", "name": "Bard", "icon": "fa-solid fa-music" },
+    { "id": "cleric", "name": "Cleric", "icon": "fa-solid fa-staff-snake" },
+    { "id": "druid", "name": "Druid", "icon": "fa-solid fa-leaf" },
+    { "id": "fighter", "name": "Fighter", "icon": "fa-solid fa-shield-halved" },
+    { "id": "monk", "name": "Monk", "icon": "fa-solid fa-fist-raised" },
+    { "id": "paladin", "name": "Paladin", "icon": "fa-solid fa-cross" },
+    { "id": "ranger", "name": "Ranger", "icon": "fa-solid fa-bullseye" },
+    { "id": "rogue", "name": "Rogue", "icon": "fa-solid fa-mask" },
+    { "id": "sorcerer", "name": "Sorcerer", "icon": "fa-solid fa-fire" },
+    { "id": "warlock", "name": "Warlock", "icon": "fa-solid fa-skull" },
+    { "id": "wizard", "name": "Wizard", "icon": "fa-solid fa-hat-wizard" }
+]

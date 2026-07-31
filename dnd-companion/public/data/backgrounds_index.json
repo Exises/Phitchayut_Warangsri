@@ -1,0 +1,7 @@
+[
+    { "id": "acolyte", "name": "Acolyte", "icon": "fa-solid fa-place-of-worship" },
+    { "id": "criminal", "name": "Criminal", "icon": "fa-solid fa-mask" },
+    { "id": "noble", "name": "Noble", "icon": "fa-solid fa-crown" },
+    { "id": "sage", "name": "Sage", "icon": "fa-solid fa-scroll" },
+    { "id": "soldier", "name": "Soldier", "icon": "fa-solid fa-shield-halved" }
+]

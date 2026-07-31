@@ -1,0 +1,618 @@
+{
+    "id": "ranger",
+    "name": "Ranger",
+    "source": "PHB'24, pp. 122-133. Available in the SRD 5.2.1 and the Basic Rules (2024).",
+    "flavor_text": [
+        "Far from bustling cities, amid the trees of trackless forests and across wide plains, Rangers keep their unending watch in the wilderness. Rangers learn to track their quarry as a predator does, moving stealthily through the wilds and hiding themselves in brush and rubble.",
+        "Thanks to their connection with nature, Rangers can also cast spells that harness primal powers of the wilderness. A Ranger's talents and magic are honed with deadly focus to protect the world from the ravages of monsters and tyrants."
+    ],
+    "creating_info": {
+        "text": "To create a Ranger, consult the Core Ranger Traits table for Hit Points, Proficiencies, and Armor Training. If you are making a 1st-level character, also consult the Starting Equipment section.",
+        "quick_build": "You can make a Ranger quickly by following these suggestions. First, make Dexterity or Strength your highest ability score, followed by Wisdom and Constitution. Second, choose the Guide background."
+    },
+    "hit_points": {
+        "hit_die": "D10 per Ranger level",
+        "hp_at_1st_level": "8 + your Constitution modifier",
+        "hp_at_higher_levels": "D8 + your Constitution modifier, or, 5 + your Constitution modifier"
+    },
+    "proficiencies": {
+        "primary_ability": "Dexterity and Wisdom",
+        "armor_training": "Light armor, Medium armor, Shields",
+        "weapon_proficiencies": "Simple weapons, Martial weapons",
+        "tool_proficiencies": "None",
+        "saving_throw_proficiencies": "Strength, Dexterity",
+        "skill_proficiencies": "Choose any 3 Skills from Animal Handling, Athletics, Insight, Investigation, Nature, Perception, Stealth, and Survival"
+    },
+    "multiclassing": {
+        "requirements": "To qualify for a new class, you must have a score of at least 13 in the primary ability of the new class and your current classes. For Ranger, this is Dexterity and Wisdom.",
+        "proficiencies_gained": {
+            "armor_training": "Light armor, Medium armor, Shields",
+            "weapon_proficiencies": "Simple weapons, Martial weapons",
+            "tool_proficiencies": "",
+            "skill_proficiencies": "One skill of your choice"
+        }
+    },
+    "becoming": {
+        "level_1": [
+            "Gain all the traits in the Core Rogue Traits table.",
+            "Gain the Rogue’s level 1 features, which are listed in the Rogue Features table."
+        ],
+        "multiclass": [
+            "Gain the following traits from the Core Rogue Traits table: Hit Point Die, proficiency in one skill of your choice from the Rogue’s skill list, proficiency with Thieves’ Tools, and training with Light armor.",
+            "Gain the Rogue’s level 1 features, which are listed in the Rogue Features table."
+        ]
+    },
+    "equipment": [
+        "(A) Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Druidic Focus (sprig of mistletoe), Explorer's Pack, and 7 GP",
+        "(B) 150 GP"
+    ],
+    "levels": [
+        {
+            "level": 1,
+            "prof_bonus": 2,
+            "features": [
+                {
+                    "name": "Spellcasting",
+                    "desc": [
+                        "<p>You have learned to channel the magical essence of nature to cast spells. See chapter 7 for the rules on spellcasting. The information below details how you use those rules with Ranger spells, which appear in the Ranger spell list later in the class's description.</p>",
+                        "<p><b>Spell Slots:</b> The Ranger Features table shows how many spell slots you have to cast your level 1+ spells. You regain all expended slots when you finish a Long Rest.</p>",
+                        "<p><b>Prepared Spells of Level 1+:</b> You prepare the list of level 1+ spells that are available for you to cast with this feature. To start, choose two level 1 Ranger spells. Cure Wounds and Ensnaring Strike are recommended.</p>",
+                        "<p>The number of spells on your list increases as you gain Ranger levels, as shown in the Prepared Spells column of the Ranger Features table. Whenever that number increases, choose additional Ranger spells until the number of spells on your list matches the number in the Ranger Features table. The chosen spells must be of a level for which you have spell slots. For example, if you're a level 5 Ranger, your list of prepared spells can include six Ranger spells of level 1 or 2 in any combination.<br>If another Ranger feature gives you spells that you always have prepared, those spells don't count against the number of spells you can prepare with this feature, but those spells otherwise count as Ranger spells for you.</p>",
+                        "<p><b>Changing Your Prepared Spells:</b> Whenever you finish a Long Rest, you can replace one spell on your list with another Ranger spell for which you have spell slots.</p>",
+                        "<p><b>Spellcasting Ability:</b> Wisdom is your spellcasting ability for your Ranger spells.</p>",
+                        "<p><b>Spellcasting Focus:</b> You can use a Druidic Focus as a Spellcasting Focus for your Ranger spells.</p>"
+                    ]
+                },
+                {
+                    "name": "Favored Enemy",
+                    "desc": [
+                        "<p>You always have the Hunter's Mark spell prepared. You can cast it twice without expending a spell slot, and you regain all expended uses of this ability when you finish a Long Rest.</p>",
+                        "<p>The number of times you can cast the spell without a spell slot increases when you reach certain Ranger levels, as shown in the Favored Enemy column of the Ranger Features table.</p>"
+                    ]
+                },
+                {
+                    "name": "Weapon Mastery",
+                    "desc": [
+                        "<p>Your training with weapons allows you to use the mastery properties of two kinds of weapons of your choice with which you have proficiency, such as Longbows and Shortswords.</p>",
+                        "<p>Whenever you finish a Long Rest, you can change the kinds of weapons you chose. For example, you could switch to using the mastery properties of Scimitars and Longswords.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 2,
+                "prepared": 2,
+                "slots": [2,0,0,0,0]
+            }
+        },
+        {
+            "level": 2,
+            "prof_bonus": 2,
+            "features": [
+                {
+                    "name": "Deft Explorer",
+                    "desc": [
+                        "<p>Thanks to your travels, you gain the following benefits.</p>",
+                        "<p><b>Expertise:</b> Choose one of your skill proficiencies with which you lack Expertise. You gain Expertise in that skill.</p>",
+                        "<p><b>Languages:</b> You know two languages of your choice from the language tables in chapter 2.</p>"
+                    ]
+                },
+                {
+                    "name": "Fighting Style",
+                    "desc": [
+                        "<p>You gain a Fighting Style feat of your choice. Instead of choosing one of those feats, you can choose the option below.</p>",
+                        "<p><b>Druidic Warrior:</b> You learn two Druid cantrips of your choice. Guidance and Starry Wisp are recommended. The chosen cantrips count as Ranger spells for you, and Wisdom is your spellcasting ability for them. Whenever you gain a Ranger level, you can replace one of these cantrips with another Druid cantrip.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 2,
+                "prepared": 3,
+                "slots": [2,0,0,0,0]
+            }
+        },
+        {
+            "level": 3,
+            "prof_bonus": 2,
+            "features": [
+                {
+                    "name": "Ranger Subclass",
+                    "desc": [
+                        "<p>You gain a Ranger subclass of your choice. A subclass is a specialization that grants you features at certain Ranger levels. For the rest of your career, you gain each of your subclass's features that are of your Ranger level or lower.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 2,
+                "prepared": 4,
+                "slots": [3,0,0,0,0]
+            }
+        },
+        {
+            "level": 4,
+            "prof_bonus": 2,
+            "features": [
+                {
+                    "name": "Ability Score Improvement",
+                    "desc": [
+                        "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify. You gain this feature again at Ranger levels 8, 12, and 16.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 3,
+                "prepared": 5,
+                "slots": [3,0,0,0,0]
+            }
+        },
+        {
+            "level": 5,
+            "prof_bonus": 3,
+            "features": [
+                {
+                    "name": "Extra Attack",
+                    "desc": [
+                        "<p>You can attack twice instead of once whenever you take the Attack action on your turn.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 3,
+                "prepared": 6,
+                "slots": [4,2,0,0,0]
+            }
+        },
+        {
+            "level": 6,
+            "prof_bonus": 3,
+            "features": [
+                {
+                    "name": "Roving",
+                    "desc": [
+                        "<p>Your Speed increases by 10 feet while you aren't wearing Heavy armor. You also have a Climb Speed and a Swim Speed equal to your Speed.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 3,
+                "prepared": 6,
+                "slots": [4,2,0,0,0]
+            }
+        },
+        {
+            "level": 7,
+            "prof_bonus": 3,
+            "features": [
+                {
+                    "name": "Subclass Feature",
+                    "desc": [
+                        "<p>You gain a feature from your Ranger Subclass.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 3,
+                "prepared": 7,
+                "slots": [4,3,0,0,0]
+            }
+        },
+        {
+            "level": 8,
+            "prof_bonus": 3,
+            "features": [
+                {
+                    "name": "Ability Score Improvement",
+                    "desc": [
+                        "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 3,
+                "prepared": 7,
+                "slots": [4,3,0,0,0]
+            }
+        },
+        {
+            "level": 9,
+            "prof_bonus": 4,
+            "features": [
+                {
+                    "name": "Expertise",
+                    "desc": [
+                        "<p>Choose two of your skill proficiencies with which you lack Expertise. You gain Expertise in those skills.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 3,
+                "prepared": 9,
+                "slots": [4,3,2,0,0]
+            }
+        },
+        {
+            "level": 10,
+            "prof_bonus": 4,
+            "features": [
+                {
+                    "name": "Tireless",
+                    "desc": [
+                        "<p>Primal forces now help fuel you on your journeys, granting you the following benefits.</p>",
+                        "<p><b>Temporary Hit Points:</b> As a Magic action, you can give yourself a number of Temporary Hit Points equal to 1d8 plus your Wisdom modifier (minimum of 1). You can use this action a number of times equal to your Wisdom modifier (minimum of once), and you regain all expended uses when you finish a Long Rest.</p>",
+                        "<p><b>Decrease Exhaustion:</b> Whenever you finish a Short Rest, your Exhaustion level, if any, decreases by 1.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 4,
+                "prepared": 9,
+                "slots": [4,3,2,0,0]
+            }
+        },
+        {
+            "level": 11,
+            "prof_bonus": 4,
+            "features": [
+                {
+                    "name": "Subclass Feature",
+                    "desc": [
+                        "<p>You gain a feature from your Ranger Subclass.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 4,
+                "prepared": 10,
+                "slots": [4,3,3,0,0]
+            }
+        },
+        {
+            "level": 12,
+            "prof_bonus": 4,
+            "features": [
+                {
+                    "name": "Ability Score Improvement",
+                    "desc": [
+                        "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 4,
+                "prepared": 10,
+                "slots": [4,3,3,0,0]
+            }
+        },
+        {
+            "level": 13,
+            "prof_bonus": 5,
+            "features": [
+                {
+                    "name": "Relentless Hunter",
+                    "desc": [
+                        "<p>Taking damage can't break your Concentration on Hunter's Mark.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 4,
+                "prepared": 11,
+                "slots": [4,3,3,1,0]
+            }
+        },
+        {
+            "level": 14,
+            "prof_bonus": 5,
+            "features": [
+                {
+                    "name": "Nature's Veil",
+                    "desc": [
+                        "<p>You invoke spirits of nature to magically hide yourself. As a Bonus Action, you can give yourself the Invisible condition until the end of your next turn.</p>",
+                        "<p>You can use this feature a number of times equal to your Wisdom modifier (minimum of once), and you regain all expended uses when you finish a Long Rest.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 4,
+                "prepared": 11,
+                "slots": [4,3,3,1,0]
+            }
+        },
+        {
+            "level": 15,
+            "prof_bonus": 5,
+            "features": [
+                {
+                    "name": "Subclass Feature",
+                    "desc": [
+                        "<p>You gain a feature from your Ranger Subclass.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 4,
+                "prepared": 12,
+                "slots": [4,3,3,2,0]
+            }
+        },
+        {
+            "level": 16,
+            "prof_bonus": 5,
+            "features": [
+                {
+                    "name": "Ability Score Improvement",
+                    "desc": [
+                        "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 4,
+                "prepared": 12,
+                "slots": [4,3,3,2,0]
+            }
+        },
+        {
+            "level": 17,
+            "prof_bonus": 6,
+            "features": [
+                {
+                    "name": "Precise Hunter",
+                    "desc": [
+                        "<p>You have Advantage on attack rolls against the creature currently marked by your Hunter's Mark.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 4,
+                "prepared": 14,
+                "slots": [4,3,3,3,1]
+            }
+        },
+        {
+            "level": 18,
+            "prof_bonus": 6,
+            "features": [
+                {
+                    "name": "Feral Senses",
+                    "desc": [
+                        "<p>Your connection to the forces of nature grants you Blindsight with a range of 30 feet.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 4,
+                "prepared": 14,
+                "slots": [4,3,3,3,1]
+            }
+        },
+        {
+            "level": 19,
+            "prof_bonus": 6,
+            "features": [
+                {
+                    "name": "Epic Boon",
+                    "desc": [
+                        "<p>You gain an Epic Boon feat or another feat of your choice for which you qualify. Boon of Dimensional Travel is recommended.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 4,
+                "prepared": 15,
+                "slots": [4,3,3,3,2]
+            }
+        },
+        {
+            "level": 20,
+            "prof_bonus": 6,
+            "features": [
+                {
+                    "name": "Foe Slayer",
+                    "desc": [
+                        "<p>The damage die of your Hunter's Mark is a d10 rather than a d6.</p>"
+                    ]
+                }
+            ],
+            "class_specific": {
+                "favored_enemy": 4,
+                "prepared": 15,
+                "slots": [4,3,3,3,2]
+            }
+        }
+    ],
+    "subclasses": [
+        {
+            "name": "Beast Master",
+            "tagline": "Fight Alongside a Primal Beast",
+            "flavor": "Beast Masters bond with a primal beast through a combination of magic and friendship. This beast becomes a faithful companion that fights alongside the Ranger.",
+            "features": [
+                {
+                    "level": 3,
+                    "name": "Beast Master Spells",
+                    "desc": [
+                        "<p>You always have the Animal Friendship, Beast Bond, and Speak with Animals spells prepared.</p>"
+                    ]
+                },
+                {
+                    "level": 3,
+                    "name": "Primal Companion",
+                    "desc": [
+                        "<p>You magically summon a Primal Companion, which draws strength from your bond with nature. The beast is friendly to you and your companions and obeys your commands. Choose its stat block—Beast of the Land, Beast of the Sea, or Beast of the Sky—which uses your Proficiency Bonus (PB) in several places.</p>",
+                        "<p>In combat, the beast acts during your turn. It can move and use its Reaction on its own, but the only action it takes is the Dodge action, unless you take a Bonus Action to command it to take another action. That action can be one in its stat block or some other action. You can also sacrifice one of your attacks when you take the Attack action to command the beast to take the Attack action. If you are Incapacitated, the beast can take any action of its choice, not just Dodge.</p>",
+                        "<p>If the beast dies, you can revive it within 1 hour as a Magic action, expending a spell slot of level 1 or higher. You can also summon a new companion at the end of a Long Rest.</p>"
+                    ]
+                },
+                {
+                    "level": 7,
+                    "name": "Exceptional Training",
+                    "desc": [
+                        "<p>On any of your turns when your Primal Companion doesn't attack, you can use a Bonus Action to command the beast to take the Dash, Disengage, Dodge, or Help action. In addition, the beast's attacks now count as magical for the purpose of overcoming immunity and resistance to nonmagical attacks.</p>"
+                    ]
+                },
+                {
+                    "level": 11,
+                    "name": "Bestial Fury",
+                    "desc": [
+                        "<p>When you command your Primal Companion to take the Attack action, the beast can make two attacks, or it can take the Multiattack action if it has that action.</p>"
+                    ]
+                },
+                {
+                    "level": 15,
+                    "name": "Share Spells",
+                    "desc": [
+                        "<p>When you cast a spell targeting yourself, you can also affect your Primal Companion with the spell if the beast is within 30 feet of you.</p>"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Fey Wanderer",
+            "tagline": "Wield Fey Magic and Charm",
+            "flavor": "A Fey Wanderer guards the border between the Feywild and the Material Plane. These Rangers are comfortable in both worlds and often serve as diplomats or guides between them.",
+            "features": [
+                {
+                    "level": 3,
+                    "name": "Fey Wanderer Spells",
+                    "desc": [
+                        "<p>You always have the Charm Person spell prepared. You also always have the Misty Step (level 5), Dispel Magic (level 9), Dimension Door (level 13), and Mislead (level 17) spells prepared when you reach the appropriate Ranger levels.</p>"
+                    ]
+                },
+                {
+                    "level": 3,
+                    "name": "Dreadful Strikes",
+                    "desc": [
+                        "<p>When you hit a creature with a weapon, you can deal an extra 1d4 Psychic damage to the target, which can take this extra damage only once per turn. The extra damage increases to 1d6 when you reach Ranger level 11.</p>"
+                    ]
+                },
+                {
+                    "level": 3,
+                    "name": "Otherworldly Glamour",
+                    "desc": [
+                        "<p>Whenever you make a Charisma check, you gain a bonus to the check equal to your Wisdom modifier (minimum of +1). In addition, you gain proficiency in one of the following skills of your choice: Deception, Performance, or Persuasion.</p>"
+                    ]
+                },
+                {
+                    "level": 7,
+                    "name": "Beguiling Twist",
+                    "desc": [
+                        "<p>You have Advantage on saving throws against being Charmed or Frightened. In addition, whenever you or a creature you can see within 120 feet of you succeeds on a saving throw against being Charmed or Frightened, you can use your Reaction to force a different creature you can see within 120 feet of you to make a Wisdom saving throw against your spell save DC. If the save fails, the target is Charmed or Frightened by you (your choice) for 1 minute. The target repeats the save at the end of each of its turns, ending the effect on itself on a success.</p>"
+                    ]
+                },
+                {
+                    "level": 11,
+                    "name": "Fey Reinforcements",
+                    "desc": [
+                        "<p>You know the Summon Fey spell. It doesn't count against the number of spells you have prepared, and you can cast it without a material component. You can also cast it once without a spell slot, and you regain the ability to do so when you finish a Long Rest.</p>"
+                    ]
+                },
+                {
+                    "level": 15,
+                    "name": "Misty Wanderer",
+                    "desc": [
+                        "<p>You can cast Misty Step without expending a spell slot. You can do so a number of times equal to your Wisdom modifier (minimum of once), and you regain all expended uses when you finish a Long Rest. In addition, whenever you cast Misty Step, you can bring one willing creature you can see within 5 feet of you with you. That creature teleports to an unoccupied space of your choice within 5 feet of your destination space.</p>"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Gloom Stalker",
+            "tagline": "Hunt in the Darkness",
+            "flavor": "Gloom Stalkers are at home in the darkest places: deep within the earth, in gloomy alleyways, and in primeval forests. They venture into the darkness to ambush threats before those threats can reach the light.",
+            "features": [
+                {
+                    "level": 3,
+                    "name": "Gloom Stalker Spells",
+                    "desc": [
+                        "<p>You always have the Disguise Self spell prepared. You also always have the Rope Trick (level 5), Fear (level 9), Greater Invisibility (level 13), and Seeming (level 17) spells prepared when you reach the appropriate Ranger levels.</p>"
+                    ]
+                },
+                {
+                    "level": 3,
+                    "name": "Dread Ambusher",
+                    "desc": [
+                        "<p>You master the art of the ambush. You gain a bonus to your Initiative rolls equal to your Wisdom modifier.</p>",
+                        "<p>At the start of your first turn of each combat, your Speed increases by 10 feet until the end of that turn. If you take the Attack action on that turn, you can make one additional weapon attack as part of that action. If that attack hits, the target takes an extra 1d8 damage of the weapon's type.</p>"
+                    ]
+                },
+                {
+                    "level": 3,
+                    "name": "Umbral Sight",
+                    "desc": [
+                        "<p>You gain Darkvision out to a range of 60 feet. If you already have Darkvision, its range increases by 30 feet. You are also adept at evading creatures that rely on Darkvision. While in darkness, you are Invisible to any creature that relies on Darkvision to see you in that darkness.</p>"
+                    ]
+                },
+                {
+                    "level": 7,
+                    "name": "Iron Mind",
+                    "desc": [
+                        "<p>You gain proficiency in Wisdom saving throws. If you already have this proficiency, you instead gain proficiency in Intelligence or Charisma saving throws (your choice).</p>"
+                    ]
+                },
+                {
+                    "level": 11,
+                    "name": "Stalker's Flurry",
+                    "desc": [
+                        "<p>Once on each of your turns when you miss with a weapon attack, you can make another weapon attack as part of the same action.</p>"
+                    ]
+                },
+                {
+                    "level": 15,
+                    "name": "Shadowy Dodge",
+                    "desc": [
+                        "<p>Whenever a creature makes an attack roll against you and doesn't have Advantage on the roll, you can use your Reaction to impose Disadvantage on it. You must use this feature before you know the outcome of the attack roll.</p>"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Hunter",
+            "tagline": "Protect Civilization from the Wild",
+            "flavor": "Hunters are the classic Ranger archetype, warriors dedicated to protecting civilization from the terrors of the wild. They learn specialized techniques for fighting different types of threats, from rampaging ogres and hordes of orcs to towering giants and terrifying dragons.",
+            "features": [
+                {
+                    "level": 3,
+                    "name": "Hunter's Prey",
+                    "desc": [
+                        "<p>You gain one of the following features of your choice:</p>",
+                        "<p><strong>Colossus Slayer:</strong> Your tenacity can wear down the most potent foes. When you hit a creature with a weapon attack, the creature takes an extra 1d8 damage if it's below its Hit Point maximum. You can deal this extra damage only once per turn.</p>",
+                        "<p><strong>Horde Breaker:</strong> Once on each of your turns when you make a weapon attack, you can make another attack with the same weapon against a different creature that is within 5 feet of the original target and within range of your weapon.</p>"
+                    ]
+                },
+                {
+                    "level": 3,
+                    "name": "Hunter's Lore",
+                    "desc": [
+                        "<p>You can use your Hunter's Mark to learn about a creature's vulnerabilities and immunities. When you cast the spell or mark a new creature with it, you know whether the creature has any Immunities, Resistances, or Vulnerabilities, and if so, what they are.</p>"
+                    ]
+                },
+                {
+                    "level": 7,
+                    "name": "Defensive Tactics",
+                    "desc": [
+                        "<p>You gain one of the following features of your choice:</p>",
+                        "<p><strong>Escape the Horde:</strong> Opportunity Attacks against you are made with Disadvantage.</p>",
+                        "<p><strong>Multiattack Defense:</strong> When a creature hits you with an attack, you gain a +4 bonus to AC against all subsequent attacks made by that creature for the rest of the turn.</p>"
+                    ]
+                },
+                {
+                    "level": 11,
+                    "name": "Superior Hunter's Prey",
+                    "desc": [
+                        "<p>You gain one of the following features of your choice:</p>",
+                        "<p><strong>Volley:</strong> You can use your action to make a ranged attack against any number of creatures within 10 feet of a point you can see within your weapon's range. You must have ammunition for each target, as normal, and you make a separate attack roll for each target.</p>",
+                        "<p><strong>Whirlwind Attack:</strong> You can use your action to make melee attacks against any number of creatures within 5 feet of you, with a separate attack roll for each target.</p>"
+                    ]
+                },
+                {
+                    "level": 15,
+                    "name": "Superior Hunter's Defense",
+                    "desc": [
+                        "<p>You gain one of the following features of your choice:</p>",
+                        "<p><strong>Evasion:</strong> When you are subjected to an effect that allows you to make a Dexterity saving throw to take only half damage, you instead take no damage if you succeed on the saving throw, and only half damage if you fail.</p>",
+                        "<p><strong>Uncanny Dodge:</strong> When an attacker that you can see hits you with an attack, you can use your Reaction to halve the attack's damage against you.</p>"
+                    ]
+                }
+            ]
+        }
+    ]
+}

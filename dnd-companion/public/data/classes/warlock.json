@@ -1,0 +1,445 @@
+{
+    "id": "warlock",
+    "name": "Warlock",
+    "source": "PHB'24, pp. 158-169. Available in the SRD 5.2.1 and the Basic Rules (2024).",
+    "flavor_text": [
+        "Warlocks are seekers of the knowledge that lies hidden in the fabric of the multiverse. Through pacts made with mysterious beings of supernatural power, Warlocks unlock magical effects both subtle and spectacular. Drawing on the ancient knowledge of beings such as fey nobles, demons, devils, hags, and alien entities of the Far Realm, Warlocks piece together arcane secrets to bolster their own power.",
+        "A Warlock is defined by a pact with an otherworldly being. Sometimes the relationship between Warlock and patron is like that of a cleric and a deity, though the beings that serve as patrons for Warlocks are not gods. A Warlock might lead a cult dedicated to a demon prince, an archdevil, or an utterly alien entity—beings not typically served by clerics. More often, though, the arrangement is similar to that between a master and an apprentice. The Warlock learns and grows in power, at the cost of occasional services performed on the patron's behalf."
+    ],
+    "creating_info": {
+        "text": "To create a Warlock, consult the Core Warlock Traits table for Hit Points, Proficiencies, and Armor Training. If you are making a 1st-level character, also consult the Starting Equipment section.",
+        "quick_build": "You can make a Warlock quickly by following these suggestions. First, Charisma should be your highest ability score, followed by Constitution. Second, choose the Charlatan background. Third, choose Eldritch Blast and Prestidigitation for your Cantrips. For your first Eldritch Invocation, choose Pact of the Tome."
+    },
+    "hit_points": {
+        "hit_die": "1d8 per Warlock level",
+        "hp_at_1st_level": "8 + your Constitution modifier",
+        "hp_at_higher_levels": "1d8 (or 5) + your Constitution modifier per Warlock level after 1st"
+    },
+    "proficiencies": {
+        "primary_ability": "Charisma",
+        "armor_training": "Light armor",
+        "weapon_proficiencies": "Simple weapons",
+        "tool_proficiencies": "None",
+        "saving_throw_proficiencies": "Wisdom, Charisma",
+        "skill_proficiencies": "Choose any 2 Skills from Arcana, Deception, History, Intimidation, Investigation, Nature, and Religion"
+    },
+    "multiclassing": {
+        "requirements": "Charisma 13",
+        "proficiencies_gained": {
+            "armor_training": "Light armor",
+            "weapon_proficiencies": "Simple weapons"
+        }
+    },
+    "becoming": {
+        "level_1": [
+            "Gain all the traits in the Core Warlock Traits table.",
+            "Gain the Warlock’s level 1 features."
+        ],
+        "multiclass": [
+            "Gain the following traits from the Core Warlock Traits table: Hit Point Die, proficiency with Light armor, and proficiency with Simple weapons.",
+            "Gain the Warlock’s level 1 features."
+        ]
+    },
+    "equipment": [
+        "(A) Leather Armor, Sickle, 2 Daggers, Arcane Focus, Component Pouch, Scholar's Pack, and 10 GP",
+        "(B) 85 GP"
+    ],
+    "levels": [
+        {
+            "level": 1,
+            "prof_bonus": 2,
+            "features": [
+                {
+                    "name": "Pact Magic",
+                    "desc": [
+                        "<p>You have learned to cast spells. See chapter 7 for the rules on spellcasting. The information below details how you use those rules with Warlock spells, which appear in the Warlock spell list later in the class's description.</p>",
+                        "<p><strong>Cantrips:</strong> You know two cantrips of your choice from the Warlock spell list. Eldritch Blast and Prestidigitation are recommended. Whenever you gain a Warlock level, you can replace one of your cantrips with another cantrip of your choice from the Warlock spell list. When you reach Warlock levels 4 and 10, you learn another cantrip of your choice from the Warlock spell list, as shown in the Cantrips column of the Warlock Features table.</p>",
+                        "<p><strong>Spell Slots:</strong> The Warlock Features table shows how many spell slots you have to cast your Warlock spells of level 1 through 5. The table also shows what the level of those slots is; all of your spell slots are the same level. To cast one of your Warlock spells of level 1 or higher, you must expend a spell slot. You regain all expended spell slots when you finish a Short or Long Rest.</p>",
+                        "<p><strong>Prepared Spells of Level 1+:</strong> You prepare the list of level 1+ spells that are available for you to cast with this feature. To start, choose two level 1 spells from the Warlock spell list. Charm Person and Hex are recommended.</p>",
+                        "<p>The number of spells on your list increases as you gain Warlock levels, as shown in the Prepared Spells column of the Warlock Features table. Whenever that number increases, choose additional spells from the Warlock spell list until the number of spells on your list matches the number on the table. The chosen spells must be of a level no higher than what's shown in the table's Slot Level column for your level.</p>",
+                        "<p><strong>Changing Your Prepared Spells:</strong> Whenever you gain a Warlock level, you can replace one spell on your list with another Warlock spell for which you have spell slots.</p>",
+                        "<p><strong>Spellcasting Ability:</strong> Charisma is your spellcasting ability for your Warlock spells.</p>",
+                        "<p><strong>Spellcasting Focus:</strong> You can use an Arcane Focus as a Spellcasting Focus for your Warlock spells.</p>"
+                    ]
+                },
+                {
+                    "name": "Eldritch Invocations",
+                    "desc": [
+                        "<p>In your study of occult lore, you have unearthed Eldritch Invocations, fragments of forbidden knowledge that imbue you with an abiding magical ability.</p>",
+                        "<p>You gain one Eldritch Invocation of your choice. Pact of the Tome is recommended. You gain more invocations when you reach certain Warlock levels, as shown in the Invocations column of the Warlock Features table.</p>",
+                        "<p>Whenever you gain a Warlock level, you can replace one of your invocations with another one that you could learn at that level.</p>",
+                        "<p><strong>Prerequisites:</strong> If an invocation has a prerequisite, you must meet it to learn the invocation. If a prerequisite is a level, it refers to your Warlock level, not your character level.</p>"
+                    ]
+                }
+            ],
+            "class_specific": { "invocations": 1, "cantrips": 2, "prepared": 2, "slots": 1, "slot_level": 1 }
+        },
+        {
+            "level": 2,
+            "prof_bonus": 2,
+            "features": [
+                {
+                    "name": "Magical Cunning",
+                    "desc": "<p>You can perform an esoteric rite for 1 minute to regain half your maximum Pact Magic spell slots (round up). Once you use this feature, you can't do so again until you finish a Long Rest.</p>"
+                },
+                {
+                    "name": "Eldritch Invocations",
+                    "desc": "<p>You gain two additional Eldritch Invocations of your choice (for a total of three). Agonizing Blast and Repelling Blast are recommended.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 3, "cantrips": 2, "prepared": 3, "slots": 2, "slot_level": 1 }
+        },
+        {
+            "level": 3,
+            "prof_bonus": 2,
+            "features": [
+                {
+                    "name": "Warlock Subclass",
+                    "desc": "<p>You gain a Warlock subclass of your choice: Archfey Patron, Celestial Patron, Fiend Patron, or Great Old One Patron. A subclass is a specialization that grants you features at certain Warlock levels. For the rest of your career, you gain each of your subclass's features that are of your Warlock level or lower.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 3, "cantrips": 2, "prepared": 4, "slots": 2, "slot_level": 2 }
+        },
+        {
+            "level": 4,
+            "prof_bonus": 2,
+            "features": [
+                {
+                    "name": "Ability Score Improvement",
+                    "desc": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify. You gain this feature again at Warlock levels 8, 12, and 16.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 3, "cantrips": 3, "prepared": 5, "slots": 2, "slot_level": 2 }
+        },
+        {
+            "level": 5,
+            "prof_bonus": 3,
+            "features": [
+                {
+                    "name": "Eldritch Invocations",
+                    "desc": "<p>You gain one additional Eldritch Invocation of your choice.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 4, "cantrips": 3, "prepared": 6, "slots": 2, "slot_level": 3 }
+        },
+        {
+            "level": 6,
+            "prof_bonus": 3,
+            "features": [
+                {
+                    "name": "Subclass Feature",
+                    "desc": "<p>You gain a feature from your Warlock Subclass.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 4, "cantrips": 3, "prepared": 7, "slots": 2, "slot_level": 3 }
+        },
+        {
+            "level": 7,
+            "prof_bonus": 3,
+            "features": [
+                {
+                    "name": "Eldritch Invocations",
+                    "desc": "<p>You gain one additional Eldritch Invocation of your choice.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 5, "cantrips": 3, "prepared": 8, "slots": 2, "slot_level": 4 }
+        },
+        {
+            "level": 8,
+            "prof_bonus": 3,
+            "features": [
+                {
+                    "name": "Ability Score Improvement",
+                    "desc": "<p>You gain a feat of your choice.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 5, "cantrips": 3, "prepared": 9, "slots": 2, "slot_level": 4 }
+        },
+        {
+            "level": 9,
+            "prof_bonus": 4,
+            "features": [
+                {
+                    "name": "Contact Patron",
+                    "desc": "<p>You can contact your patron to seek their counsel. You always have the Contact Other Plane spell prepared. You can cast it without expending a spell slot. When you cast the spell with this feature, you automatically succeed on the Intelligence saving throw.</p><p>Once you use this feature, you can't use it again until you finish a Long Rest.</p>"
+                },
+                {
+                    "name": "Eldritch Invocations",
+                    "desc": "<p>You gain one additional Eldritch Invocation of your choice.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 6, "cantrips": 3, "prepared": 10, "slots": 2, "slot_level": 5 }
+        },
+        {
+            "level": 10,
+            "prof_bonus": 4,
+            "features": [
+                {
+                    "name": "Subclass Feature",
+                    "desc": "<p>You gain a feature from your Warlock Subclass.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 6, "cantrips": 4, "prepared": 10, "slots": 2, "slot_level": 5 }
+        },
+        {
+            "level": 11,
+            "prof_bonus": 4,
+            "features": [
+                {
+                    "name": "Mystic Arcanum (Level 6)",
+                    "desc": "<p>Your patron bestows upon you a magical secret called an Arcanum. Choose one level 6 spell from the Warlock spell list as this Arcanum. You can cast your Arcanum spell once without expending a spell slot, and you must finish a Long Rest before you can do so again.</p><p>Whenever you gain a Warlock level, you can replace the spell with another Warlock spell of the same level.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 6, "cantrips": 4, "prepared": 11, "slots": 3, "slot_level": 5 }
+        },
+        {
+            "level": 12,
+            "prof_bonus": 4,
+            "features": [
+                {
+                    "name": "Ability Score Improvement",
+                    "desc": "<p>You gain a feat of your choice.</p>"
+                },
+                {
+                    "name": "Eldritch Invocations",
+                    "desc": "<p>You gain one additional Eldritch Invocation of your choice.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 7, "cantrips": 4, "prepared": 11, "slots": 3, "slot_level": 5 }
+        },
+        {
+            "level": 13,
+            "prof_bonus": 5,
+            "features": [
+                {
+                    "name": "Mystic Arcanum (Level 7)",
+                    "desc": "<p>You gain a level 7 spell from the Warlock spell list as an Arcanum. You can cast your Arcanum spell once without expending a spell slot, and you must finish a Long Rest before you can do so again.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 7, "cantrips": 4, "prepared": 12, "slots": 3, "slot_level": 5 }
+        },
+        {
+            "level": 14,
+            "prof_bonus": 5,
+            "features": [
+                {
+                    "name": "Subclass Feature",
+                    "desc": "<p>You gain a feature from your Warlock Subclass.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 7, "cantrips": 4, "prepared": 12, "slots": 3, "slot_level": 5 }
+        },
+        {
+            "level": 15,
+            "prof_bonus": 5,
+            "features": [
+                {
+                    "name": "Mystic Arcanum (Level 8)",
+                    "desc": "<p>You gain a level 8 spell from the Warlock spell list as an Arcanum. You can cast your Arcanum spell once without expending a spell slot, and you must finish a Long Rest before you can do so again.</p>"
+                },
+                {
+                    "name": "Eldritch Invocations",
+                    "desc": "<p>You gain one additional Eldritch Invocation of your choice.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 8, "cantrips": 4, "prepared": 13, "slots": 3, "slot_level": 5 }
+        },
+        {
+            "level": 16,
+            "prof_bonus": 5,
+            "features": [
+                {
+                    "name": "Ability Score Improvement",
+                    "desc": "<p>You gain a feat of your choice.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 8, "cantrips": 4, "prepared": 13, "slots": 3, "slot_level": 5 }
+        },
+        {
+            "level": 17,
+            "prof_bonus": 6,
+            "features": [
+                {
+                    "name": "Mystic Arcanum (Level 9)",
+                    "desc": "<p>You gain a level 9 spell from the Warlock spell list as an Arcanum. You can cast your Arcanum spell once without expending a spell slot, and you must finish a Long Rest before you can do so again.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 8, "cantrips": 4, "prepared": 14, "slots": 4, "slot_level": 5 }
+        },
+        {
+            "level": 18,
+            "prof_bonus": 6,
+            "features": [
+                {
+                    "name": "Eldritch Invocations",
+                    "desc": "<p>You gain two additional Eldritch Invocations of your choice.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 10, "cantrips": 4, "prepared": 14, "slots": 4, "slot_level": 5 }
+        },
+        {
+            "level": 19,
+            "prof_bonus": 6,
+            "features": [
+                {
+                    "name": "Epic Boon",
+                    "desc": "<p>You gain an Epic Boon feat or another feat of your choice. Boon of the Night Spirit is recommended.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 10, "cantrips": 4, "prepared": 15, "slots": 4, "slot_level": 5 }
+        },
+        {
+            "level": 20,
+            "prof_bonus": 6,
+            "features": [
+                {
+                    "name": "Eldritch Master",
+                    "desc": "<p>You can draw on your inner reserve of mystical power. As a Bonus Action, you can regain all your expended Pact Magic spell slots. Once you use this feature, you can't do so again until you finish a Long Rest.</p>"
+                }
+            ],
+            "class_specific": { "invocations": 10, "cantrips": 4, "prepared": 15, "slots": 4, "slot_level": 5 }
+        }
+    ],
+    "subclasses": [
+        {
+            "name": "Archfey Patron",
+            "tagline": "Weave the Magic of the Feywild",
+            "flavor": "Your patron is a lord or lady of the Fey, a creature of legend who holds secrets that were forgotten before the mortal races were born. This being’s motivations are often inscrutable, and sometimes whimsical, and might involve a striving for greater magical power or the settling of age-old grudges.",
+            "features": [
+                {
+                    "level": 3,
+                    "name": "Archfey Spells",
+                    "desc": [
+                        "<p>The magic of your patron ensures you always have certain spells ready. The Archfey Spells table shows when you get them. They count as Warlock spells for you, and they don't count against the number of spells you can have prepared.</p>",
+                        "<table class=\"dnd-table\"><thead><tr><th>Warlock Level</th><th>Spells</th></tr></thead><tbody><tr><td>3</td><td>Charm Person, Faerie Fire, Calm Emotions, Misty Step, Phantasmal Force, Sleep</td></tr><tr><td>5</td><td>Blink, Plant Growth</td></tr><tr><td>7</td><td>Dominate Beast, Greater Invisibility</td></tr><tr><td>9</td><td>Dominate Person, Seeming</td></tr></tbody></table>"
+                    ]
+                },
+                {
+                    "level": 3,
+                    "name": "Steps of the Fey",
+                    "desc": "<p>You can weave your way through the Feywild to escape danger or gain a tactical advantage. As a Bonus Action, you can cast Misty Step without expending a spell slot. You can do so a number of times equal to your Charisma modifier (minimum of once), and you regain all expended uses when you finish a Long Rest. In addition, whenever you cast Misty Step, you can choose one of the following additional effects:</p><ul><li><strong>Refreshing Step:</strong> You or one willing creature you can see within 10 feet of you gains Temporary Hit Points equal to 1d10 plus your Warlock level.</li><li><strong>Taunting Step:</strong> Creatures of your choice within 5 feet of the space you leave must succeed on a Wisdom saving throw against your spell save DC or have Disadvantage on attack rolls against creatures other than you until the start of your next turn.</li></ul>"
+                },
+                {
+                    "level": 6,
+                    "name": "Misty Escape",
+                    "desc": "<p>When you use your Steps of the Fey feature, you can also choose the following additional effect:</p><ul><li><strong>Disappearing Step:</strong> You become Invisible until the start of your next turn or until you attack or cast a spell.</li></ul><p>In addition, when you take damage, you can use your Reaction to cast Misty Step. When you cast it in this way, it counts as a use of your Steps of the Fey.</p>"
+                },
+                {
+                    "level": 10,
+                    "name": "Beguiling Defenses",
+                    "desc": "<p>You are immune to the Charmed condition. In addition, when another creature attempts to charm you, you can use your Reaction to attempt to turn the charm back on that creature. The creature must succeed on a Wisdom saving throw against your spell save DC or be Charmed by you for 1 minute or until the creature takes any damage.</p>"
+                },
+                {
+                    "level": 14,
+                    "name": "Bewitching Magic",
+                    "desc": "<p>When you cast an Enchantment or Illusion spell using a spell slot, you can choose one creature that you can see within 60 feet of you. The target must succeed on a Wisdom saving throw against your spell save DC or be Charmed or Frightened (your choice) by you for 1 minute or until it takes any damage.</p>"
+                }
+            ]
+        },
+        {
+            "name": "Celestial Patron",
+            "tagline": "Channel Divine Light and Healing",
+            "flavor": "Your patron is a powerful being of the Upper Planes. You have bound yourself to an ancient empyrean, solar, ki-rin, unicorn, or other entity that resides in the planes of everlasting bliss. Your pact with that being allows you to experience the barest touch of the holy light that illuminates the multiverse.",
+            "features": [
+                {
+                    "level": 3,
+                    "name": "Celestial Spells",
+                    "desc": [
+                        "<p>The magic of your patron ensures you always have certain spells ready. The Celestial Spells table shows when you get them. They count as Warlock spells for you, and they don't count against the number of spells you can have prepared.</p>",
+                        "<table class=\"dnd-table\"><thead><tr><th>Warlock Level</th><th>Spells</th></tr></thead><tbody><tr><td>3</td><td>Aid, Cure Wounds, Guiding Bolt, Lesser Restoration, Light, Sacred Flame</td></tr><tr><td>5</td><td>Daylight, Revivify</td></tr><tr><td>7</td><td>Guardian of Faith, Wall of Fire</td></tr><tr><td>9</td><td>Greater Restoration, Summon Celestial</td></tr></tbody></table>"
+                    ]
+                },
+                {
+                    "level": 3,
+                    "name": "Healing Light",
+                    "desc": "<p>You gain the ability to channel celestial energy to heal wounds. You have a pool of d6s that you spend to fuel this healing. The number of dice in the pool equals 1 plus your Warlock level.</p><p>As a Bonus Action, you can heal one creature that you can see within 60 feet of you, spending dice from the pool. The maximum number of dice you can spend at once equals your Charisma modifier (minimum of one die). Roll the dice you spend, add them together, and restore a number of Hit Points equal to the total. Your pool regains all expended dice when you finish a Long Rest.</p>"
+                },
+                {
+                    "level": 6,
+                    "name": "Radiant Soul",
+                    "desc": "<p>Your link to the Celestial allows you to serve as a conduit for radiant energy. You have Resistance to Radiant damage, and when you cast a spell that deals Radiant or Fire damage, you can add your Charisma modifier to one radiant or fire damage roll of that spell against one of its targets.</p>"
+                },
+                {
+                    "level": 10,
+                    "name": "Celestial Resilience",
+                    "desc": "<p>You gain Temporary Hit Points whenever you finish a Short or Long Rest. These Temporary Hit Points equal your Warlock level plus your Charisma modifier. Additionally, choose up to five creatures you can see at the end of the rest. Those creatures each gain Temporary Hit Points equal to half your Warlock level plus your Charisma modifier.</p>"
+                },
+                {
+                    "level": 14,
+                    "name": "Searing Vengeance",
+                    "desc": "<p>When you have to make a death saving throw at the start of your turn, you can instead spring back to your feet with a burst of radiant energy. You regain Hit Points equal to half your Hit Point maximum, and then you can stand up if you so choose. Each creature of your choice that is within 30 feet of you takes Radiant damage equal to 2d8 plus your Charisma modifier, and it has the Blinded condition until the end of the current turn.</p><p>Once you use this feature, you can’t use it again until you finish a Long Rest.</p>"
+                }
+            ]
+        },
+        {
+            "name": "Fiend Patron",
+            "tagline": "Strike a Deal with a Lower Planar Entity",
+            "flavor": "You have made a pact with a fiend from the Lower Planes of existence, a being whose aims are evil, even if you strive against those aims. Such beings desire the corruption or destruction of all things, ultimately including you. Fiends powerful enough to forge a pact include demon lords such as Demogorgon and Orcus or archdevils such as Asmodeus and Mephistopheles.",
+            "features": [
+                {
+                    "level": 3,
+                    "name": "Fiend Spells",
+                    "desc": [
+                        "<p>The magic of your patron ensures you always have certain spells ready. The Fiend Spells table shows when you get them. They count as Warlock spells for you, and they don't count against the number of spells you can have prepared.</p>",
+                        "<table class=\"dnd-table\"><thead><tr><th>Warlock Level</th><th>Spells</th></tr></thead><tbody><tr><td>3</td><td>Burning Hands, Command, Blindness/Deafness, Scorching Ray, Suggestion</td></tr><tr><td>5</td><td>Fireball, Stinking Cloud</td></tr><tr><td>7</td><td>Fire Shield, Wall of Fire</td></tr><tr><td>9</td><td>Flame Strike, Hallow</td></tr></tbody></table>"
+                    ]
+                },
+                {
+                    "level": 3,
+                    "name": "Dark One's Blessing",
+                    "desc": "<p>When you reduce a hostile creature to 0 Hit Points, you gain Temporary Hit Points equal to your Charisma modifier plus your Warlock level (minimum of 1).</p>"
+                },
+                {
+                    "level": 6,
+                    "name": "Dark One's Own Luck",
+                    "desc": "<p>You can call on your patron to alter fate in your favor. When you make an ability check or a saving throw, you can use this feature to add a d10 to your roll. You can do so after seeing the initial roll but before any of the roll’s effects occur.</p><p>Once you use this feature, you can’t use it again until you finish a Short or Long Rest.</p>"
+                },
+                {
+                    "level": 10,
+                    "name": "Fiendish Resilience",
+                    "desc": "<p>You can choose one damage type when you finish a Short or Long Rest. You gain Resistance to that damage type until you choose a different one with this feature. Damage from magical weapons or silver weapons ignores this resistance.</p>"
+                },
+                {
+                    "level": 14,
+                    "name": "Hurl Through Hell",
+                    "desc": "<p>When you hit a creature with an attack, you can use this feature to instantly transport the target through the Lower Planes. The creature disappears and hurtles through a nightmare landscape. At the end of your next turn, the target returns to the space it previously occupied, or the nearest unoccupied space. If the target is not a Fiend, it takes 10d10 Psychic damage as it reels from its horrific experience.</p><p>Once you use this feature, you can’t use it again until you finish a Long Rest. You can also restore your use of it by expending a level 5 spell slot (no action required).</p>"
+                }
+            ]
+        },
+        {
+            "name": "Great Old One Patron",
+            "tagline": "Unlock the Secrets of the Far Realm",
+            "flavor": "Your patron is a mysterious entity whose nature is utterly foreign to the fabric of reality. It might come from the Far Realm, the space beyond reality, or it could be one of the elder gods known only in legends. Its motives are incomprehensible to mortals, and its knowledge is so vast and ancient that even the greatest libraries pale in comparison.",
+            "features": [
+                {
+                    "level": 3,
+                    "name": "Great Old One Spells",
+                    "desc": [
+                        "<p>The magic of your patron ensures you always have certain spells ready. The Great Old One Spells table shows when you get them. They count as Warlock spells for you, and they don't count against the number of spells you can have prepared.</p>",
+                        "<table class=\"dnd-table\"><thead><tr><th>Warlock Level</th><th>Spells</th></tr></thead><tbody><tr><td>3</td><td>Dissonant Whispers, Tasha's Hideous Laughter, Detect Thoughts, Phantasmal Force</td></tr><tr><td>5</td><td>Clairvoyance, Hunger of Hadar</td></tr><tr><td>7</td><td>Confusion, Summon Aberration</td></tr><tr><td>9</td><td>Modify Memory, Telekinesis</td></tr></tbody></table>"
+                    ]
+                },
+                {
+                    "level": 3,
+                    "name": "Awakened Mind",
+                    "desc": "<p>You can telepathically speak to any creature you can see within 30 feet of you. You don’t need to share a language with the creature for it to understand your telepathic utterances, but the creature must be able to understand at least one language.</p>"
+                },
+                {
+                    "level": 6,
+                    "name": "Entropic Ward",
+                    "desc": "<p>When a creature makes an attack roll against you, you can use your Reaction to impose Disadvantage on that roll. If the attack misses you, your next attack roll against the creature has Advantage if you make it before the end of your next turn.</p><p>Once you use this feature, you can’t use it again until you finish a Short or Long Rest.</p>"
+                },
+                {
+                    "level": 10,
+                    "name": "Thought Shield",
+                    "desc": "<p>Your thoughts can’t be read by telepathy or other means unless you allow it. You also have Resistance to Psychic damage, and whenever a creature deals Psychic damage to you, that creature takes the same amount of damage that you do.</p>"
+                },
+                {
+                    "level": 14,
+                    "name": "Create Thrall",
+                    "desc": "<p>You gain the ability to infect a humanoid's mind with the alien magic of your patron. You can use your action to touch an Incapacitated humanoid. That creature is then Charmed by you until a Remove Curse spell is cast on it, the Charmed condition is removed from it, or you use this feature again. You can communicate telepathically with the charmed creature as long as the two of you are on the same plane of existence.</p>"
+                }
+            ]
+        }
+    ]
+}

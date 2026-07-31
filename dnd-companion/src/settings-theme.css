@@ -1,0 +1,230 @@
+/* Settings UI Styles - Sharp & Premium */
+.setting-hint {
+    font-size: 0.85rem;
+    color: var(--color-gray, #888);
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+}
+
+.setting-toggle-group {
+    margin-bottom: 24px;
+}
+
+.setting-toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+}
+
+.setting-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+/* Sharp Toggle Slider */
+.toggle-slider {
+    width: 44px;
+    height: 20px;
+    background-color: var(--bg-sidebar, #333);
+    border: 1px solid var(--border-color, #444);
+    border-radius: 2px; /* Sharp edges */
+    position: relative;
+    transition: all 0.3s ease;
+    margin-right: 15px;
+    flex-shrink: 0;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.toggle-slider:before {
+    content: "";
+    position: absolute;
+    height: 14px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: var(--color-ink, #e0e0e0);
+    border-radius: 1px; /* Sharp */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.setting-toggle input:checked + .toggle-slider {
+    background-color: var(--color-red, #e11d48);
+    border-color: var(--color-red, #e11d48);
+}
+
+.setting-toggle input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+    background-color: #fff;
+}
+
+.toggle-label {
+    font-weight: 500;
+    color: var(--color-ink, #e0e0e0);
+    font-size: 0.95rem;
+}
+
+/* Modern Select Dropdowns */
+.profile-input-wrapper select {
+    appearance: none;
+    background-color: var(--bg-white, #1e1e1e);
+    color: var(--color-ink, #e0e0e0);
+    border: 1px solid var(--border-color, #333);
+    border-radius: 0; /* Sharp */
+    padding: 10px 15px;
+    width: 100%;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.profile-input-wrapper select:focus {
+    outline: none;
+    border-color: var(--color-red, #e11d48);
+}
+
+/* Range Slider - Sharp */
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    background: transparent;
+    height: 24px;
+}
+
+input[type="range"]:focus {
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background: var(--border-color, #333);
+    border-radius: 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    height: 16px;
+    width: 8px;
+    border-radius: 0; /* Sharp rectangle thumb */
+    background: var(--color-red, #e11d48);
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -6px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+/* Premium Card Modifications for Settings */
+.profile-card {
+    border-radius: 0; /* Sharp cards */
+    border: 1px solid var(--border-color, #222);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* =========================================
+   Themes Global Variables Override
+   ========================================= */
+
+/* 1. Abyssal Dark (Deep Black + Blood Red) */
+body.theme-abyssal {
+    /* Override Global CSS variables from index.css */
+    --bg-paper: #050505;
+    --bg-white: #111111;
+    --bg-sidebar: #0a0a0a;
+
+    --color-red: #dc2626;      /* Accent color (Blood Red) */
+    --color-red-dark: #b91c1c; /* Hover accent */
+    --color-ink: #f3f4f6;      /* Text color */
+    --color-gray: #9ca3af;     /* Muted text */
+    --color-gray-light: #4b5563;
+    --color-gold: #ef4444;     /* Replace gold with red */
+
+    --border-color: #262626;   
+    --border-gold: #b91c1c;
+
+    background-color: var(--bg-paper);
+    color: var(--color-ink);
+}
+body.theme-abyssal .profile-menu-item.active {
+    background-color: rgba(220, 38, 38, 0.15);
+    color: #ef4444;
+    border-left: 3px solid #dc2626;
+}
+body.theme-abyssal .navbar {
+    border-bottom-color: var(--border-color);
+}
+body.theme-abyssal .profile-sidebar {
+    background-color: var(--bg-sidebar);
+    border-right-color: var(--border-color);
+}
+
+
+/* 2. Arcane Neon (Deep Indigo + Cyan) */
+body.theme-arcane {
+    --bg-paper: #090e17;       /* Very Deep Indigo */
+    --bg-white: #121c2d;       /* Card/Navbar */
+    --bg-sidebar: #0f172a;
+    
+    --color-red: #06b6d4;      /* Accent color (Cyan) */
+    --color-red-dark: #0891b2; /* Hover accent */
+    --color-ink: #e2e8f0;      /* Text color */
+    --color-gray: #94a3b8;
+    --color-gray-light: #334155;
+    --color-gold: #22d3ee;     
+    
+    --border-color: #1e293b;
+    --border-gold: #06b6d4;
+    
+    background-color: var(--bg-paper);
+    color: var(--color-ink);
+}
+body.theme-arcane .profile-menu-item.active {
+    background-color: rgba(6, 182, 212, 0.15);
+    color: #22d3ee;
+    border-left: 3px solid #06b6d4;
+}
+body.theme-arcane .navbar {
+    border-bottom-color: var(--border-color);
+}
+body.theme-arcane .profile-sidebar {
+    background-color: var(--bg-sidebar);
+    border-right-color: var(--border-color);
+}
+body.theme-arcane .setting-toggle input:checked + .toggle-slider {
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.6);
+}
+
+
+/* 3. Classic Parchment (Cream + Crimson/Brown) */
+body.theme-classic {
+    --bg-paper: #fdf9ec;
+    --bg-white: #ffffff;
+    --bg-sidebar: #f5f5f4;
+
+    --color-red: #711a19;
+    --color-red-dark: #4a1110;
+    --color-ink: #333333;
+    --color-gray: #6b7280;
+    --color-gray-light: #9ca3af;
+    --color-gold: #d4af37;
+
+    --border-color: #e5e7eb;
+    --border-gold: #d4af37;
+
+    background-color: var(--bg-paper);
+    color: var(--color-ink);
+}
+body.theme-classic .profile-menu-item.active {
+    background-color: rgba(113, 26, 25, 0.1);
+    color: #711a19;
+    border-left: 3px solid #711a19;
+}
+body.theme-classic .profile-input-wrapper select {
+    border-radius: 4px;
+}
