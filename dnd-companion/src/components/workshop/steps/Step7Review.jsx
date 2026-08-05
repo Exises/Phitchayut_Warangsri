@@ -10,7 +10,8 @@ import {
   getAllInnateAndFeatureSpells,
   cleanAndStyleHtml,
   toggleMultiLevelFilter,
-  matchesMultiLevel
+  matchesMultiLevel,
+  calculateLongRestHdRecovery
 } from '../../../utils/workshopHelpers';
 import { FeatChoiceEditor } from '../WorkshopWidgets';
 import TopCombatStrip from '../../actions/TopCombatStrip';
@@ -53,7 +54,15 @@ export default function Step7Review({
         const [reviewTab, setReviewTab] = useState('summary');
         const [reviewHpCur, setReviewHpCur] = useState(characterState?.hp?.current ?? 10);
         const [reviewHpTemp, setReviewHpTemp] = useState(characterState?.hp?.temp ?? 0);
-        const [reviewExpendedHd, setReviewExpendedHd] = useState(characterState?.hit_dice_current?.expended ?? 0);
+        
+        const initialExpHd = characterState?.hit_dice_current?.expended;
+        const defaultExpHd = typeof initialExpHd === 'object' && initialExpHd !== null 
+          ? initialExpHd 
+          : (typeof initialExpHd === 'number' 
+              ? { [(resolvedMechanics?.hitPoints?.hitDiceList?.[0]?.classId || 'unknown')]: initialExpHd } 
+              : {});
+        const [reviewExpendedHd, setReviewExpendedHd] = useState(defaultExpHd);
+        
         const [deathSaveSuccess, setDeathSaveSuccess] = useState(characterState?.death_save_success ?? 0);
         const [deathSaveFailure, setDeathSaveFailure] = useState(characterState?.death_save_failure ?? 0);
         const [activeHpTab, setActiveHpTab] = useState('combat');
@@ -139,7 +148,8 @@ export default function Step7Review({
               timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
             }, ...(prev || []).slice(0, 24)]);
           }
-          
+          // Persist HP action to DB
+          postLogToDb('gameplay', 'HP_ACTION', logMsg, { title, formula: details, total: displayTotal });
         };
 
         const syncSpellsToSheet = (classId, type, spellArray) => {
@@ -231,7 +241,7 @@ export default function Step7Review({
         const raceName = dbData.races?.find(r => r.species_id === characterState.race?.id)?.species_name || characterState.race?.id || 'Human';
         const classList = characterState.classData?.classes || [];
         const totalLvl = classList.reduce((acc, c) => acc + (parseInt(c.level) || 1), 0);
-        const classStr = classList.map(c => `${c.classId} (${c.level || 1})`).join(' / ') || 'Adventurer';
+        const classStr = classList.map(c => `${String(c.classId).charAt(0).toUpperCase() + String(c.classId).slice(1)} (${c.level || 1})`).join(' / ') || 'Adventurer';
         const getMod = val => Math.floor(((parseInt(val) || 10) - 10) / 2);
         const fmtMod = mod => mod >= 0 ? `+${mod}` : `${mod}`;
 
@@ -239,6 +249,20 @@ export default function Step7Review({
         const dexMod = getMod(totalStats.dex);
         const conMod = getMod(totalStats.con);
         const intMod = getMod(totalStats.int);
+
+        let hasThaumaturge = false, hasMagician = false, hasProtector = false, hasWarden = false;
+        classList.forEach(cl => {
+          Object.values(cl.featureChoices || {}).forEach(val => {
+            const arr = Array.isArray(val) ? val : [val];
+            arr.forEach(v => {
+              if (v === 'Thaumaturge') hasThaumaturge = true;
+              if (v === 'Magician') hasMagician = true;
+              if (v === 'Protector') hasProtector = true;
+              if (v === 'Warden') hasWarden = true;
+            });
+          });
+        });
+
         const wisMod = getMod(totalStats.wis);
         const chaMod = getMod(totalStats.cha);
         const profBonus = Math.ceil(1 + (totalLvl / 4));
@@ -564,26 +588,59 @@ export default function Step7Review({
             }
           } catch { /* ignore */ }
         }
-        if (lineageObj?.traits) {
-          try {
-            const trs = typeof lineageObj.traits === 'string' ? JSON.parse(lineageObj.traits) : lineageObj.traits;
-            if (Array.isArray(trs)) {
-              trs.forEach(t => {
-                const reqLvl = parseInt(t.level || t.required_level || 1, 10) || 1;
-                if (reqLvl <= totalLvl) {
-                  allFeaturesListReview.push({
-                    name: formatCleanName(t.name || t.title || 'Lineage Trait'),
-                    desc: formatTraitOrFeatureText(t),
-                    source: formatSourceWithParens(lineageObj.lineage_name || 'Lineage'),
-                    pageSource: t.srd_source || lineageObj.srd_source || 'PHB-2024, pg. 190',
-                    category: 'SPECIES TRAITS',
-                    choiceObj: characterState.race?.traitChoices?.[t.name || t.title] || characterState.race?.traitChoices?.[formatCleanName(t.name || t.title || '')] || null,
-                    chargeInfo: getFeatureChargeInfo(t.name || t.title, t, characterState, classList)
-                  });
+        if (lineageObj) {
+          if (lineageObj.traits) {
+            try {
+              const trs = typeof lineageObj.traits === 'string' ? JSON.parse(lineageObj.traits) : lineageObj.traits;
+              if (Array.isArray(trs)) {
+                trs.forEach(t => {
+                  const reqLvl = parseInt(t.level || t.required_level || 1, 10) || 1;
+                  if (reqLvl <= totalLvl) {
+                    allFeaturesListReview.push({
+                      name: formatCleanName(t.name || t.title || 'Lineage Trait'),
+                      desc: formatTraitOrFeatureText(t),
+                      source: formatSourceWithParens(lineageObj.lineage_name || 'Lineage'),
+                      pageSource: t.srd_source || lineageObj.srd_source || 'PHB-2024, pg. 190',
+                      category: 'SPECIES TRAITS',
+                      choiceObj: characterState.race?.traitChoices?.[t.name || t.title] || characterState.race?.traitChoices?.[formatCleanName(t.name || t.title || '')] || null,
+                      chargeInfo: getFeatureChargeInfo(t.name || t.title, t, characterState, classList)
+                    });
+                  }
+                });
+              }
+            } catch { /* ignore */ }
+          }
+          if (lineageObj.lineage_desc && !lineageObj.traits) {
+            let merged = false;
+            for (let trait of allFeaturesListReview) {
+              if (trait.category === 'SPECIES TRAITS' && trait.choiceObj) {
+                const choiceStr = typeof trait.choiceObj === 'string' ? trait.choiceObj : (trait.choiceObj.value || trait.choiceObj.choice || '');
+                if (choiceStr && lineageObj.lineage_name && (choiceStr.toLowerCase().includes(lineageObj.lineage_name.toLowerCase()) || lineageObj.lineage_name.toLowerCase().includes(choiceStr.toLowerCase()))) {
+                  trait.lineageEffect = { name: lineageObj.lineage_name || 'Lineage Benefit', desc: lineageObj.lineage_desc };
+                  merged = true;
+                  break;
                 }
+              }
+            }
+            if (!merged) {
+              const parentTrait = allFeaturesListReview.find(t => t.category === 'SPECIES TRAITS' && (t.name.toLowerCase().includes('ancestry') || t.name.toLowerCase().includes('lineage') || t.name.toLowerCase().includes('legacy')));
+              if (parentTrait) {
+                parentTrait.lineageEffect = { name: lineageObj.lineage_name || 'Lineage Benefit', desc: lineageObj.lineage_desc };
+                merged = true;
+              }
+            }
+            if (!merged) {
+              allFeaturesListReview.push({
+                name: lineageObj.lineage_name || 'Lineage Trait',
+                desc: lineageObj.lineage_desc,
+                source: formatSourceWithParens(raceObj?.species_name || 'Lineage'),
+                pageSource: lineageObj.srd_source || 'PHB-2024, pg. 190',
+                category: 'SPECIES TRAITS',
+                choiceObj: null,
+                chargeInfo: null
               });
             }
-          } catch { /* ignore */ }
+          }
         }
           // eslint-disable-next-line no-unused-vars
         classList.forEach((cl, clIdx) => {
@@ -981,7 +1038,8 @@ export default function Step7Review({
                     {charName}
                   </h1>
                   <p style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--color-gray)', textTransform: 'uppercase', letterSpacing: '1.5px', margin: '4px 0 0 0' }}>
-                    Level {totalLvl} • {raceName} {classStr}
+                    Level {totalLvl} • {raceName}
+                    {classList.length > 1 ? <><br />{classStr}</> : ` ${classStr}`}
                   </p>
                 </div>
 
@@ -1198,10 +1256,10 @@ export default function Step7Review({
                 </div>
 
                 <div
-                  onClick={() => triggerQuickRoll('Initiative', dexMod)}
+                  onClick={() => triggerQuickRoll('Initiative', totalStats?.initiative ?? dexMod)}
                   style={{ textAlign: 'center', borderLeft: '1px solid #e2e8f0', padding: '0 10px', cursor: 'pointer' }}
                 >
-                  <div style={{ fontFamily: 'Cinzel, serif', fontSize: '1.4rem', color: 'var(--color-ink)', fontWeight: '700' }}>{fmtMod(dexMod)}</div>
+                  <div style={{ fontFamily: 'Cinzel, serif', fontSize: '1.4rem', color: 'var(--color-ink)', fontWeight: '700' }}>{fmtMod(totalStats?.initiative ?? dexMod)}</div>
                   <div style={{ fontSize: '0.6rem', color: '#711a19', fontWeight: '800', textTransform: 'uppercase' }}>Init <i className="fa-solid fa-dice-d20"></i></div>
                 </div>
 
@@ -1467,7 +1525,19 @@ export default function Step7Review({
                     const isProf = (proficientSkills || []).includes(skName);
                     const isExp = (expertiseSkills || []).includes(skName);
                     const bonus = isExp ? profBonus * 2 : isProf ? profBonus : 0;
-                    const totalSkillMod = abMod + bonus;
+                    let totalSkillMod = abMod + bonus;
+                    let extraLabel = '';
+                    
+                    if (hasThaumaturge && (skName === 'Arcana' || skName === 'Religion')) {
+                        const wisMin1 = Math.max(1, wisMod);
+                        totalSkillMod += wisMin1;
+                        extraLabel = ` (+${wisMin1} Thaumaturge)`;
+                    }
+                    if (hasMagician && (skName === 'Arcana' || skName === 'Nature')) {
+                        const wisMin1 = Math.max(1, wisMod);
+                        totalSkillMod += wisMin1;
+                        extraLabel = ` (+${wisMin1} Magician)`;
+                    }
 
                     return (
                       <div
@@ -1486,7 +1556,10 @@ export default function Step7Review({
                             <i className="fa-regular fa-circle" style={{ color: 'var(--border-color)', fontSize: '0.85rem' }}></i>
                           )}
                           <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--color-gray)', width: '28px', textTransform: 'uppercase' }}>{abKey}</span>
-                          <span style={{ fontSize: '0.85rem', color: 'var(--color-ink)', fontWeight: isProf ? '700' : '500' }}>{skName}</span>
+                          <span style={{ fontSize: '0.85rem', color: 'var(--color-ink)', fontWeight: isProf ? '700' : '500' }}>
+                            {skName}
+                            <span style={{ fontSize: '0.7rem', color: '#10b981', fontStyle: 'italic', marginLeft: '4px' }}>{extraLabel}</span>
+                          </span>
                         </div>
                         <span style={{ fontSize: '0.85rem', fontWeight: '800', color: isProf ? '#711a19' : 'var(--color-gray)', backgroundColor: 'var(--bg-white)', border: '1px solid #e2e8f0', padding: '2px 8px', borderRadius: '4px' }}>
                           {fmtMod(totalSkillMod)}
@@ -2984,6 +3057,10 @@ export default function Step7Review({
                           feat.choiceObj.forEach(x => typeof x === 'string' && choiceItems.push(`🔹 ${formatChoiceName(x)}`));
                         }
                       }
+                      
+                      if (feat.lineageEffect) {
+                        choiceItems.push(`📜 ${feat.lineageEffect.name}: ${feat.lineageEffect.desc}`);
+                      }
                     }
 
                     const featIdForEdit = feat.featId || feat.name;
@@ -3355,15 +3432,21 @@ export default function Step7Review({
                       </div>
                     </div>
 
-                    {/* Background Proficiencies Granted */}
+                    {/* Equipment & Tool Proficiencies */}
                     <div style={{ backgroundColor: 'var(--bg-white)', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '14px', color: 'var(--color-ink)' }}>
-                      <h5 style={{ color: '#711a19', margin: '0 0 10px 0', fontSize: '0.95rem', fontWeight: '800' }}>Proficiencies Granted by Background</h5>
+                      <h5 style={{ color: '#711a19', margin: '0 0 10px 0', fontSize: '0.95rem', fontWeight: '800' }}>Equipment & Other Proficiencies</h5>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.8rem', color: 'var(--color-ink)' }}>
                         <div style={{ color: 'var(--color-ink)' }}>
-                          <strong style={{ color: '#0f172a' }}>Skill Proficiencies:</strong> {(characterState.background?.originalSkills || []).map(s => characterState.background?.replacedSkills?.[s] ? `${characterState.background.replacedSkills[s]} (replaced ${s})` : s).join(', ') || formatCleanName(realBackgroundObj?.skill_proficiencies || '') || 'None specified'}
+                          <strong style={{ color: '#0f172a' }}>Armor:</strong> {totalStats?.proficientArmor?.length ? totalStats.proficientArmor.map(formatCleanName).join(', ') : 'None'}
                         </div>
                         <div style={{ color: 'var(--color-ink)' }}>
-                          <strong style={{ color: '#0f172a' }}>Tool / Language Proficiencies:</strong> {(characterState.background?.toolChoices || []).map(formatCleanName).join(', ') || formatCleanName(realBackgroundObj?.tool_proficiencies || '') || 'None specified'}
+                          <strong style={{ color: '#0f172a' }}>Weapons:</strong> {totalStats?.proficientWeapons?.length ? totalStats.proficientWeapons.map(formatCleanName).join(', ') : 'None'}
+                        </div>
+                        <div style={{ color: 'var(--color-ink)' }}>
+                          <strong style={{ color: '#0f172a' }}>Tools & Instruments:</strong> {totalStats?.proficientTools?.length ? totalStats.proficientTools.map(formatCleanName).join(', ') : 'None'}
+                        </div>
+                        <div style={{ color: 'var(--color-ink)' }}>
+                          <strong style={{ color: '#0f172a' }}>Languages:</strong> {totalStats?.languages?.length ? totalStats.languages.map(formatCleanName).join(', ') : 'Common'}
                         </div>
                       </div>
                     </div>
@@ -3583,7 +3666,8 @@ export default function Step7Review({
               (() => {
                 const activeDeathSucc = deathSaves?.succ ? deathSaves.succ.filter(Boolean).length : deathSaveSuccess;
                 const activeDeathFail = deathSaves?.fail ? deathSaves.fail.filter(Boolean).length : deathSaveFailure;
-                const availHd = Math.max(0, totalLvl - reviewExpendedHd);
+                const totalExpendedHd = Object.values(reviewExpendedHd || {}).reduce((acc, val) => acc + (parseInt(val) || 0), 0);
+                const availHd = Math.max(0, totalLvl - totalExpendedHd);
 
                 return (
                   <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2500, padding: '16px' }}>
@@ -3788,56 +3872,90 @@ export default function Step7Review({
                         <div className="animate-fade-in" style={{ padding: '4px 0' }}>
                           <div style={{ backgroundColor: '#fefcf8', border: '1px solid #e2d8c3', borderRadius: '8px', padding: '14px', marginBottom: '14px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                              <span style={{ fontSize: '0.82rem', fontWeight: 'bold', color: 'var(--color-gray)' }}>Available Hit Dice:</span>
-                              <strong style={{ fontSize: '1.05rem', color: '#711a19' }}>{availHd} / {totalLvl}</strong>
+                              <span style={{ fontSize: '0.82rem', fontWeight: 'bold', color: 'var(--color-gray)' }}>Total Hit Dice:</span>
+                              <strong style={{ fontSize: '1.05rem', color: '#711a19' }}>{availHd} / {totalLvl} Available</strong>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.78rem', color: 'var(--color-gray)' }}>
-                              <span>Hit Die Size:</span>
-                              <span>1d{resolvedMechanics?.hitPoints?.hitDiceList?.[0]?.hitDie || 8} (+{conMod} CON)</span>
+                            <div style={{ borderTop: '1px solid #e2d8c3', paddingTop: '8px', marginTop: '4px' }}>
+                              <div style={{ fontSize: '0.78rem', color: 'var(--color-gray)', marginBottom: '8px', fontWeight: 'bold' }}>Available Hit Dice Pools:</div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                {(resolvedMechanics?.hitPoints?.hitDiceList || []).map((hd, idx) => {
+                                  const cId = hd.classId || `class_${idx}`;
+                                  const cMax = parseInt(hd.count) || 0;
+                                  const cExpended = parseInt(reviewExpendedHd?.[cId]) || 0;
+                                  const cAvail = Math.max(0, cMax - cExpended);
+                                  
+                                  return (
+                                    <div key={cId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 8px', backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: '6px' }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#711a19', color: 'white', width: '24px', height: '24px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' }}>d{hd.hitDie}</div>
+                                        <span style={{ fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'capitalize' }}>{cId}</span>
+                                      </div>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <span style={{ fontSize: '0.8rem', color: cAvail > 0 ? '#15803d' : 'var(--color-gray)', fontWeight: 'bold' }}>{cAvail} / {cMax}</span>
+                                        <button
+                                          type="button"
+                                          disabled={cAvail <= 0 || curHp >= maxHp}
+                                          onClick={() => {
+                                            if (cAvail <= 0) return;
+                                            const hdSize = hd.hitDie || 8;
+                                            const roll = Math.floor(Math.random() * hdSize) + 1;
+                                            const recovered = Math.max(1, roll + conMod);
+                                            const nextHp = Math.min(maxHp, curHp + recovered);
+                                            const nextHd = { ...reviewExpendedHd, [cId]: cExpended + 1 };
+                                            syncHpAndSave(nextHp, reviewHpTemp, nextHd);
+                                            
+                                            const hdRollTitle = `🎲 Roll ${cId.toUpperCase()} Hit Die (1d${hdSize}${conMod >= 0 ? `+${conMod}` : conMod})`;
+                                            const hdFormulaStr = `1d${hdSize} (${roll}) ${conMod >= 0 ? `+ ${conMod}` : `- ${Math.abs(conMod)}`}`;
+                                            const hdRollsStr = `Hit Die Roll: [${roll}] + CON Mod (${conMod >= 0 ? `+${conMod}` : conMod}) ➔ Recovered +${recovered} HP (HP: ${curHp} ➔ ${nextHp})`;
+                                            
+                                            if (typeof setDiceModalData === 'function') {
+                                              setDiceModalData({ title: hdRollTitle, formula: hdFormulaStr, rolls: hdRollsStr, total: `+${recovered}`, advMode: 'normal' });
+                                            }
+                                            logHpAction(hdRollTitle, `Recovered +${recovered} HP (HP: ${curHp} ➔ ${nextHp})`, `+${recovered}`);
+                                          }}
+                                          style={{ padding: '4px 10px', backgroundColor: cAvail <= 0 || curHp >= maxHp ? 'var(--border-color)' : '#2563eb', color: 'var(--bg-white)', border: 'none', borderRadius: '4px', fontWeight: 'bold', fontSize: '0.75rem', cursor: cAvail <= 0 || curHp >= maxHp ? 'not-allowed' : 'pointer' }}
+                                        >
+                                          Roll
+                                        </button>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
                             </div>
                           </div>
 
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             <button
                               type="button"
-                              disabled={availHd <= 0 || curHp >= maxHp}
+                              disabled={totalExpendedHd <= 0}
                               onClick={() => {
-                                if (availHd <= 0) return;
-                                const hdSize = resolvedMechanics?.hitPoints?.hitDiceList?.[0]?.hitDie || 8;
-                                const roll = Math.floor(Math.random() * hdSize) + 1;
-                                const recovered = Math.max(1, roll + conMod);
-                                const nextHp = Math.min(maxHp, curHp + recovered);
-                                const nextHd = Math.min(totalLvl, reviewExpendedHd + 1);
-                                syncHpAndSave(nextHp, reviewHpTemp, nextHd);
-                                const hdRollTitle = `🎲 Roll Hit Die (1d${hdSize}${conMod >= 0 ? `+${conMod}` : conMod})`;
-                                const hdFormulaStr = `1d${hdSize} (${roll}) ${conMod >= 0 ? `+ ${conMod}` : `- ${Math.abs(conMod)}`}`;
-                                const hdRollsStr = `Hit Die Roll: [${roll}] + CON Mod (${conMod >= 0 ? `+${conMod}` : conMod}) ➔ Recovered +${recovered} HP (HP: ${curHp} ➔ ${nextHp})`;
-                                if (typeof setDiceModalData === 'function') {
-                                  setDiceModalData({
-                                    title: hdRollTitle,
-                                    formula: hdFormulaStr,
-                                    rolls: hdRollsStr,
-                                    total: `+${recovered}`,
-                                    advMode: 'normal'
-                                  });
-                                }
-                                logHpAction(hdRollTitle, `Recovered +${recovered} HP (HP: ${curHp} ➔ ${nextHp})`, `+${recovered}`);
+                                if (totalExpendedHd <= 0) return;
+                                
+                                const { nextHd, recoveredAmount } = calculateLongRestHdRecovery(
+                                  totalLvl,
+                                  resolvedMechanics?.hitPoints?.hitDiceList,
+                                  reviewExpendedHd
+                                );
+                                
+                                syncHpAndSave(undefined, undefined, nextHd);
+                                logHpAction('Long Rest HD Reset (RAW)', `Recovered ${recoveredAmount} Hit Dice (Max 1/2 of ${totalLvl}).`, `+${recoveredAmount} HD`);
                               }}
-                              style={{ padding: '12px', backgroundColor: availHd <= 0 || curHp >= maxHp ? 'var(--border-color)' : '#2563eb', color: 'var(--bg-white)', border: 'none', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.88rem', cursor: availHd <= 0 || curHp >= maxHp ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                              style={{ padding: '10px', backgroundColor: '#15803d', color: 'var(--bg-white)', border: 'none', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.8rem', cursor: totalExpendedHd <= 0 ? 'not-allowed' : 'pointer' }}
                             >
-                              <i className="fa-solid fa-dice"></i> Spend 1 Hit Die to Recover HP
+                              🏕️ Recover Half Hit Dice (5e RAW Long Rest)
                             </button>
 
                             <button
                               type="button"
-                              disabled={reviewExpendedHd <= 0}
+                              disabled={totalExpendedHd <= 0}
                               onClick={() => {
-                                syncHpAndSave(undefined, undefined, 0);
-                                logHpAction('Long Rest HD Reset', `All ${totalLvl} Hit Dice fully restored.`, `${totalLvl}/${totalLvl} HD`);
+                                syncHpAndSave(undefined, undefined, {});
+                                logHpAction('Full Rest HD Reset (Homebrew)', `All ${totalLvl} Hit Dice fully restored.`, `${totalLvl}/${totalLvl} HD`);
                               }}
-                              style={{ padding: '10px', backgroundColor: 'var(--bg-white)', color: reviewExpendedHd <= 0 ? 'var(--color-gray)' : 'var(--color-gray)', border: '1px solid #cbd5e1', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.8rem', cursor: reviewExpendedHd <= 0 ? 'not-allowed' : 'pointer' }}
+                              style={{ padding: '8px', backgroundColor: 'var(--bg-white)', color: totalExpendedHd <= 0 ? 'var(--color-gray)' : '#711a19', border: '1px solid #e2d8c3', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.75rem', cursor: totalExpendedHd <= 0 ? 'not-allowed' : 'pointer' }}
                             >
-                              🔄 Restore All Hit Dice (Long Rest)
+                              🔄 Restore ALL Hit Dice (Homebrew)
                             </button>
                           </div>
                         </div>

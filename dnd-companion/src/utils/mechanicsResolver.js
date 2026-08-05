@@ -134,15 +134,22 @@ export const resolveSpellcasting = (characterState, dbData, profBonus = 2, abili
 
   classList.forEach(cl => {
     const cid = (cl.classId || '').toLowerCase();
+    const scid = (cl.subclassId || '').toLowerCase();
     const lvl = parseInt(cl.level, 10) || 1;
-    if (['bard', 'cleric', 'druid', 'sorcerer', 'wizard', 'warlock'].includes(cid)) {
+    
+    if (['bard', 'cleric', 'druid', 'sorcerer', 'wizard', 'artificer'].includes(cid)) {
       spellcastingClassesCount++;
-      if (cid === 'wizard') spellcastingAbility = 'Intelligence';
+      if (['wizard', 'artificer'].includes(cid)) spellcastingAbility = 'Intelligence';
       else if (['cleric', 'druid'].includes(cid)) spellcastingAbility = 'Wisdom';
       else spellcastingAbility = 'Charisma';
+    } else if (cid === 'warlock') {
+      spellcastingAbility = 'Charisma'; // They have a spellcasting stat, but do not increment spellcastingClassesCount for multiclassing
     } else if (['paladin', 'ranger'].includes(cid) && lvl >= 2) {
       spellcastingClassesCount++;
       spellcastingAbility = cid === 'paladin' ? 'Charisma' : 'Wisdom';
+    } else if ((scid.includes('eldritch') || scid.includes('trickster')) && lvl >= 3) {
+      spellcastingClassesCount++;
+      spellcastingAbility = 'Intelligence';
     }
   });
 
@@ -580,6 +587,12 @@ export const resolveCharacterMechanics = (characterState, dbData) => {
       flatSpeedBonus += monkBonus;
       speedBonuses.push({ name: "Unarmored Movement", bonus: monkBonus });
     }
+  }
+
+  // Ranger Roving
+  if (hasFeature("roving")) {
+    flatSpeedBonus += 10;
+    speedBonuses.push({ name: "Roving", bonus: 10 });
   }
 
   if (strengthReqPenalty > 0) {
@@ -1043,8 +1056,20 @@ export const resolveCharacterMechanics = (characterState, dbData) => {
     else if (['Arcana', 'History', 'Investigation', 'Nature', 'Religion'].includes(skill)) abil = 'int';
     else if (['Deception', 'Intimidation', 'Performance', 'Persuasion'].includes(skill)) abil = 'cha';
     const mod = abil === 'str' ? strMod : abil === 'dex' ? dexMod : abil === 'int' ? intMod : abil === 'cha' ? chaMod : wisMod;
-    const bonus = mod + (isExp ? profBonus * 2 : isProf ? profBonus : 0);
-    skillsMap[skill] = { proficient: isProf, expertise: isExp, bonus, modifier: mod };
+    const hasJackOfAllTrades = hasFeature("jack of all trades");
+    let skillBonus = 0;
+    let isHalfProf = false;
+    
+    if (isExp) {
+      skillBonus = profBonus * 2;
+    } else if (isProf) {
+      skillBonus = profBonus;
+    } else if (hasJackOfAllTrades) {
+      skillBonus = Math.floor(profBonus / 2);
+      isHalfProf = true;
+    }
+    const bonus = mod + skillBonus;
+    skillsMap[skill] = { proficient: isProf, expertise: isExp, halfProficient: isHalfProf, bonus, modifier: mod };
   });
 
   const weaponsList = [];
@@ -1055,9 +1080,24 @@ export const resolveCharacterMechanics = (characterState, dbData) => {
       const propsLower = props.map(p => p.toLowerCase());
       if (cat.includes('weapon') || item.damage || item.damage_dice || propsLower.includes('finesse') || propsLower.includes('heavy')) {
         let isFinesse = propsLower.some(p => p.includes('finesse'));
-        let isRanged = propsLower.some(p => p.includes('ranged') || p.includes('thrown') || p.includes('ammunition') || cat.includes('ranged'));
-        let modUsed = isRanged ? dexMod : isFinesse ? Math.max(strMod, dexMod) : strMod;
-        let attackBonus = profBonus + modUsed;
+        let isRangedOnly = (propsLower.some(p => p.includes('ammunition') || p.includes('ranged') || p.includes('range')) || cat.includes('ranged')) && !propsLower.some(p => p.includes('thrown'));
+        let isThrown = propsLower.some(p => p.includes('thrown'));
+        
+        let modUsed = strMod;
+        if (isRangedOnly) {
+           modUsed = dexMod;
+        } else if (isFinesse) {
+           modUsed = Math.max(strMod, dexMod);
+        }
+
+        const profWeapons = characterState.abilities?.proficientWeapons || [];
+        const wName = (item.name || item.item_name || '').toLowerCase();
+        let isProficient = false;
+        if (profWeapons.some(pw => pw.toLowerCase() === wName)) isProficient = true;
+        if (cat.includes('simple') && profWeapons.some(pw => pw.toLowerCase().includes('simple'))) isProficient = true;
+        if (cat.includes('martial') && profWeapons.some(pw => pw.toLowerCase().includes('martial'))) isProficient = true;
+
+        let attackBonus = modUsed + (isProficient ? profBonus : 0);
         weaponsList.push({
           itemId: item.itemId || item.item_id || item.name,
           name: item.name || item.item_name || 'Weapon',
@@ -1091,6 +1131,7 @@ export const resolveCharacterMechanics = (characterState, dbData) => {
 
   return {
     armorClass,
+    initiative: dexMod + (hasFeature("jack of all trades") ? Math.floor(profBonus / 2) : 0),
     hitPoints,
     speed,
     combatAttacks: {

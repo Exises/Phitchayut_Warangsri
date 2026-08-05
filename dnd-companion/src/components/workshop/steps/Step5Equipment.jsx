@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 export default function Step5Equipment({
   characterState,
   setCharacterState,
-  dbData
+  dbData,
+  totalStats
 }) {
         const [showBeginnerGuide, setShowBeginnerGuide] = useState(true);
         const [catalogSearch, setCatalogSearch] = useState('');
@@ -148,26 +149,12 @@ export default function Step5Equipment({
         const shieldsList = allItemsList.filter(i => (i.subcategory || '').toLowerCase() === 'shield' || (i.item_name || '').toLowerCase() === 'shield');
         const weaponsList = allItemsList.filter(i => i.item_type === 'Weapon');
 
-        const CLASS_ARMOR_PROFICIENCIES = {
-          barbarian: ['Light Armor', 'Medium Armor', 'Shield'],
-          bard: ['Light Armor'],
-          cleric: ['Light Armor', 'Medium Armor', 'Shield'],
-          druid: ['Light Armor', 'Medium Armor', 'Shield'],
-          fighter: ['Light Armor', 'Medium Armor', 'Heavy Armor', 'Shield'],
-          monk: [],
-          paladin: ['Light Armor', 'Medium Armor', 'Heavy Armor', 'Shield'],
-          ranger: ['Light Armor', 'Medium Armor', 'Shield'],
-          rogue: ['Light Armor'],
-          sorcerer: [],
-          warlock: ['Light Armor'],
-          wizard: []
-        };
-        const allowedArmorTypes = CLASS_ARMOR_PROFICIENCIES[primaryClassId] || ['Light Armor', 'Medium Armor', 'Heavy Armor', 'Shield'];
+        const allowedArmorTypes = totalStats?.proficientArmor || [];
 
         const checkArmorSelectable = (armorObj) => {
           if (!armorObj) return { selectable: true };
           const subcat = armorObj.subcategory || '';
-          if (!allowedArmorTypes.includes(subcat)) {
+          if (!allowedArmorTypes.includes(subcat) && !allowedArmorTypes.includes(subcat + 's')) {
             return { selectable: false, reason: 'Not Proficient' };
           }
           const propStr = armorObj.properties || '';
@@ -181,7 +168,7 @@ export default function Step5Equipment({
           return { selectable: true };
         };
 
-        const shieldSelectable = allowedArmorTypes.includes('Shield');
+        const shieldSelectable = allowedArmorTypes.includes('Shield') || allowedArmorTypes.includes('Shields');
 
         const charLevel = (characterState.classData?.classes || []).reduce((sum, cl) => sum + (Number(cl.level) || 0), 0) || 1;
         const profBonus = Math.ceil(1 + (charLevel / 4));

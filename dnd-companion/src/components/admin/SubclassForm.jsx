@@ -140,6 +140,32 @@ export default function SubclassForm({ initialData, availableClasses = [], avail
 
             <textarea rows="2" placeholder="คำอธิบายฟีเจอร์..." value={feat.description || feat.desc || ''} onChange={e => handleUpdateFeature(index, 'description', e.target.value)} style={{ width: '100%', backgroundColor: '#0f172a', border: '1px solid #475569', color: '#fff', padding: '6px', borderRadius: '4px', fontSize: '0.8rem', marginBottom: '8px' }} />
 
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '12px' }}>
+              <div>
+                <label style={{ fontSize: '0.7rem', color: '#94a3b8' }}>ประเภทแอคชั่น (Action Type)</label>
+                <select value={feat.action_type || ''} onChange={e => handleUpdateFeature(index, 'action_type', e.target.value)} style={{ width: '100%', backgroundColor: '#0f172a', border: '1px solid #475569', color: '#fff', padding: '4px', borderRadius: '4px', fontSize: '0.75rem' }}>
+                  <option value="">-- อัตโนมัติ (Passive) --</option>
+                  <option value="Action">แอคชั่นหลัก (Action)</option>
+                  <option value="Bonus Action">โบนัสแอคชั่น (Bonus Action)</option>
+                  <option value="Reaction">รีแอคชั่น (Reaction)</option>
+                  <option value="Free Action">ฟรีแอคชั่น (Free Action)</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize: '0.7rem', color: '#94a3b8' }}>จำนวนครั้งที่ใช้ได้ (Uses)</label>
+                <input type="text" placeholder="เช่น 3 หรือ profBonus" value={feat.uses_count || ''} onChange={e => handleUpdateFeature(index, 'uses_count', e.target.value)} style={{ width: '100%', backgroundColor: '#0f172a', border: '1px solid #475569', color: '#fff', padding: '4px', borderRadius: '4px', fontSize: '0.75rem' }} />
+              </div>
+              <div>
+                <label style={{ fontSize: '0.7rem', color: '#94a3b8' }}>ฟื้นฟูเมื่อ (Recovery)</label>
+                <select value={feat.uses_recovery || ''} onChange={e => handleUpdateFeature(index, 'uses_recovery', e.target.value)} style={{ width: '100%', backgroundColor: '#0f172a', border: '1px solid #475569', color: '#fff', padding: '4px', borderRadius: '4px', fontSize: '0.75rem' }}>
+                  <option value="">-- ไม่มีขีดจำกัด --</option>
+                  <option value="Short Rest">พักสั้น (Short Rest)</option>
+                  <option value="Long Rest">พักยาว (Long Rest)</option>
+                  <option value="Dawn">รุ่งสาง (Dawn)</option>
+                </select>
+              </div>
+            </div>
+
             <div style={{ padding: '8px', backgroundColor: '#0f172a', borderRadius: '4px', border: '1px dashed #475569' }}>
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '6px' }}>ตัวปรับแต่งความสามารถ (Modifiers) - เมื่อได้รับฟีเจอร์นี้</div>
               <ModifierBuilder

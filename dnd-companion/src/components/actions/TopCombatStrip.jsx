@@ -35,23 +35,21 @@ export default function TopCombatStrip({
 
   const maxHp = resolvedMechanics?.hitPoints?.max || 10;
   const curHp = reviewHpCur !== null && reviewHpCur !== undefined ? reviewHpCur : maxHp;
-  const hitDiceList = resolvedMechanics?.hitPoints?.hitDiceList || [{ hitDie: 8, count: totalLvl }];
+  const hitDiceList = resolvedMechanics?.hitPoints?.hitDiceList || [{ classId: 'unknown', hitDie: 8, count: totalLvl }];
   const totalHdCount = totalLvl;
-  const availHd = Math.max(0, totalHdCount - expendedHitDice);
+  const totalExpendedHd = Object.values(expendedHitDice || {}).reduce((a, b) => a + (parseInt(b) || 0), 0);
+  const availHd = Math.max(0, totalHdCount - totalExpendedHd);
 
   const isWarlock = (characterState?.classes || characterState?.classData?.classes || []).some(cl => String(cl.classId).toLowerCase() === 'warlock');
 
-  const handleShortRestRoll = () => {
-    if (availHd <= 0) {
-      alert("No Hit Dice remaining!");
-      return;
-    }
-    // Roll primary HD
-    const hdType = hitDiceList[0]?.hitDie || 8;
-    const roll = Math.floor(Math.random() * hdType) + 1;
+  const handleShortRestRoll = (targetClassId, targetHitDie) => {
+    if (availHd <= 0) return;
+    const cExpended = parseInt(expendedHitDice?.[targetClassId]) || 0;
+    
+    const roll = Math.floor(Math.random() * targetHitDie) + 1;
     const recovered = Math.max(1, roll + conMod);
     const nextHp = Math.min(maxHp, curHp + recovered);
-    const nextHd = Math.min(totalHdCount, expendedHitDice + 1);
+    const nextHd = { ...expendedHitDice, [targetClassId]: cExpended + 1 };
     
     setReviewHpCur(nextHp);
     setExpendedHitDice(nextHd);
@@ -59,11 +57,10 @@ export default function TopCombatStrip({
       syncHpAndSave(nextHp, undefined, nextHd);
     }
 
-    // Log to gameplay history
     if (setGameplayRollHistory) {
       setGameplayRollHistory(prev => [{
         timestamp: new Date().toLocaleTimeString(),
-        title: `Short Rest Hit Die Roll (1d${hdType} + ${conMod})`,
+        title: `Short Rest HD Roll (${targetClassId} 1d${targetHitDie} + ${conMod})`,
         total: `+${recovered} HP (${roll} + ${conMod})`,
         formula: `HP: ${curHp} ➔ ${nextHp} (HD left: ${availHd - 1})`
       }, ...prev]);
@@ -122,9 +119,22 @@ export default function TopCombatStrip({
     // Restore Feature Charges
     if (setLiveFeatureCharges) setLiveFeatureCharges({});
 
-    // Restore half Hit Dice
-    const restoreHd = Math.max(1, Math.floor(totalLvl / 2));
-    const nextHd = Math.max(0, expendedHitDice - restoreHd);
+    // Restore half Hit Dice (5e RAW)
+    const restoreCount = Math.max(1, Math.floor(totalLvl / 2));
+    const expendedList = (hitDiceList || [])
+      .map(hd => ({ cId: hd.classId || 'unknown', hitDie: parseInt(hd.hitDie) || 0, expended: parseInt(expendedHitDice?.[hd.classId || 'unknown']) || 0 }))
+      .filter(x => x.expended > 0)
+      .sort((a, b) => b.hitDie - a.hitDie);
+    
+    let remainingToRecover = restoreCount;
+    const nextHd = { ...expendedHitDice };
+    for (const hd of expendedList) {
+      if (remainingToRecover <= 0) break;
+      const recoverFromThis = Math.min(hd.expended, remainingToRecover);
+      nextHd[hd.cId] -= recoverFromThis;
+      remainingToRecover -= recoverFromThis;
+    }
+
     setExpendedHitDice(nextHd);
 
     if (syncHpAndSave) {
@@ -136,7 +146,7 @@ export default function TopCombatStrip({
         timestamp: new Date().toLocaleTimeString(),
         title: 'Long Rest Completed 🌙',
         total: 'Full Recovery',
-        formula: `HP reset to ${maxHp}/${maxHp}, all Spell Slots & Features restored.`
+        formula: `HP reset to ${maxHp}/${maxHp}, all Spell Slots, Features, and ${restoreCount - remainingToRecover} HD restored.`
       }, ...prev]);
     }
   };
@@ -225,35 +235,38 @@ export default function TopCombatStrip({
 
             <div style={{ backgroundColor: '#fefcf8', border: '1px solid #e2d8c3', borderRadius: '8px', padding: '12px', marginBottom: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.85rem' }}>
-                <span style={{ color: 'var(--color-gray)', fontWeight: '600' }}>Available Hit Dice:</span>
-                <strong style={{ color: '#711a19' }}>{availHd} / {totalHdCount} (1d{hitDiceList[0]?.hitDie || 8})</strong>
+                <span style={{ color: 'var(--color-gray)', fontWeight: '600' }}>Total Available:</span>
+                <strong style={{ color: '#711a19' }}>{availHd} / {totalHdCount} HD</strong>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '8px' }}>
                 <span style={{ color: 'var(--color-gray)', fontWeight: '600' }}>Current HP:</span>
                 <strong style={{ color: 'var(--color-ink)' }}>{curHp} / {maxHp}</strong>
               </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
-              <button
-                type="button"
-                disabled={availHd <= 0 || curHp >= maxHp}
-                onClick={handleShortRestRoll}
-                style={{
-                  flex: 1,
-                  padding: '10px',
-                  backgroundColor: availHd <= 0 || curHp >= maxHp ? 'var(--border-color)' : '#2563eb',
-                  color: 'var(--bg-white)',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontWeight: '800',
-                  fontSize: '0.85rem',
-                  cursor: availHd <= 0 || curHp >= maxHp ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.15s'
-                }}
-              >
-                🎲 Roll 1 Hit Die (+{conMod} CON)
-              </button>
+              
+              <div style={{ borderTop: '1px solid #e2d8c3', paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {hitDiceList.map((hd, i) => {
+                  const cId = hd.classId || `class_${i}`;
+                  const cMax = parseInt(hd.count) || 0;
+                  const cExpended = parseInt(expendedHitDice?.[cId]) || 0;
+                  const cAvail = Math.max(0, cMax - cExpended);
+                  return (
+                    <div key={cId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
+                      <span style={{ textTransform: 'capitalize', fontWeight: 'bold', color: 'var(--color-gray)' }}>{cId} (1d{hd.hitDie}):</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontWeight: 'bold' }}>{cAvail}/{cMax}</span>
+                        <button
+                          type="button"
+                          disabled={cAvail <= 0 || curHp >= maxHp}
+                          onClick={() => handleShortRestRoll(cId, hd.hitDie)}
+                          style={{ padding: '6px 10px', backgroundColor: cAvail <= 0 || curHp >= maxHp ? 'var(--border-color)' : '#2563eb', color: 'var(--bg-white)', border: 'none', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', cursor: cAvail <= 0 || curHp >= maxHp ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                        >
+                          <i className="fa-solid fa-dice"></i> Roll
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', borderTop: '1px solid #e2d8c3', paddingTop: '12px' }}>

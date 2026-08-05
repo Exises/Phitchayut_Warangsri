@@ -67,7 +67,7 @@ export default function useCharacterCalculations(characterState, dbData) {
        if (wlInfo?.level_progression) {
           try {
             const wlProg = JSON.parse(wlInfo.level_progression);
-            const currentWl = wlProg.find(p => p.level === warlockClass.level)?.class_specific;
+            const currentWl = wlProg.find(p => p.level === parseInt(warlockClass.level, 10))?.class_specific;
             if (currentWl && currentWl.slots && currentWl.slot_level) {
               warlockSlots = { count: parseInt(currentWl.slots, 10), level: parseInt(currentWl.slot_level, 10) };
             }
@@ -116,25 +116,70 @@ export default function useCharacterCalculations(characterState, dbData) {
     return Array.from(ids);
   }, [characterState, dbData]);
 
-  const { proficientSkills, expertiseSkills, activeClassSaves } = useMemo(() => {
+  const { proficientSkills, expertiseSkills, activeClassSaves, proficientArmor, proficientWeapons, proficientTools, languages } = useMemo(() => {
     const proficiencies = new Set();
     const expertise = new Set();
     const savingThrowsSet = new Set((characterState.proficiencies?.savingThrows || []).map(s => s.toLowerCase()));
+    const armorSet = new Set();
+    const weaponsSet = new Set();
+    const toolsSet = new Set();
+    const languagesSet = new Set();
 
     // 1. Class Base Skills & Saving Throws
     (characterState.proficiencies?.skills || []).forEach(s => proficiencies.add(s));
     (characterState.classData?.classes || []).forEach((cl, idx) => {
-       if (idx !== 0) return;
        const cInfo = dbData.classes?.find(c => c.class_id === cl.classId);
-       if (cInfo?.core_traits) {
-         try {
-           const traits = typeof cInfo.core_traits === 'string' ? JSON.parse(cInfo.core_traits) : cInfo.core_traits;
-           if (Array.isArray(traits?.saving_throws)) {
-             traits.saving_throws.forEach(s => savingThrowsSet.add(String(s).toLowerCase()));
-           } else if (typeof traits?.saving_throws === 'string') {
-             traits.saving_throws.split(',').forEach(s => savingThrowsSet.add(s.trim().toLowerCase()));
-           }
-         } catch { /* ignore */ }
+       if (!cInfo) return;
+       
+       if (idx === 0) {
+         // --- Primary Class ---
+         if (cInfo.core_traits) {
+           try {
+             const traits = typeof cInfo.core_traits === 'string' ? JSON.parse(cInfo.core_traits) : cInfo.core_traits;
+             if (Array.isArray(traits?.saving_throws)) {
+               traits.saving_throws.forEach(s => savingThrowsSet.add(String(s).toLowerCase()));
+             } else if (typeof traits?.saving_throws === 'string') {
+               traits.saving_throws.split(',').forEach(s => savingThrowsSet.add(s.trim().toLowerCase()));
+             }
+           } catch { /* ignore */ }
+         }
+         if (cInfo.proficiencies) {
+           try {
+             const profs = typeof cInfo.proficiencies === 'string' ? JSON.parse(cInfo.proficiencies) : cInfo.proficiencies;
+             if (profs?.granted?.armor) profs.granted.armor.forEach(a => armorSet.add(a));
+             if (profs?.granted?.weapons) profs.granted.weapons.forEach(w => weaponsSet.add(w));
+             if (profs?.granted?.tools) profs.granted.tools.forEach(t => toolsSet.add(t));
+           } catch { /* ignore */ }
+         }
+       } else {
+         // --- Multiclass ---
+         if (cInfo.core_traits) {
+           try {
+             const traits = typeof cInfo.core_traits === 'string' ? JSON.parse(cInfo.core_traits) : cInfo.core_traits;
+             if (traits.multiclass && Array.isArray(traits.multiclass.proficiencies_gained)) {
+               traits.multiclass.proficiencies_gained.forEach(p => {
+                 const pLower = p.toLowerCase();
+                 if (pLower.includes('armor') || pLower.includes('shield')) {
+                    if (pLower.includes('light')) armorSet.add('Light');
+                    if (pLower.includes('medium')) armorSet.add('Medium');
+                    if (pLower.includes('heavy')) armorSet.add('Heavy');
+                    if (pLower.includes('shield')) armorSet.add('Shields');
+                 }
+                 else if (pLower.includes('weapon')) {
+                    if (pLower.includes('simple')) weaponsSet.add('Simple');
+                    if (pLower.includes('martial')) weaponsSet.add('Martial');
+                    else weaponsSet.add(p); // Specific weapon e.g. "Longsword"
+                 }
+                 else if (ALL_SKILLS_LIST.map(s => s.toLowerCase()).includes(pLower)) {
+                    proficiencies.add(p);
+                 }
+                 else {
+                    toolsSet.add(p);
+                 }
+               });
+             }
+           } catch { /* ignore */ }
+         }
        }
     });
 
@@ -257,12 +302,25 @@ export default function useCharacterCalculations(characterState, dbData) {
     return {
        proficientSkills: Array.from(proficiencies),
        expertiseSkills: Array.from(expertise),
-       activeClassSaves: Array.from(savingThrowsSet)
+       activeClassSaves: Array.from(savingThrowsSet),
+       proficientArmor: Array.from(armorSet),
+       proficientWeapons: Array.from(weaponsSet),
+       proficientTools: Array.from(toolsSet),
+       languages: Array.from(languagesSet)
     };
   }, [characterState, dbData]);
 
   return {
-    totalStats,
+    totalStats: {
+      ...totalStats,
+      proficientSkills,
+      expertiseSkills,
+      activeClassSaves,
+      proficientArmor,
+      proficientWeapons,
+      proficientTools,
+      languages
+    },
     resolvedMechanics,
     spellSlotsCalculation,
     knownSpellsSourceMap,

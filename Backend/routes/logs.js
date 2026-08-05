@@ -28,10 +28,10 @@ router.post('/add', async (req, res) => {
     }
 });
 
-router.post('/get', async (req, res) => {
+router.all('/get', async (req, res) => {
     try {
-        const char_id = parseInt(req.body.char_id || req.query.char_id || 0);
-        const category = req.body.category || req.query.category || 'all';
+        const char_id = parseInt(req.body?.char_id || req.query?.char_id || 0);
+        const category = req.body?.category || req.query?.category || 'all';
         
         if (!char_id) {
             return res.json([]);

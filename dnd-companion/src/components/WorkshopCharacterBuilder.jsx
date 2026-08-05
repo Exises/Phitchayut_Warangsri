@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import useLocalStorageState from '../hooks/useLocalStorageState';
 import useCharacterCalculations from '../hooks/useCharacterCalculations';
 import WARLOCK_INVOCATIONS from '../data/warlock_invocations.json';
@@ -158,7 +158,54 @@ function WorkshopCharacterBuilder({ onCancel }) {
   const [newItemQty, setNewItemQty] = useState(1);
   const [gameplayRollHistory, setGameplayRollHistory] = useState([]);
 
-  const triggerQuickRoll = (label, modValue, diceStr = '1d20') => {
+  // Helper: POST a roll/action log entry to the DB for persistence
+  const postRollLog = (title, formula, total) => {
+    const charId = characterState?.char_id;
+    if (!charId || charId === 'current') return;
+    try {
+      fetch('http://localhost:5000/api', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'add_character_log',
+          char_id: charId,
+          user_id: 1,
+          category: 'gameplay',
+          action_type: 'DICE_ROLL',
+          log_text_th: `${title}: ${formula} = ${total}`,
+          metadata_json: { title, formula, total }
+        })
+      }).catch(() => {});
+    } catch(e) {}
+  };
+
+  // Load saved roll history from DB on mount (when char_id is available)
+  useEffect(() => {
+    const charId = characterState?.char_id;
+    if (!charId || charId === 'current') return;
+    fetch(`http://localhost:5000/api?action=get_character_logs&char_id=${charId}&category=gameplay`)
+      .then(res => res.json())
+      .then(logs => {
+        if (Array.isArray(logs) && logs.length > 0) {
+          const mapped = logs
+            .filter(l => l.action_type === 'DICE_ROLL' || l.action_type === 'HP_ACTION')
+            .slice(0, 25)
+            .map(l => {
+              const meta = typeof l.metadata_json === 'string' ? (() => { try { return JSON.parse(l.metadata_json); } catch(e) { return null; } })() : l.metadata_json;
+              return {
+                title: meta?.title || meta?.label || l.action_type || 'Roll',
+                formula: meta?.formula || l.log_text_th || '',
+                total: meta?.total || '✓',
+                timestamp: l.created_at ? new Date(l.created_at).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '--:--'
+              };
+            });
+          setGameplayRollHistory(mapped);
+        }
+      })
+      .catch(() => {});
+  }, [characterState?.char_id]);
+
+  const triggerQuickRoll = useCallback((label, modValue, diceStr = '1d20') => {
     if (typeof modValue === 'string' && isNaN(Number(modValue.replace(/[\+\-\s]/g, '')))) {
       const numMatch = modValue.match(/[+-]?\d+(?:\/\d+)?/);
       const displayTotal = numMatch ? numMatch[0] : '✓';
@@ -168,6 +215,7 @@ function WorkshopCharacterBuilder({ onCancel }) {
         total: displayTotal,
         timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
       }, ...prev.slice(0, 24)]);
+      postRollLog(label, modValue, displayTotal);
       return;
     }
     const modNum = parseInt(modValue) || 0;
@@ -191,6 +239,7 @@ function WorkshopCharacterBuilder({ onCancel }) {
           total,
           timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
         }, ...prev.slice(0, 24)]);
+        postRollLog(label, formulaStr, total);
         return;
       }
 
@@ -243,6 +292,7 @@ function WorkshopCharacterBuilder({ onCancel }) {
               total,
               timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
             }, ...prev.slice(0, 24)]);
+            postRollLog(label, formulaDesc, total);
           } else {
             const match = diceStr.match(/^(\d+)d(\d+)(.*)$/i);
             const count = match ? parseInt(match[1]) || 1 : 1;
@@ -276,6 +326,7 @@ function WorkshopCharacterBuilder({ onCancel }) {
               total,
               timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
             }, ...prev.slice(0, 24)]);
+            postRollLog(label, formulaStr, total);
           }
         }
       });
@@ -308,6 +359,7 @@ function WorkshopCharacterBuilder({ onCancel }) {
           total,
           timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
         }, ...prev.slice(0, 24)]);
+        postRollLog(label, formulaStr, total);
         return;
       }
       const match = diceStr.match(/^(\d+)d(\d+)(.*)$/);
@@ -341,6 +393,7 @@ function WorkshopCharacterBuilder({ onCancel }) {
           total,
           timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
         }, ...prev.slice(0, 24)]);
+        postRollLog(label, diceStr, total);
         return;
       }
     }
@@ -358,7 +411,8 @@ function WorkshopCharacterBuilder({ onCancel }) {
       total,
       timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     }, ...prev.slice(0, 24)]);
-  };
+    postRollLog(label, formulaStr, total);
+  }, [isReady, roll3D, rollAdvMode, postRollLog]);
 
   // Lock background scroll when modals open
   useEffect(() => {

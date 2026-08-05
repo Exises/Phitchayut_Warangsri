@@ -355,6 +355,19 @@ export default function Step2Class({
                                     maxSpellLevel = i;
                                   }
                                 }
+                                
+                                // Fallback for Paladin/Ranger root-level array format
+                                if (maxSpellLevel === 0) {
+                                  const currentRootProg = classProgression.find(p => p.level === activeClassLevel);
+                                  if (currentRootProg && Array.isArray(currentRootProg.spell_slots)) {
+                                    for (let i = 0; i < currentRootProg.spell_slots.length; i++) {
+                                      const slotCount = currentRootProg.spell_slots[i];
+                                      if (slotCount && slotCount !== '-' && slotCount !== '—') {
+                                        maxSpellLevel = i + 1;
+                                      }
+                                    }
+                                  }
+                                }
                               }
 
                               const filteredSpells = allAvailableSpells.filter(spell => {
@@ -1076,17 +1089,6 @@ export default function Step2Class({
                            }
 
                            const cidFighter = (cl.classId || cl.class_id || cl.name || classInfo?.class_id || classInfo?.class_name || '').toLowerCase();
-                           if (cidFighter === 'fighter') {
-                             if (cl.level >= 4 && !featuresToRender.some(f => f.name === 'Weapon Mastery' && f.level === 4)) {
-                               featuresToRender.push({ name: 'Weapon Mastery', level: 4, desc: 'Choose 1 additional Weapon Mastery' });
-                             }
-                             if (cl.level >= 10 && !featuresToRender.some(f => f.name === 'Weapon Mastery' && f.level === 10)) {
-                               featuresToRender.push({ name: 'Weapon Mastery', level: 10, desc: 'Choose 1 additional Weapon Mastery' });
-                             }
-                             if (cl.level >= 16 && !featuresToRender.some(f => f.name === 'Weapon Mastery' && f.level === 16)) {
-                               featuresToRender.push({ name: 'Weapon Mastery', level: 16, desc: 'Choose 1 additional Weapon Mastery' });
-                             }
-                           }
                            
                             // Prerequisite Checker
                             const checkPrerequisite = (feat) => {
@@ -1771,6 +1773,126 @@ export default function Step2Class({
                                  }
 
                                  let descHtml = cleanAndStyleHtml(f.name, f.display || f.description || f.desc || '');
+
+                                 if (f.name === 'Divine Order') {
+                                     isChoice = false;
+                                     descHtml = "You have dedicated yourself to one of the following sacred roles of your choice.";
+                                     const options = ['Protector', 'Thaumaturge'];
+                                     const selectedOrder = cl.featureChoices?.[featureKey]?.[0] || '';
+                                     const selectedCantrip = cl.featureChoices?.[featureKey]?.[1] || '';
+                                     
+                                     let clericCantrips = [];
+                                     if (selectedOrder === 'Thaumaturge') {
+                                         const clericClassObj = dbData.classes?.find(c => c.class_id === 'cleric');
+                                         const clericSpellList = clericClassObj?.spell_list ? (typeof clericClassObj.spell_list === 'string' ? JSON.parse(clericClassObj.spell_list) : clericClassObj.spell_list) : [];
+                                         clericCantrips = dbData.spells?.filter(s => parseInt(s.spell_level, 10) === 0 && (clericSpellList.includes(s.spell_id) || s.classes?.toLowerCase().includes('cleric'))).sort((a,b)=>a.spell_name.localeCompare(b.spell_name)) || [];
+                                     }
+
+                                     let orderDesc = "";
+                                     if (selectedOrder === 'Protector') orderDesc = "Trained for battle, you gain proficiency with Martial weapons and training with Heavy armor.";
+                                     if (selectedOrder === 'Thaumaturge') orderDesc = "You know one extra cantrip from the Cleric spell list. In addition, your mystical connection to the divine gives you a bonus to your Intelligence (Arcana or Religion) checks. The bonus equals your Wisdom modifier (minimum of +1).";
+
+                                     customUI = (
+                                         <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                             <CustomSelect
+                                               value={selectedOrder}
+                                               onChange={(e) => handleFeatureChoice(index, featureKey, 0, e.target.value)}
+                                               style={{ width: '100%', maxWidth: '450px', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db', fontSize: '0.85rem' }}
+                                             >
+                                                 <option value="">-- Choose Divine Order --</option>
+                                                 {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                             </CustomSelect>
+                                             
+                                             {selectedOrder && (
+                                                <div style={{ marginTop: '4px' }}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowFeatDetails(prev => ({ ...prev, [`${index}-${featureKey}`]: !prev[`${index}-${featureKey}`] }))}
+                                                        style={{ background: 'none', border: 'none', color: '#3b82f6', fontSize: '0.8rem', cursor: 'pointer', padding: '0', textDecoration: 'underline' }}
+                                                    >
+                                                        {showFeatDetails[`${index}-${featureKey}`] ? `Hide ${selectedOrder} Details` : `Show ${selectedOrder} Details`}
+                                                    </button>
+                                                    {showFeatDetails[`${index}-${featureKey}`] && (
+                                                        <div style={{ marginTop: '5px', padding: '10px', backgroundColor: 'var(--bg-white)', borderRadius: '6px', fontSize: '0.85rem', color: 'var(--color-gray)', lineHeight: '1.4' }}>
+                                                            {orderDesc}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                             )}
+
+                                             {selectedOrder === 'Thaumaturge' && (
+                                                 <CustomSelect
+                                                   value={selectedCantrip}
+                                                   onChange={(e) => handleFeatureChoice(index, featureKey, 1, e.target.value)}
+                                                   style={{ width: '100%', maxWidth: '450px', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db', fontSize: '0.85rem' }}
+                                                 >
+                                                     <option value="">-- Choose 1 Bonus Cleric Cantrip --</option>
+                                                     {clericCantrips.map(sp => <option key={sp.spell_id} value={sp.spell_id}>{sp.spell_name}</option>)}
+                                                 </CustomSelect>
+                                             )}
+                                         </div>
+                                     );
+                                 }
+
+                                 if (f.name === 'Primal Order') {
+                                     isChoice = false;
+                                     descHtml = "You have dedicated yourself to one of the following primal roles of your choice.";
+                                     const options = ['Magician', 'Warden'];
+                                     const selectedOrder = cl.featureChoices?.[featureKey]?.[0] || '';
+                                     const selectedCantrip = cl.featureChoices?.[featureKey]?.[1] || '';
+                                     
+                                     let druidCantrips = [];
+                                     if (selectedOrder === 'Magician') {
+                                         const druidClassObj = dbData.classes?.find(c => c.class_id === 'druid');
+                                         const druidSpellList = druidClassObj?.spell_list ? (typeof druidClassObj.spell_list === 'string' ? JSON.parse(druidClassObj.spell_list) : druidClassObj.spell_list) : [];
+                                         druidCantrips = dbData.spells?.filter(s => parseInt(s.spell_level, 10) === 0 && (druidSpellList.includes(s.spell_id) || s.classes?.toLowerCase().includes('druid'))).sort((a,b)=>a.spell_name.localeCompare(b.spell_name)) || [];
+                                     }
+
+                                     let orderDesc = "";
+                                     if (selectedOrder === 'Magician') orderDesc = "You know one extra cantrip from the Druid spell list. In addition, your mystical connection to nature gives you a bonus to your Intelligence (Nature) checks. The bonus equals your Wisdom modifier (minimum of +1).";
+                                     if (selectedOrder === 'Warden') orderDesc = "Trained for battle, you gain proficiency with Martial weapons and training with Medium armor.";
+
+                                     customUI = (
+                                         <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                             <CustomSelect
+                                               value={selectedOrder}
+                                               onChange={(e) => handleFeatureChoice(index, featureKey, 0, e.target.value)}
+                                               style={{ width: '100%', maxWidth: '450px', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db', fontSize: '0.85rem' }}
+                                             >
+                                                 <option value="">-- Choose Primal Order --</option>
+                                                 {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                             </CustomSelect>
+                                             
+                                             {selectedOrder && (
+                                                <div style={{ marginTop: '4px' }}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowFeatDetails(prev => ({ ...prev, [`${index}-${featureKey}`]: !prev[`${index}-${featureKey}`] }))}
+                                                        style={{ background: 'none', border: 'none', color: '#3b82f6', fontSize: '0.8rem', cursor: 'pointer', padding: '0', textDecoration: 'underline' }}
+                                                    >
+                                                        {showFeatDetails[`${index}-${featureKey}`] ? `Hide ${selectedOrder} Details` : `Show ${selectedOrder} Details`}
+                                                    </button>
+                                                    {showFeatDetails[`${index}-${featureKey}`] && (
+                                                        <div style={{ marginTop: '5px', padding: '10px', backgroundColor: 'var(--bg-white)', borderRadius: '6px', fontSize: '0.85rem', color: 'var(--color-gray)', lineHeight: '1.4' }}>
+                                                            {orderDesc}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                             )}
+
+                                             {selectedOrder === 'Magician' && (
+                                                 <CustomSelect
+                                                   value={selectedCantrip}
+                                                   onChange={(e) => handleFeatureChoice(index, featureKey, 1, e.target.value)}
+                                                   style={{ width: '100%', maxWidth: '450px', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db', fontSize: '0.85rem' }}
+                                                 >
+                                                     <option value="">-- Choose 1 Bonus Druid Cantrip --</option>
+                                                     {druidCantrips.map(sp => <option key={sp.spell_id} value={sp.spell_id}>{sp.spell_name}</option>)}
+                                                 </CustomSelect>
+                                             )}
+                                         </div>
+                                     );
+                                 }
 
                                  if (f.name === 'Circle of the Land Spells') {
                                      isChoice = false;

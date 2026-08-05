@@ -401,14 +401,44 @@ function Compendium() {
     const createMarkup = (htmlString) => {
         if (typeof htmlString !== 'string') return { __html: '' };
         let formatted = htmlString;
-        formatted = formatted.replace(/\\n/g, ''); // Remove literal \n
-        formatted = formatted.replace(/\\t/g, ''); // Remove literal \t
-        formatted = formatted.replace(/>(?:\s*n\s*)+</g, '><'); // Remove orphan 'n's between tags caused by PHP stripslashes on \n
+        
+        // 1. Normalize line breaks
+        formatted = formatted.replace(/\\n/g, '\n');
+        formatted = formatted.replace(/\\t/g, ''); 
+        formatted = formatted.replace(/>(?:\s*n\s*)+</g, '><'); 
         formatted = stripAppendixFromFeature(formatted);
-        formatted = formatted.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
+        
+        // 2. Markdown Parsing
+        // Bold Italics
+        formatted = formatted.replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
+        // Bold
+        formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        // Italics (Underscores or single asterisks, non-greedy)
+        formatted = formatted.replace(/_([\s\S]+?)_/g, '<em style="font-weight: 600; color: #1e293b; font-style: italic;">$1</em>');
+        formatted = formatted.replace(/\*([^*]+)\*/g, '<em style="font-weight: 600; color: #1e293b; font-style: italic;">$1</em>');
+        
+        // 3. Paragraph Formatting
+        // Split by double newline to create paragraphs
+        let paragraphs = formatted.split(/\n\n/);
+        formatted = paragraphs.map(p => {
+            p = p.trim();
+            if (!p) return '';
+            
+            // Auto-format known 5e headers if they lack Markdown
+            // Matches 1 to 4 capitalized words at the start of a paragraph, followed by a period.
+            p = p.replace(/^((?:[A-Z][a-zA-Z\-\']*\s+){0,3}[A-Z][a-zA-Z\-\']*)\.(?=\s|$)/, '<strong>$1.</strong>');
+            
+            // Convert remaining single newlines to spaces to prevent line breaking in the middle of sentences
+            p = p.replace(/\n/g, ' ');
+
+            return `<p style="margin-top: 0; margin-bottom: 0.9em; line-height: 1.7;">${p}</p>`;
+        }).join('');
+        
+        // 4. Table styling
         formatted = formatted.replace(/<table\b[^>]*>/gi, '<table style="width: 100%; border-collapse: collapse; margin: 12px 0 16px 0; border: 1px solid #94a3b8; text-align: left; font-size: 0.85rem; background-color: white;">');
         formatted = formatted.replace(/<th\b[^>]*>/gi, '<th style="padding: 8px 12px; border: 1px solid #94a3b8; background-color: #1e293b; color: white; font-weight: 600; text-align: left;">');
         formatted = formatted.replace(/<td\b[^>]*>/gi, '<td style="padding: 8px 12px; border: 1px solid #94a3b8; color: #1e293b;">');
+        
         return { __html: formatted };
     };
 
@@ -954,6 +984,63 @@ function Compendium() {
                                         ))}
                                     </div>
                                 </div>
+
+                                {selectedItem.data.lineages && selectedItem.data.lineages.length > 0 && (
+                                    <div className="feature-list" style={{marginTop: '40px'}}>
+                                        {(() => {
+                                            const hasSpells = selectedItem.data.lineages.some(l => l.granted_spells && l.granted_spells.length > 0);
+                                            
+                                            // Helper to format spells text
+                                            const getSpellNames = (lineage, level) => {
+                                                if (!lineage.granted_spells) return '';
+                                                const spells = lineage.granted_spells.filter(s => s.level === level);
+                                                if (spells.length === 0) return '';
+                                                return spells.map(s => s.spell_id.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')).join(', ');
+                                            };
+
+                                            return (
+                                                <>
+                                                    <h3 style={{fontFamily: 'var(--font-heading)', color: '#4a3f35', borderBottom: '1px solid #d1c7b3', paddingBottom: '10px', marginBottom: '20px', fontSize: '1.5em'}}>
+                                                        <i className="fa-solid fa-droplet" style={{color: '#b89c72', marginRight: '10px'}}></i>
+                                                        Subraces / Lineages
+                                                    </h3>
+                                                    <table style={{width: '100%', borderCollapse: 'collapse', backgroundColor: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.03)', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e6dfcc'}}>
+                                                        <thead>
+                                                            <tr style={{backgroundColor: '#8b0000', color: '#fff', textAlign: 'left'}}>
+                                                                <th style={{padding: '14px 20px', borderBottom: '2px solid #5a0000', fontFamily: 'Cinzel, serif', width: hasSpells ? '20%' : '25%', fontSize: '1.15em', letterSpacing: '0.5px'}}>Lineage</th>
+                                                                <th style={{padding: '14px 20px', borderBottom: '2px solid #5a0000', fontFamily: 'Cinzel, serif', width: hasSpells ? '50%' : '75%', fontSize: '1.15em', letterSpacing: '0.5px'}}>{hasSpells ? 'Level 1' : 'Description'}</th>
+                                                                {hasSpells && <th style={{padding: '14px 20px', borderBottom: '2px solid #5a0000', fontFamily: 'Cinzel, serif', width: '15%', fontSize: '1.15em', letterSpacing: '0.5px'}}>Level 3</th>}
+                                                                {hasSpells && <th style={{padding: '14px 20px', borderBottom: '2px solid #5a0000', fontFamily: 'Cinzel, serif', width: '15%', fontSize: '1.15em', letterSpacing: '0.5px'}}>Level 5</th>}
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {selectedItem.data.lineages.map((lineage, idx) => {
+                                                                const lvl1Spells = getSpellNames(lineage, 1);
+                                                                return (
+                                                                    <tr key={idx} style={{backgroundColor: idx % 2 === 0 ? '#fffcf7' : '#ffffff', borderBottom: idx === selectedItem.data.lineages.length - 1 ? 'none' : '1px solid #e6dfcc'}}>
+                                                                        <td style={{padding: '18px 20px', color: '#8b0000', fontWeight: 'bold', verticalAlign: 'top', fontSize: '1.05em', fontFamily: 'Cinzel, serif'}}>{lineage.lineage_name}</td>
+                                                                        {hasSpells ? (
+                                                                            <>
+                                                                                <td style={{padding: '18px 20px', color: '#333333', lineHeight: '1.7', verticalAlign: 'top', fontSize: '0.98em'}}>
+                                                                                    <div dangerouslySetInnerHTML={createMarkup(lineage.lineage_desc)}></div>
+                                                                                    {lvl1Spells && <div style={{marginTop: '8px', color: '#8b0000'}}><strong>Spells:</strong> <em>{lvl1Spells}</em></div>}
+                                                                                </td>
+                                                                                <td style={{padding: '18px 20px', color: '#333333', verticalAlign: 'top', fontSize: '0.98em', fontStyle: 'italic'}}>{getSpellNames(lineage, 3) || '-'}</td>
+                                                                                <td style={{padding: '18px 20px', color: '#333333', verticalAlign: 'top', fontSize: '0.98em', fontStyle: 'italic'}}>{getSpellNames(lineage, 5) || '-'}</td>
+                                                                            </>
+                                                                        ) : (
+                                                                            <td style={{padding: '18px 20px', color: '#333333', lineHeight: '1.7', verticalAlign: 'top', fontSize: '0.98em'}} dangerouslySetInnerHTML={createMarkup(lineage.lineage_desc)}></td>
+                                                                        )}
+                                                                    </tr>
+                                                                );
+                                                            })}
+                                                        </tbody>
+                                                    </table>
+                                                </>
+                                            );
+                                        })()}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
@@ -1054,24 +1141,26 @@ function Compendium() {
                                     {selectedItem.data.spell_level === 0 ? 'Cantrip' : `Level ${selectedItem.data.spell_level}`} {selectedItem.data.school}
                                 </div>
                                 
+                                { (selectedItem.data.casting_time || selectedItem.data.range_dist || selectedItem.data.components || selectedItem.data.duration) && (
                                 <div className="spell-meta-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '15px', marginTop: '15px', borderTop: '1px solid #eee', paddingTop: '15px' }}>
-                                    <div>
+                                    {selectedItem.data.casting_time && <div>
                                         <div style={{ fontSize: '0.7rem', color: '#8b0000', fontWeight: 'bold', textTransform: 'uppercase' }}>Casting Time</div>
                                         <div style={{ fontSize: '1rem', fontWeight: '500' }}>{selectedItem.data.casting_time}</div>
-                                    </div>
-                                    <div>
+                                    </div>}
+                                    {selectedItem.data.range_dist && <div>
                                         <div style={{ fontSize: '0.7rem', color: '#8b0000', fontWeight: 'bold', textTransform: 'uppercase' }}>Range/Area</div>
                                         <div style={{ fontSize: '1rem', fontWeight: '500' }}>{selectedItem.data.range_dist}</div>
-                                    </div>
-                                    <div>
+                                    </div>}
+                                    {selectedItem.data.components && <div>
                                         <div style={{ fontSize: '0.7rem', color: '#8b0000', fontWeight: 'bold', textTransform: 'uppercase' }}>Components</div>
                                         <div style={{ fontSize: '1rem', fontWeight: '500' }}>{selectedItem.data.components}</div>
-                                    </div>
-                                    <div>
+                                    </div>}
+                                    {selectedItem.data.duration && <div>
                                         <div style={{ fontSize: '0.7rem', color: '#8b0000', fontWeight: 'bold', textTransform: 'uppercase' }}>Duration</div>
                                         <div style={{ fontSize: '1rem', fontWeight: '500' }}>{selectedItem.data.duration}</div>
-                                    </div>
+                                    </div>}
                                 </div>
+                                )}
                             </div>
                             
                             <div className="item-content-v2" style={{ color: '#2c3e50', lineHeight: '1.8', fontSize: '1.15rem', fontFamily: 'var(--font-body)' }}>

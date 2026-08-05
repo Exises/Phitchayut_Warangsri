@@ -11,11 +11,12 @@ const MODIFIER_TYPES = {
   sense: 'การมองเห็น/สัมผัส (Sense)',
   speed: 'ความเร็ว (Speed)',
   spell: 'คาถา (Spell)',
-  damage: 'ความเสียหาย (Damage)'
+  damage: 'ความเสียหาย (Damage)',
+  mechanic: 'กลไกพิเศษ (Custom Mechanic)'
 };
 
 const SUB_TYPES = {
-  bonus: { stat: 'สเตตัส (Ability Score)', ac: 'คลาสเกราะ (AC)', hp: 'พลังชีวิต (HP)', attack: 'ทอยโจมตี (Attack Roll)', damage: 'ทอยดาเมจ (Damage Roll)', save: 'ทอยหลบ (Saving Throw)' },
+  bonus: { stat: 'สเตตัส (Ability Score)', stat_max: 'ขีดจำกัดสเตตัส (Stat Max Cap)', ac: 'คลาสเกราะ (AC)', hp: 'พลังชีวิต (HP)', attack: 'ทอยโจมตี (Attack Roll)', damage: 'ทอยดาเมจ (Damage Roll)', save: 'ทอยหลบ (Saving Throw)' },
   proficiency: { skill: 'ทักษะ (Skill)', tool: 'เครื่องมือ (Tool)', weapon: 'อาวุธ (Weapon)', armor: 'ชุดเกราะ (Armor)', save: 'ทอยหลบ (Saving Throw)' },
   advantage: { skill: 'ทักษะ (Skill)', save: 'ทอยหลบ (Saving Throw)', attack: 'ทอยโจมตี (Attack Roll)' },
   disadvantage: { skill: 'ทักษะ (Skill)', save: 'ทอยหลบ (Saving Throw)', attack: 'ทอยโจมตี (Attack Roll)' },
@@ -24,12 +25,14 @@ const SUB_TYPES = {
   vulnerability: { damage: 'ประเภทดาเมจ (Damage Type)' },
   sense: { vision: 'การมองเห็น (Vision Type)' },
   speed: { move: 'ประเภทการเคลื่อนที่ (Movement Type)' },
-  spell: { grant: 'ได้รับคาถา (Grant Spell)' },
-  damage: { add: 'เพิ่มดาเมจ (Add Damage)' }
+  spell: { grant: 'ได้รับคาถาเลย (Grant Spell)', expand_list: 'เพิ่มเข้า Spell List (Expand List)', cast_free: 'ร่ายฟรีไม่ใช้ Slot (Cast Free)' },
+  damage: { add: 'เพิ่มดาเมจ (Add Damage)', replace: 'เปลี่ยนประเภทดาเมจ (Replace Type)' },
+  mechanic: { resource: 'เพิ่ม Resource (เช่น Ki, Sorcery Points)', special: 'ปลดล็อกฟังก์ชันพิเศษ (Unlock)' }
 };
 
 const TARGET_OPTIONS = {
   stat: ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'],
+  stat_max: ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'],
   skill: ['acrobatics', 'animal handling', 'arcana', 'athletics', 'deception', 'history', 'insight', 'intimidation', 'investigation', 'medicine', 'nature', 'perception', 'performance', 'persuasion', 'religion', 'sleight of hand', 'stealth', 'survival'],
   save: ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'],
   damage: ['acid', 'bludgeoning', 'cold', 'fire', 'force', 'lightning', 'necrotic', 'piercing', 'poison', 'psychic', 'radiant', 'slashing', 'thunder'],
@@ -47,6 +50,8 @@ export default function ModifierBuilder({ modifiers = [], onChange }) {
     
     if (presetType === 'stat_bonus') newMod = { type: 'bonus', sub_type: 'stat', target: 'strength', value: '2' };
     else if (presetType === 'proficiency_skill') newMod = { type: 'proficiency', sub_type: 'skill', target: 'perception', value: '' };
+    else if (presetType === 'spell_grant') newMod = { type: 'spell', sub_type: 'grant', target: 'fireball', value: '' };
+    else if (presetType === 'mechanic_resource') newMod = { type: 'mechanic', sub_type: 'resource', target: 'ki_points', value: '3' };
     else if (presetType === 'resistance_damage') newMod = { type: 'resistance', sub_type: 'damage', target: 'fire', value: '' };
     else if (presetType === 'sense_vision') newMod = { type: 'sense', sub_type: 'vision', target: 'darkvision', value: '60' };
     else if (presetType === 'speed_bonus') newMod = { type: 'speed', sub_type: 'move', target: 'walk', value: '10' };
@@ -93,10 +98,10 @@ export default function ModifierBuilder({ modifiers = [], onChange }) {
       <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', flexWrap: 'wrap' }}>
         <button type="button" onClick={() => handleAddModifier('stat_bonus')} style={{ fontSize: '0.75rem', padding: '4px 8px', borderRadius: '4px', border: '1px solid #059669', backgroundColor: '#064e3b', color: '#34d399', cursor: 'pointer' }}>+ บัฟสเตตัส (+2 STR)</button>
         <button type="button" onClick={() => handleAddModifier('proficiency_skill')} style={{ fontSize: '0.75rem', padding: '4px 8px', borderRadius: '4px', border: '1px solid #2563eb', backgroundColor: '#1e3a8a', color: '#60a5fa', cursor: 'pointer' }}>+ ชำนาญสกิล (Perception)</button>
+        <button type="button" onClick={() => handleAddModifier('spell_grant')} style={{ fontSize: '0.75rem', padding: '4px 8px', borderRadius: '4px', border: '1px solid #0284c7', backgroundColor: '#0c4a6e', color: '#38bdf8', cursor: 'pointer' }}>+ แจกเวทมนตร์ (Fireball)</button>
+        <button type="button" onClick={() => handleAddModifier('mechanic_resource')} style={{ fontSize: '0.75rem', padding: '4px 8px', borderRadius: '4px', border: '1px solid #d97706', backgroundColor: '#78350f', color: '#fbbf24', cursor: 'pointer' }}>+ ทรัพยากรพิเศษ (Ki Points)</button>
         <button type="button" onClick={() => handleAddModifier('resistance_damage')} style={{ fontSize: '0.75rem', padding: '4px 8px', borderRadius: '4px', border: '1px solid #dc2626', backgroundColor: '#7f1d1d', color: '#f87171', cursor: 'pointer' }}>+ กันดาเมจ (Fire)</button>
-        <button type="button" onClick={() => handleAddModifier('sense_vision')} style={{ fontSize: '0.75rem', padding: '4px 8px', borderRadius: '4px', border: '1px solid #9333ea', backgroundColor: '#581c87', color: '#c084fc', cursor: 'pointer' }}>+ การมองเห็น (Darkvision)</button>
-        <button type="button" onClick={() => handleAddModifier('speed_bonus')} style={{ fontSize: '0.75rem', padding: '4px 8px', borderRadius: '4px', border: '1px solid #d97706', backgroundColor: '#78350f', color: '#fbbf24', cursor: 'pointer' }}>+ เพิ่มความเร็ว (+10 Speed)</button>
-        <button type="button" onClick={() => handleAddModifier('ac_bonus')} style={{ fontSize: '0.75rem', padding: '4px 8px', borderRadius: '4px', border: '1px solid #0284c7', backgroundColor: '#0c4a6e', color: '#38bdf8', cursor: 'pointer' }}>+ เพิ่มเกราะ (+1 AC)</button>
+        <button type="button" onClick={() => handleAddModifier('ac_bonus')} style={{ fontSize: '0.75rem', padding: '4px 8px', borderRadius: '4px', border: '1px solid #9333ea', backgroundColor: '#581c87', color: '#c084fc', cursor: 'pointer' }}>+ เพิ่มเกราะ (+1 AC)</button>
         <button type="button" onClick={() => handleAddModifier('hp_bonus')} style={{ fontSize: '0.75rem', padding: '4px 8px', borderRadius: '4px', border: '1px solid #e11d48', backgroundColor: '#881337', color: '#fda4af', cursor: 'pointer' }}>+ เพิ่ม HP (+1 HP)</button>
         <button type="button" onClick={() => handleAddModifier('custom')} style={{ fontSize: '0.75rem', padding: '4px 8px', borderRadius: '4px', border: '1px solid #475569', backgroundColor: '#1e293b', color: '#cbd5e1', cursor: 'pointer' }}>+ กำหนดเอง (Custom)</button>
       </div>

@@ -102,6 +102,17 @@ router.get('/', async (req, res) => {
                     });
                     item.subclasses = subclasses;
                 }
+                
+                // If it's a species, we need lineages
+                if (category === 'species') {
+                    const [lineages] = await pool.query("SELECT * FROM lineages WHERE species_id = ? AND deleted_at IS NULL", [id]);
+                    lineages.forEach(sub => {
+                        if (sub.granted_spells && typeof sub.granted_spells === 'string') {
+                            try { sub.granted_spells = JSON.parse(sub.granted_spells); } catch(e){}
+                        }
+                    });
+                    item.lineages = lineages;
+                }
 
                 item.data_type = category; // Important for Compendium.jsx routing logic!
 

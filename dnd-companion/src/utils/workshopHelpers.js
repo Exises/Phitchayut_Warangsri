@@ -433,6 +433,10 @@ export const getAllInnateAndFeatureSpells = (characterState, dbData) => {
         v.forEach(spId => addSpell(spId, `${className} Feature (Spell Mastery)`, 'int', true, true));
       } else if (k.startsWith('Signature Spells') && Array.isArray(v)) {
         v.forEach(spId => addSpell(spId, `${className} Feature (Signature Spells)`, 'int', true, true));
+      } else if (k.startsWith('Divine Order') && Array.isArray(v)) {
+        if (v[0] === 'Thaumaturge' && v[1]) addSpell(v[1], `${className} Feature (Divine Order)`, 'wis', false, true);
+      } else if (k.startsWith('Primal Order') && Array.isArray(v)) {
+        if (v[0] === 'Magician' && v[1]) addSpell(v[1], `${className} Feature (Primal Order)`, 'wis', false, true);
       } else if (Array.isArray(v)) {
         v.forEach(item => {
           if (typeof item === 'string' && item.trim()) {
@@ -486,10 +490,13 @@ export const getAllInnateAndFeatureSpells = (characterState, dbData) => {
           if (Array.isArray(subFeats)) {
             subFeats.forEach(sf => {
               const sfLvl = parseInt(sf.level || 1, 10) || 1;
-              if (sfLvl <= (parseInt(cl.level, 10) || 1) && sf.spells) {
-                const sfSpRaw = typeof sf.spells === 'string' ? JSON.parse(sf.spells) : sf.spells;
-                if (Array.isArray(sfSpRaw)) {
-                  sfSpRaw.forEach(spId => addSpell(spId, `${subName} (${sf.name || sf.title || 'Feature'})`, 'cha', true, true));
+              if (sfLvl <= (parseInt(cl.level, 10) || 1)) {
+                let spArr = [];
+                if (sf.spells) spArr = typeof sf.spells === 'string' ? JSON.parse(sf.spells) : sf.spells;
+                else if (sf.logic && sf.logic.granted_spells) spArr = sf.logic.granted_spells;
+                
+                if (Array.isArray(spArr)) {
+                  spArr.forEach(spId => addSpell(spId, `${subName} (${sf.name || sf.title || 'Feature'})`, 'cha', true, true));
                 }
               }
             });
@@ -583,13 +590,33 @@ export const stripAppendixFromFeature = (rawHtml) => {
 
 export const cleanAndStyleHtml = (fName, rawHtml) => {
   if (!rawHtml) return '';
-  let html = rawHtml;
+  let formatted = rawHtml;
 
-  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/_([^_]+)_/g, '<em style="font-weight: 600; color: #1e293b;">$1</em>');
-  html = html.replace(/\n\n/g, '<br/><br/>');
-  html = html.replace(/>(?:\s*n\s*)+</g, '><');
-  html = stripAppendixFromFeature(html);
+  // 1. Normalize line breaks
+  formatted = formatted.replace(/\\n/g, '\n');
+  formatted = formatted.replace(/\\t/g, ''); 
+  formatted = formatted.replace(/>(?:\s*n\s*)+</g, '><');
+  formatted = stripAppendixFromFeature(formatted);
+
+  // 2. Markdown Parsing
+  formatted = formatted.replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
+  formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  formatted = formatted.replace(/_([\s\S]+?)_/g, '<em style="font-weight: 600; color: #1e293b; font-style: italic;">$1</em>');
+  formatted = formatted.replace(/\*([^*]+)\*/g, '<em style="font-weight: 600; color: #1e293b; font-style: italic;">$1</em>');
+
+  // 3. Paragraph Formatting
+  let paragraphs = formatted.split(/\n\n/);
+  formatted = paragraphs.map(p => {
+      p = p.trim();
+      if (!p) return '';
+      // Auto-format known 5e headers if they lack Markdown
+      p = p.replace(/^((?:[A-Z][a-zA-Z\-\']*\s+){0,3}[A-Z][a-zA-Z\-\']*)\.(?=\s|$)/, '<strong>$1.</strong>');
+      // Convert single newlines to spaces
+      p = p.replace(/\n/g, ' ');
+      return `<p style="margin-top: 0; margin-bottom: 0.9em; line-height: 1.7;">${p}</p>`;
+  }).join('');
+
+  let html = formatted;
 
   if (fName === 'Channel Divinity' && html.includes('Breaking Your Oath')) {
     const saveRule = '<p style="margin-top: 14px; margin-bottom: 0; color: #4b5563;"><strong>Channel Divinity Saving Throws.</strong> If a Channel Divinity effect requires a saving throw, the DC equals the spell save DC from this class\'s Spellcasting feature.</p>';
@@ -746,7 +773,7 @@ export const formatTableFeatureNames = (clsName, level, features) => {
   return names.length > 0 ? names.join(', ') : '—';
 };
 
-import parsedSpellsCatalog from '../data/parsed_spells_catalog.json';
+import parsedSpellsCatalog from '../data/parsed_spells_catalog.json' with { type: 'json' };
 
 export const enrichSpellsCatalog = (rawSpells = []) => {
   const spellMap = new Map();
@@ -800,4 +827,32 @@ export const enrichSpellsCatalog = (rawSpells = []) => {
   });
 
   return Array.from(spellMap.values());
+};
+
+/**
+ * calculateLongRestHdRecovery
+ * Calculates the RAW 5e Hit Dice recovery (Half max HD, prioritizing largest dice).
+ * Returns { nextHd: Object, recoveredAmount: Number }
+ */
+export const calculateLongRestHdRecovery = (totalLvl, resolvedHitDiceList, currentExpendedHd) => {
+  const recoverCount = Math.max(1, Math.floor(totalLvl / 2));
+  const expendedList = (resolvedHitDiceList || [])
+    .map(hd => ({ cId: hd.classId || 'unknown', hitDie: parseInt(hd.hitDie) || 0, expended: parseInt(currentExpendedHd?.[hd.classId || 'unknown']) || 0 }))
+    .filter(x => x.expended > 0)
+    .sort((a, b) => b.hitDie - a.hitDie); // Sort by largest die first
+  
+  let remainingToRecover = recoverCount;
+  const nextHd = { ...currentExpendedHd };
+  
+  for (const hd of expendedList) {
+    if (remainingToRecover <= 0) break;
+    const recoverFromThis = Math.min(hd.expended, remainingToRecover);
+    nextHd[hd.cId] -= recoverFromThis;
+    remainingToRecover -= recoverFromThis;
+  }
+
+  return {
+    nextHd,
+    recoveredAmount: recoverCount - remainingToRecover
+  };
 };

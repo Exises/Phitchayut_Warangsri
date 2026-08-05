@@ -67,7 +67,7 @@ app.use((req, res, next) => {
                     req.url = '/api/logs/add';
                     break;
                 case 'get_character_logs':
-                    req.url = '/api/logs/get';
+                    req.url = preserveQuery('/api/logs/get', req.url);
                     break;
                 case 'clear_character_logs':
                     req.url = '/api/logs/clear';
