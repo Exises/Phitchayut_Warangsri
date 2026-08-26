@@ -1,0 +1,17 @@
+# D&D Companion
+
+> D&D Companion is a comprehensive web application designed for Dungeons & Dragons (5e) players and Dungeon Masters. It provides tools for character management, 3D dice rolling, and rules reference.
+
+## Key Sections
+
+- [Workshop](/workshop) - Character creation and builder tools.
+- [Character Sheets](/sheets) - Vault for saving and viewing active characters.
+- [Compendium](/compendium) - Searchable database for spells, monsters, and D&D 5e SRD rules.
+- [Class Test](/class-test) - Interactive psychological test to determine your ideal D&D class.
+- [Class Test DM](/class-test-dm) - AI-powered Dungeon Master interactive narrative test.
+- [Legal Notice](/legal) - Wizards of the Coast Fan Content Policy and CC-BY-4.0 SRD details.
+
+## Features
+- Full 3D Physics Dice Roller via @3d-dice/dice-box.
+- Secure local and backend database storage for characters.
+- AI-driven interactive storytelling.

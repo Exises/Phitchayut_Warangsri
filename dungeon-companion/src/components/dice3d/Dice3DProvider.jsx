@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import DiceBox from '@3d-dice/dice-box';
 import { useSettings } from '../../context/SettingsContext';
 
 const Dice3DContext = createContext(null);
+
 
 export function Dice3DProvider({ children }) {
   const { settings } = useSettings();
@@ -110,6 +110,9 @@ export function Dice3DProvider({ children }) {
           case 'rust': initThemeColor = '#b45309'; initTheme = 'rust'; break;
           default: initThemeColor = '#d97706'; initTheme = 'default'; break; // divine-marble
         }
+
+        // Dynamically import DiceBox to prevent blocking initial load
+        const { default: DiceBox } = await import('@3d-dice/dice-box');
 
         const box = new DiceBox({
           container: "#dice-box-canvas",

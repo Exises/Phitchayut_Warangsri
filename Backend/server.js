@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+require('dotenv').config();
 
 const app = express();
 
@@ -35,7 +36,7 @@ app.use((req, res, next) => {
                     req.method = 'GET';
                     break;
                 case 'get_character_by_id':
-                    req.url = `/api/character/${req.query.id}`;
+                    req.url = `/api/character/${req.query.id}?user_id=${req.query.user_id || ''}`;
                     req.method = 'GET';
                     break;
                 case 'save_character':

@@ -149,14 +149,13 @@ function Profile() {
         }
 
         const formData = new FormData();
-        formData.append('action', 'upload_avatar');
         formData.append('user_id', user.user_id);
         formData.append('avatar', file);
 
         setStatusMessage({ type: 'success', text: 'กำลังอัปโหลด...' });
 
         try {
-            const response = await fetch('http://localhost:5000/api', {
+            const response = await fetch('http://localhost:5000/api/upload/avatar', {
                 method: 'POST',
                 body: formData
             });
@@ -185,14 +184,11 @@ function Profile() {
 
         setStatusMessage({ type: 'success', text: 'กำลังลบรูปภาพ...' });
 
-        const formData = new FormData();
-        formData.append('action', 'delete_avatar');
-        formData.append('user_id', user.user_id);
-
         try {
-            const response = await fetch('http://localhost:5000/api', {
+            const response = await fetch('http://localhost:5000/api/upload/delete_avatar', {
                 method: 'POST',
-                body: formData
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: user.user_id })
             });
 
             const data = await response.json();

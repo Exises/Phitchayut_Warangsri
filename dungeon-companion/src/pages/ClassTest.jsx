@@ -27,6 +27,16 @@ function ClassTest() {
         Paladin: 0, Ranger: 0, Rogue: 0, Sorcerer: 0, Warlock: 0, Wizard: 0
     });
     const [topClasses, setTopClasses] = useState([]);
+    const [showAccessDenied, setShowAccessDenied] = useState(false);
+
+    const handleAIDMClick = () => {
+        const user = localStorage.getItem('dnd_user');
+        if (!user) {
+            setShowAccessDenied(true);
+        } else {
+            navigate('/class-test-dm');
+        }
+    };
 
     useEffect(() => {
         fetch('/data/dnd_quiz.json')
@@ -100,6 +110,35 @@ function ClassTest() {
 
     return (
         <div className="class-test-page">
+            {/* Access Denied Modal for Guest */}
+            {showAccessDenied && (
+                <div className="modal-overlay">
+                    <div className="modal-content-minimal animate-slide-down">
+                        <button className="modal-close-minimal" onClick={() => setShowAccessDenied(false)}>
+                            <i className="fa-solid fa-xmark"></i>
+                        </button>
+                        <div className="access-denied-container">
+                            <div className="denied-icon-wrapper">
+                                <i className="fa-solid fa-lock"></i>
+                            </div>
+                            <h2 className="denied-title">สิทธิ์การเข้าถึงถูกจำกัด</h2>
+                            <p className="denied-subtitle">
+                                คุณไม่สามารถเข้าถึงส่วนนี้ได้ <br />
+                                เนื่องจากฟีเจอร์นี้เปิดให้ใช้งานเฉพาะสมาชิกเท่านั้น
+                            </p>
+                            <div className="denied-actions">
+                                <button className="btn-denied-main" onClick={() => navigate('/login')}>
+                                    สมัครสมาชิก / เข้าสู่ระบบ
+                                </button>
+                                <button className="btn-denied-secondary" onClick={() => { setShowAccessDenied(false); handleStart(); }}>
+                                    ทำแบบทดสอบหาอาชีพแทน
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {currentState === 'start' && (
                 <div className="test-start-layout animate-fade-in">
                     <div className="test-start-left-panel">
@@ -143,7 +182,7 @@ function ClassTest() {
                                 <button 
                                     className="btn-start-test" 
                                     style={{ background: '#8b0000', color: 'white', border: '1px solid #5a0000' }}
-                                    onClick={() => navigate('/class-test-dm')}
+                                    onClick={handleAIDMClick}
                                 >
                                     <i className="fa-solid fa-dragon"></i> โหมด AI DM (The Grand Weaver)
                                 </button>

@@ -40,10 +40,16 @@ router.get('/user/:user_id', async (req, res) => {
 router.get('/:char_id', async (req, res) => {
     try {
         const charId = parseInt(req.params.char_id, 10);
-        const [chars] = await pool.query("SELECT * FROM characters WHERE char_id = ?", [charId]);
+        const userId = req.query.user_id ? parseInt(req.query.user_id, 10) : null;
+        
+        if (!userId) {
+            return res.status(401).json({ error: 'Unauthorized: User ID is required' });
+        }
+
+        const [chars] = await pool.query("SELECT * FROM characters WHERE char_id = ? AND user_id = ?", [charId, userId]);
         
         if (chars.length === 0) {
-            return res.status(404).json({ error: 'Character not found' });
+            return res.status(403).json({ error: 'Character not found or you do not have permission to access it.' });
         }
 
         const char = chars[0];
@@ -96,20 +102,37 @@ router.post('/save', async (req, res) => {
 
         const char_id = parseInt(data.char_id || 0);
 
+        // Validation Rules (TF-VAL-001, TF-VAL-002)
+        if (hp_max < 1 || hp_max > 1000) {
+            return res.status(400).json({ status: 'error', message: 'Validation Error: ค่า Max HP ต้องอยู่ระหว่าง 1 ถึง 1000' });
+        }
+        if (char_level < 1 || char_level > 20) {
+            return res.status(400).json({ status: 'error', message: 'Validation Error: เลเวลต้องอยู่ระหว่าง 1 ถึง 20' });
+        }
+        const stats = [str_score, dex_score, con_score, int_score, wis_score, cha_score];
+        if (stats.some(score => score < 1 || score > 30)) {
+            return res.status(400).json({ status: 'error', message: 'Validation Error: ค่า Ability Score (STR, DEX, etc.) ต้องอยู่ระหว่าง 1 ถึง 30' });
+        }
+
         if (char_id) {
-            await pool.query(
+            const [updateResult] = await pool.query(
                 `UPDATE characters SET 
-                    user_id=?, char_name=?, species_id=?, lineage_id=?, background_id=?, primary_class_id=?, classes_data=?, 
+                    char_name=?, species_id=?, lineage_id=?, background_id=?, primary_class_id=?, classes_data=?, 
                     char_alignment=?, char_level=?, hp_max=?, hp_current=?, str_score=?, dex_score=?, con_score=?, int_score=?, 
                     wis_score=?, cha_score=?, proficiencies_choices=?, spellcasting_data=?, inventory=?, currency=?, feats_data=?, 
                     hit_dice_current=?, death_save_success=?, death_save_failure=?, inspiration=?, exhaustion_level=?, base_ac=?, 
                     build_data=?, play_data=?, updated_at=NOW() 
-                 WHERE char_id=?`,
-                [user_id, char_name, species_id, lineage_id, background_id, primary_class_id, classes_data, char_alignment, char_level, 
+                 WHERE char_id=? AND user_id=?`,
+                [char_name, species_id, lineage_id, background_id, primary_class_id, classes_data, char_alignment, char_level, 
                  hp_max, hp_current, str_score, dex_score, con_score, int_score, wis_score, cha_score, proficiencies_choices, 
                  spellcasting_data, inventory, currency, feats_data, hit_dice_current, death_save_success, death_save_failure, 
-                 inspiration, exhaustion_level, base_ac, build_data, play_data, char_id]
+                 inspiration, exhaustion_level, base_ac, build_data, play_data, char_id, user_id]
             );
+            
+            if (updateResult.affectedRows === 0) {
+                return res.status(403).json({ status: 'error', message: 'You do not have permission to update this character.' });
+            }
+            
             res.json({ status: 'success', message: 'บันทึกอัปเดตตัวละครลงฐานข้อมูลสำเร็จ', char_id });
         } else {
             const [result] = await pool.query(

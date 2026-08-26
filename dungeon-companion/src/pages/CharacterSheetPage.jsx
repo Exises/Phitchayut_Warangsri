@@ -86,7 +86,9 @@ export default function CharacterSheetPage() {
         setDbData(ccJson);
 
         if (id && id !== 'current') {
-          const charRes = await fetch(`http://localhost:5000/api?action=get_character_by_id&id=${id}`);
+          const u = JSON.parse(localStorage.getItem('dnd_user') || '{}');
+          const uid = u.user_id || '';
+          const charRes = await fetch(`http://localhost:5000/api?action=get_character_by_id&id=${id}&user_id=${uid}`);
           const charObj = await charRes.json();
           if (charObj && !charObj.error) {
             if (charObj.build_data && typeof charObj.build_data === 'object' && Object.keys(charObj.build_data).length > 0) {

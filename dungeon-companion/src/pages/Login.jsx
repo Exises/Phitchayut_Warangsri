@@ -61,10 +61,10 @@ function Login() {
                 });
                 const data = await response.json();
 
-                if (data.error) {
-                    setMessage({ type: 'error', text: data.error });
+                if (data.status === 'error' || data.error) {
+                    setMessage({ type: 'error', text: data.message || data.error });
                 } else {
-                    setMessage({ type: 'success', text: data.success });
+                    setMessage({ type: 'success', text: data.message || data.success || 'สมัครสมาชิกสำเร็จ!' });
                     setMode('signin');
                     setFormData({ username: '', email: '', password: '' });
                 }
@@ -217,7 +217,53 @@ function Login() {
                                             onChange={handleRememberChange}
                                         /> Remember me
                                     </label>
-                                    <a href="#" className="forgot-link">Forgot Password?</a>
+                                    <a 
+                                        href="#" 
+                                        className="forgot-link"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            import('sweetalert2').then(Swal => {
+                                                Swal.default.fire({
+                                                    title: 'ลืมรหัสผ่าน',
+                                                    text: 'กรุณากรอกอีเมลของคุณเพื่อรับลิงก์รีเซ็ตรหัสผ่าน',
+                                                    input: 'email',
+                                                    inputPlaceholder: 'อีเมลของคุณ',
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: '#711a19',
+                                                    cancelButtonColor: '#9ca3af',
+                                                    confirmButtonText: 'ส่งลิงก์',
+                                                    cancelButtonText: 'ยกเลิก',
+                                                    showLoaderOnConfirm: true,
+                                                    preConfirm: (email) => {
+                                                        return fetch('http://localhost:5000/api/auth/forgot-password', {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({ email })
+                                                        })
+                                                        .then(response => {
+                                                            if (!response.ok) {
+                                                                throw new Error(response.statusText)
+                                                            }
+                                                            return response.json()
+                                                        })
+                                                        .catch(error => {
+                                                            Swal.default.showValidationMessage(`เกิดข้อผิดพลาด: ${error}`)
+                                                        })
+                                                    },
+                                                    allowOutsideClick: () => !Swal.default.isLoading()
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        const resData = result.value;
+                                                        if (resData.status === 'success') {
+                                                            Swal.default.fire('ส่งสำเร็จ!', resData.message, 'success');
+                                                        } else {
+                                                            Swal.default.fire('ผิดพลาด', resData.message, 'error');
+                                                        }
+                                                    }
+                                                });
+                                            });
+                                        }}
+                                    >Forgot Password?</a>
                                 </div>
                             )}
 

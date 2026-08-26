@@ -247,6 +247,18 @@ export default function Step6Details({
                     style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.9rem', color: 'var(--color-ink)', fontWeight: '600' }}
                   />
                 </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: 'var(--color-gray)', letterSpacing: '0.5px', marginBottom: '6px' }}>
+                    PARTY / CAMPAIGN (OPTIONAL)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. The Fellowship / Waterdeep"
+                    value={desc.partyName || ''}
+                    onChange={(e) => handleDescChange('partyName', e.target.value)}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.9rem', color: 'var(--color-ink)', fontWeight: '600' }}
+                  />
+                </div>
               </div>
             </div>
 

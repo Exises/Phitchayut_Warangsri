@@ -30,7 +30,7 @@ function Feedback() {
 
         const userStr = localStorage.getItem('dnd_user');
         if (!userStr) {
-            setStatus({ type: 'error', text: 'Authentication Required' });
+            setStatus({ type: 'error', text: 'จำเป็นต้องเข้าสู่ระบบก่อน' });
             return;
         }
 
@@ -62,10 +62,10 @@ function Feedback() {
                 setTitle('');
                 setRating(5);
             } else {
-                setStatus({ type: 'error', text: data.message || 'System Error. Please try again.' });
+                setStatus({ type: 'error', text: data.message || 'เกิดข้อผิดพลาดในระบบ กรุณาลองใหม่อีกครั้ง' });
             }
         } catch (error) {
-            setStatus({ type: 'error', text: 'Connection failed. Please check your network.' });
+            setStatus({ type: 'error', text: 'การเชื่อมต่อล้มเหลว กรุณาตรวจสอบอินเทอร์เน็ตของคุณ' });
         } finally {
             setIsSubmitting(false);
         }
@@ -78,16 +78,16 @@ function Feedback() {
                     <div style={{ width: '64px', height: '64px', backgroundColor: '#fef2f2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px auto', color: '#ef4444', fontSize: '24px' }}>
                         <i className="fa-solid fa-lock"></i>
                     </div>
-                    <h2 style={{ color: '#0f172a', fontSize: '1.25rem', fontWeight: '700', marginBottom: '12px' }}>Authentication Required</h2>
+                    <h2 style={{ color: '#0f172a', fontSize: '1.25rem', fontWeight: '700', marginBottom: '12px' }}>จำเป็นต้องเข้าสู่ระบบ</h2>
                     <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '32px' }}>
-                        You need an active user account to access the Support Portal and submit tickets.
+                        กรุณาเข้าสู่ระบบก่อน เพื่อใช้งานศูนย์ช่วยเหลือและส่งข้อความถึงทีมงาน
                     </p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         <Link to="/login" style={{ padding: '12px 24px', backgroundColor: '#3b82f6', color: '#ffffff', borderRadius: '6px', textDecoration: 'none', fontWeight: '600', fontSize: '0.9rem', transition: 'background-color 0.2s', boxShadow: '0 2px 4px rgba(59,130,246,0.2)' }}>
-                            Sign In / Register
+                            เข้าสู่ระบบ / สมัครสมาชิก
                         </Link>
                         <Link to="/" style={{ padding: '12px 24px', backgroundColor: '#f8fafc', color: '#475569', borderRadius: '6px', textDecoration: 'none', fontWeight: '500', fontSize: '0.9rem', border: '1px solid #cbd5e1', transition: 'all 0.2s' }}>
-                            Return to Dashboard
+                            กลับสู่หน้าหลัก
                         </Link>
                     </div>
                 </div>
@@ -102,10 +102,10 @@ function Feedback() {
                 {/* Header */}
                 <div style={{ marginBottom: '30px' }}>
                     <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#0f172a', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <i className="fa-solid fa-headset text-blue-600"></i> Support Portal
+                        <i className="fa-solid fa-headset text-blue-600"></i> ศูนย์ช่วยเหลือและส่งข้อเสนอแนะ
                     </h1>
                     <p style={{ color: '#64748b', margin: 0, fontSize: '1rem' }}>
-                        Submit a ticket. Our team will review your request and get back to you.
+                        ส่งข้อความถึงเรา ทีมงานจะรีบตรวจสอบและติดต่อกลับโดยเร็วที่สุด
                     </p>
                 </div>
 
@@ -113,10 +113,10 @@ function Feedback() {
                     {/* Form Header */}
                     <div style={{ backgroundColor: '#f1f5f9', padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h2 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#334155', margin: 0 }}>
-                            New Support Ticket
+                            เขียนเรื่องแจ้งปัญหา / ข้อเสนอแนะใหม่
                         </h2>
                         <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}>
-                            <i className="fa-regular fa-clock"></i> {new Date().toLocaleDateString('en-GB')}
+                            <i className="fa-regular fa-clock"></i> {new Date().toLocaleDateString('th-TH')}
                         </span>
                     </div>
 
@@ -126,16 +126,16 @@ function Feedback() {
                             <div style={{ width: '72px', height: '72px', backgroundColor: '#ecfdf5', color: '#10b981', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px auto', fontSize: '2rem' }}>
                                 <i className="fa-solid fa-check"></i>
                             </div>
-                            <h2 style={{ color: '#0f172a', fontSize: '1.5rem', fontWeight: '700', marginBottom: '12px' }}>Ticket Submitted Successfully</h2>
-                            <p style={{ color: '#64748b', fontSize: '1rem', lineHeight: '1.6', marginBottom: '32px', maxWidth: '400px', margin: '0 auto 32px auto' }}>
-                                Your feedback has been securely logged into our system. An administrator will review it shortly.
+                            <h2 style={{ color: '#0f172a', fontSize: '1.5rem', fontWeight: '700', marginBottom: '12px' }}>ส่งข้อความสำเร็จเรียบร้อย</h2>
+                            <p style={{ color: '#64748b', fontSize: '1rem', lineHeight: '1.6', marginBottom: '32px', maxWidth: '450px', margin: '0 auto 32px auto' }}>
+                                ข้อมูลของคุณถูกบันทึกเข้าสู่ระบบแล้ว ทีมงานแอดมินจะรีบดำเนินการตรวจสอบโดยเร็วที่สุด
                             </p>
                             <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
                                 <button onClick={() => setIsSubmitted(false)} style={{ padding: '10px 20px', backgroundColor: '#3b82f6', color: '#ffffff', border: 'none', borderRadius: '6px', fontWeight: '600', fontSize: '0.9rem', cursor: 'pointer', transition: 'background-color 0.2s', boxShadow: '0 2px 4px rgba(59,130,246,0.2)' }}>
-                                    Submit Another Ticket
+                                    ส่งเรื่องใหม่อีกครั้ง
                                 </button>
                                 <button onClick={() => navigate('/')} style={{ padding: '10px 20px', backgroundColor: '#ffffff', color: '#475569', border: '1px solid #cbd5e1', borderRadius: '6px', fontWeight: '500', fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                    Return to Home
+                                    กลับสู่หน้าหลัก
                                 </button>
                             </div>
                         </div>
@@ -153,34 +153,34 @@ function Feedback() {
                                 {/* Category Dropdown */}
                                 <div>
                                     <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>
-                                        Ticket Type <span style={{ color: '#ef4444' }}>*</span>
+                                        ประเภทเรื่องแจ้ง <span style={{ color: '#ef4444' }}>*</span>
                                     </label>
                                     <select
                                         value={category}
                                         onChange={(e) => setCategory(e.target.value)}
                                         style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.95rem', color: '#1e293b', backgroundColor: '#f8fafc', outline: 'none', transition: 'border-color 0.2s', appearance: 'none', cursor: 'pointer' }}
                                     >
-                                        <option value="general">General Inquiry</option>
-                                        <option value="feature">Feature Request</option>
-                                        <option value="ui">UI / UX Feedback</option>
-                                        <option value="bug">Bug Report</option>
+                                        <option value="general">สอบถามข้อมูลทั่วไป (General Inquiry)</option>
+                                        <option value="feature">เสนอแนะฟีเจอร์ใหม่ (Feature Request)</option>
+                                        <option value="ui">ข้อเสนอแนะเกี่ยวกับหน้าเว็บ (UI/UX Feedback)</option>
+                                        <option value="bug">แจ้งปัญหาการใช้งาน / บั๊ก (Bug Report)</option>
                                     </select>
                                 </div>
 
                                 {/* Priority Dropdown */}
                                 <div>
                                     <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>
-                                        Priority Level <span style={{ color: '#ef4444' }}>*</span>
+                                        ระดับความสำคัญ <span style={{ color: '#ef4444' }}>*</span>
                                     </label>
                                     <select
                                         value={priority}
                                         onChange={(e) => setPriority(e.target.value)}
                                         style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.95rem', color: '#1e293b', backgroundColor: '#f8fafc', outline: 'none', transition: 'border-color 0.2s', appearance: 'none', cursor: 'pointer' }}
                                     >
-                                        <option value="low">Low</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
-                                        <option value="critical">Critical (System Down)</option>
+                                        <option value="low">ต่ำ (Low)</option>
+                                        <option value="medium">ปานกลาง (Medium)</option>
+                                        <option value="high">สูง (High)</option>
+                                        <option value="critical">วิกฤต / ระบบพัง (Critical)</option>
                                     </select>
                                 </div>
                             </div>
@@ -189,13 +189,13 @@ function Feedback() {
                                 {/* Title Input */}
                                 <div>
                                     <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>
-                                        Subject <span style={{ color: '#ef4444' }}>*</span>
+                                        หัวข้อเรื่อง <span style={{ color: '#ef4444' }}>*</span>
                                     </label>
                                     <input
                                         type="text"
                                         value={title}
                                         onChange={(e) => setTitle(e.target.value)}
-                                        placeholder="Brief summary of the issue..."
+                                        placeholder="สรุปหัวข้อปัญหาหรือข้อเสนอแนะสั้นๆ..."
                                         style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.95rem', color: '#1e293b', backgroundColor: '#f8fafc', outline: 'none', transition: 'border-color 0.2s' }}
                                     />
                                 </div>
@@ -203,18 +203,18 @@ function Feedback() {
                                 {/* Device Input */}
                                 <div>
                                     <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>
-                                        Environment
+                                        อุปกรณ์ที่ใช้งาน
                                     </label>
                                     <select
                                         value={deviceInfo}
                                         onChange={(e) => setDeviceInfo(e.target.value)}
                                         style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.95rem', color: '#1e293b', backgroundColor: '#f8fafc', outline: 'none', transition: 'border-color 0.2s', appearance: 'none', cursor: 'pointer' }}
                                     >
-                                        <option value="Desktop">Desktop</option>
-                                        <option value="Mobile (iOS)">iOS Device</option>
-                                        <option value="Mobile (Android)">Android Device</option>
-                                        <option value="Tablet">Tablet</option>
-                                        <option value="Other">Other</option>
+                                        <option value="Desktop">คอมพิวเตอร์ / โน้ตบุ๊ก (Desktop)</option>
+                                        <option value="Mobile (iOS)">ไอโฟน / ไอแพด (iOS)</option>
+                                        <option value="Mobile (Android)">สมาร์ทโฟน Android</option>
+                                        <option value="Tablet">แท็บเล็ต (Tablet)</option>
+                                        <option value="Other">อื่นๆ (Other)</option>
                                     </select>
                                 </div>
                             </div>
@@ -222,30 +222,30 @@ function Feedback() {
                             {/* Message Textarea */}
                             <div style={{ marginBottom: '32px' }}>
                                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>
-                                    Description <span style={{ color: '#ef4444' }}>*</span>
+                                    รายละเอียดเรื่องที่แจ้ง <span style={{ color: '#ef4444' }}>*</span>
                                 </label>
                                 <textarea
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                     rows="6"
-                                    placeholder="Please provide detailed information about your request..."
+                                    placeholder="กรุณาระบุรายละเอียดหรือขั้นตอนการเกิดปัญหาอย่างชัดเจน..."
                                     style={{ width: '100%', padding: '12px 14px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.95rem', color: '#1e293b', backgroundColor: '#f8fafc', outline: 'none', resize: 'vertical', transition: 'border-color 0.2s', minHeight: '120px' }}
                                 ></textarea>
-                                <p style={{ margin: '8px 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>Please include any error codes or steps to reproduce if reporting a bug.</p>
+                                <p style={{ margin: '8px 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>หากแจ้งปัญหาการใช้งาน กรุณาระบุรหัสข้อผิดพลาดหรือขั้นตอนเพื่อทดสอบปัญหาเพิ่มเติม</p>
                             </div>
 
                             {/* Satisfaction Rating - Segmented Control Style */}
                             <div style={{ marginBottom: '32px', borderTop: '1px solid #e2e8f0', paddingTop: '24px' }}>
                                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '12px' }}>
-                                    Overall Satisfaction
+                                    ความพึงพอใจโดยรวมต่อระบบ
                                 </label>
                                 <div style={{ display: 'flex', gap: '10px' }}>
                                     {[
-                                        { val: 1, icon: 'fa-face-frown', label: 'Poor' },
-                                        { val: 2, icon: 'fa-face-frown-open', label: 'Fair' },
-                                        { val: 3, icon: 'fa-face-meh', label: 'Neutral' },
-                                        { val: 4, icon: 'fa-face-smile', label: 'Good' },
-                                        { val: 5, icon: 'fa-face-laugh-beam', label: 'Excellent' },
+                                        { val: 1, icon: 'fa-face-frown', label: 'แย่' },
+                                        { val: 2, icon: 'fa-face-frown-open', label: 'พอใช้' },
+                                        { val: 3, icon: 'fa-face-meh', label: 'ปานกลาง' },
+                                        { val: 4, icon: 'fa-face-smile', label: 'ดี' },
+                                        { val: 5, icon: 'fa-face-laugh-beam', label: 'ดีเยี่ยม' },
                                     ].map((item) => (
                                         <div 
                                             key={item.val}
@@ -279,7 +279,7 @@ function Feedback() {
                                     onClick={() => navigate('/')}
                                     style={{ padding: '10px 24px', backgroundColor: 'transparent', color: '#64748b', border: 'none', fontWeight: '600', fontSize: '0.95rem', cursor: 'pointer', transition: 'color 0.2s' }}
                                 >
-                                    Cancel
+                                    ยกเลิก
                                 </button>
                                 <button
                                     type="submit"
@@ -287,9 +287,9 @@ function Feedback() {
                                     style={{ padding: '10px 32px', backgroundColor: isSubmitting ? '#94a3b8' : '#0f172a', color: '#ffffff', border: 'none', borderRadius: '6px', fontWeight: '600', fontSize: '0.95rem', cursor: isSubmitting ? 'not-allowed' : 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
                                 >
                                     {isSubmitting ? (
-                                        <><i className="fa-solid fa-circle-notch fa-spin"></i> Submitting...</>
+                                        <><i className="fa-solid fa-circle-notch fa-spin"></i> กำลังส่งเรื่อง...</>
                                     ) : (
-                                        <><i className="fa-solid fa-paper-plane"></i> Submit Ticket</>
+                                        <><i className="fa-solid fa-paper-plane"></i> ส่งเรื่องถึงแอดมิน</>
                                     )}
                                 </button>
                             </div>

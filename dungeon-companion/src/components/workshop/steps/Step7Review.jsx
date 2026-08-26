@@ -3463,6 +3463,7 @@ export default function Step7Review({
                         <div style={{ color: 'var(--color-ink)' }}><strong style={{ color: '#0f172a' }}>Hair Style:</strong> {characterState.description?.hairStyle || '-'}</div>
                         <div style={{ color: 'var(--color-ink)' }}><strong style={{ color: '#0f172a' }}>Height:</strong> {characterState.description?.height || '-'}</div>
                         <div style={{ color: 'var(--color-ink)' }}><strong style={{ color: '#0f172a' }}>Weight:</strong> {characterState.description?.weight || '-'}</div>
+                        <div style={{ color: 'var(--color-ink)', gridColumn: '1 / -1' }}><strong style={{ color: '#0f172a' }}>Party / Campaign:</strong> {characterState.description?.partyName || '-'}</div>
                       </div>
                     </div>
 

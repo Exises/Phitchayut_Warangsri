@@ -517,7 +517,9 @@ function WorkshopCharacterBuilder({ onCancel }) {
         if (loadId) {
           localStorage.removeItem('workshop_load_char_id');
           try {
-            const charRes = await fetch(`http://localhost:5000/api?action=get_character_by_id&id=${loadId}`);
+            const u = JSON.parse(localStorage.getItem('dnd_user') || '{}');
+            const uid = u.user_id || '';
+            const charRes = await fetch(`http://localhost:5000/api?action=get_character_by_id&id=${loadId}&user_id=${uid}`);
             const charObj = await charRes.json();
             if (charObj && !charObj.error) {
               if (charObj.build_data && typeof charObj.build_data === 'object' && Object.keys(charObj.build_data).length > 0) {
@@ -733,6 +735,23 @@ function WorkshopCharacterBuilder({ onCancel }) {
 
   const [savingDbStatus, setSavingDbStatus] = useState('');
   const handleSaveToDatabase = async () => {
+    // TF-WIZ-003 Frontend Validation
+    if (!characterState.race?.id) {
+      alert("กรุณาเลือกเผ่าพันธุ์ (Race) ของตัวละครก่อนบันทึก!");
+      setCurrentStep(1);
+      return;
+    }
+    if (!characterState.classData?.classes || characterState.classData.classes.length === 0 || !characterState.classData.classes[0].classId) {
+      alert("กรุณาเลือกสายอาชีพ (Class) ของตัวละครก่อนบันทึก!");
+      setCurrentStep(2);
+      return;
+    }
+    if (!characterState.description?.name || characterState.description.name.trim() === '') {
+      alert("กรุณาตั้งชื่อตัวละครในหน้า Details ก่อนบันทึก!");
+      setCurrentStep(6);
+      return;
+    }
+
     setSavingDbStatus('กำลังบันทึกลงฐานข้อมูล...');
     const totalLvl = (characterState.classData?.classes || []).reduce((sum, c) => sum + (parseInt(c.level) || 1), 0) || 1;
     try {
@@ -1096,10 +1115,13 @@ function WorkshopCharacterBuilder({ onCancel }) {
       
       {/* Enhanced Clear Step Footer Navigation */}
       {(() => {
-        const prevStep = STEPS.find(s => s.id === currentStep - 1);
-        const currentStepObj = STEPS.find(s => s.id === currentStep) || STEPS[0];
-        const nextStep = STEPS.find(s => s.id === currentStep + 1);
-        const percent = Math.round((currentStep / STEPS.length) * 100);
+        // Fallback for currentStep in case it gets corrupted in localStorage
+        const safeCurrentStep = (typeof currentStep === 'number' && !isNaN(currentStep) && currentStep >= 1 && currentStep <= STEPS.length) ? currentStep : 1;
+        
+        const prevStep = STEPS.find(s => s.id === safeCurrentStep - 1) || STEPS[0];
+        const currentStepObj = STEPS.find(s => s.id === safeCurrentStep) || STEPS[0];
+        const nextStep = STEPS.find(s => s.id === safeCurrentStep + 1) || STEPS[STEPS.length - 1];
+        const percent = Math.round((safeCurrentStep / STEPS.length) * 100);
 
         return (
           <div className="builder-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--bg-white)', padding: '16px 20px', borderTop: '2px solid #e2e8f0', flexWrap: 'nowrap', gap: '15px', position: 'relative', minHeight: '70px' }}>
@@ -1107,16 +1129,16 @@ function WorkshopCharacterBuilder({ onCancel }) {
             <button 
               className="btn-builder-prev" 
               onClick={handlePrev} 
-              disabled={currentStep === 1}
+              disabled={safeCurrentStep === 1}
               style={{
                 padding: '10px 18px',
                 borderRadius: '6px',
                 border: '1px solid #cbd5e1',
-                backgroundColor: currentStep === 1 ? '#f1f5f9' : 'var(--bg-white)',
-                color: currentStep === 1 ? '#94a3b8' : 'var(--color-ink)',
+                backgroundColor: safeCurrentStep === 1 ? '#f1f5f9' : 'var(--bg-white)',
+                color: safeCurrentStep === 1 ? '#94a3b8' : 'var(--color-ink)',
                 fontWeight: 'bold',
                 fontSize: '0.88rem',
-                cursor: currentStep === 1 ? 'not-allowed' : 'pointer',
+                cursor: safeCurrentStep === 1 ? 'not-allowed' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
@@ -1124,14 +1146,14 @@ function WorkshopCharacterBuilder({ onCancel }) {
               }}
             >
               <i className="fa-solid fa-arrow-left"></i> 
-              {currentStep === 1 ? 'กลับหน้าแรก' : `ย้อนกลับ (${prevStep.title} - ${prevStep.labelThai})`}
+              {safeCurrentStep === 1 ? 'กลับหน้าแรก' : `ย้อนกลับ (${prevStep.title} - ${prevStep.labelThai})`}
             </button>
             
             {/* Middle Progress Badge & Step Number Pills */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', position: 'absolute', left: '50%', transform: 'translateX(-50%)', pointerEvents: 'auto' }}>
               <div style={{ fontSize: '0.82rem', fontWeight: 'bold', color: '#711a19', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <i className="fa-solid fa-flag-checkered"></i>
-                <span>Step {currentStep} จาก {STEPS.length}: <strong>{currentStepObj.title} ({currentStepObj.labelThai})</strong></span>
+                <span>Step {safeCurrentStep} จาก {STEPS.length}: <strong>{currentStepObj.title} ({currentStepObj.labelThai})</strong></span>
                 <span style={{ backgroundColor: '#fef2f2', color: '#711a19', padding: '1px 6px', borderRadius: '4px', fontSize: '0.75rem' }}>{percent}%</span>
               </div>
               
@@ -1169,7 +1191,7 @@ function WorkshopCharacterBuilder({ onCancel }) {
             </div>
 
             {/* Next Button with Named Next Step */}
-            {currentStep < STEPS.length ? (
+            {safeCurrentStep < STEPS.length ? (
               <button 
                 className="btn-builder-next" 
                 onClick={handleNext}

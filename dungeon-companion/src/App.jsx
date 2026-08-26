@@ -20,6 +20,8 @@ import ClassTest from './pages/ClassTest';
 import ClassTestDM from './pages/ClassTestDM';
 import ClassTestResult from './pages/ClassTestResult';
 import Feedback from './pages/Feedback';
+import LegalNotice from './pages/LegalNotice';
+import ResetPassword from './pages/ResetPassword';
 import { Dice3DProvider } from './components/dice3d/Dice3DProvider';
 import Dice3DCanvas from './components/dice3d/Dice3DCanvas';
 
@@ -62,12 +64,14 @@ function AppContent() {
           <Route path="/sheets" element={<Sheets />} />
           <Route path="/character/:id" element={<CharacterSheetPage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/class-test" element={<ClassTest />} />
           <Route path="/class-test-dm" element={<ClassTestDM />} />
           <Route path="/class-test-result" element={<ClassTestResult />} />
           <Route path="/feedback" element={<Feedback />} />
+          <Route path="/legal" element={<LegalNotice />} />
           
           {/* เส้นทางลับสำหรับ DM */}
           <Route path="/admin" element={<AdminDashboard />} />

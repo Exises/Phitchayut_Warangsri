@@ -104,7 +104,9 @@ function Sheets() {
 
   const handleExportJson = async (char) => {
     try {
-      const res = await fetch(`http://localhost:5000/api?action=get_character_by_id&id=${char.char_id}`);
+      const u = JSON.parse(localStorage.getItem('dnd_user') || '{}');
+      const uid = u.user_id || '';
+      const res = await fetch(`http://localhost:5000/api?action=get_character_by_id&id=${char.char_id}&user_id=${uid}`);
       const charObj = await res.json();
       if (charObj && !charObj.error) {
         const exportPayload = charObj.build_data || charObj;
