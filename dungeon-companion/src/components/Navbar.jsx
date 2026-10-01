@@ -72,8 +72,9 @@ function Navbar() {
             <div className="menu">
               <Link to="/" className={isActive("/")}>หน้าแรก</Link>
               <Link to="/workshop" className={isActive("/workshop")} onClick={(e) => handleProtectedClick(e, "/workshop")}>เวิร์คช็อป</Link>
-              <Link to="/compendium" className={isActive("/compendium")} onClick={(e) => handleProtectedClick(e, "/compendium")}>คลังข้อมูล</Link>
+              <Link to="/compendium" className={isActive("/compendium")}>คลังข้อมูล</Link>
               <Link to="/sheets" className={isActive("/sheets")} onClick={(e) => handleProtectedClick(e, "/sheets")}>ตัวละครของฉัน</Link>
+              <Link to="/how-to-play" className={isActive("/how-to-play")}>วิธีการเล่น</Link>
             </div>
 
             <div className="auth-buttons">
@@ -105,8 +106,9 @@ function Navbar() {
           <div className="mobile-menu">
             <Link to="/" className={isActive("/")} onClick={() => setIsMobileMenuOpen(false)}>หน้าแรก</Link>
             <Link to="/workshop" className={isActive("/workshop")} onClick={(e) => { setIsMobileMenuOpen(false); handleProtectedClick(e, "/workshop"); }}>เวิร์คช็อป</Link>
-            <Link to="/compendium" className={isActive("/compendium")} onClick={(e) => { setIsMobileMenuOpen(false); handleProtectedClick(e, "/compendium"); }}>คลังข้อมูล</Link>
+            <Link to="/compendium" className={isActive("/compendium")} onClick={() => setIsMobileMenuOpen(false)}>คลังข้อมูล</Link>
             <Link to="/sheets" className={isActive("/sheets")} onClick={(e) => { setIsMobileMenuOpen(false); handleProtectedClick(e, "/sheets"); }}>ตัวละครของฉัน</Link>
+            <Link to="/how-to-play" className={isActive("/how-to-play")} onClick={() => setIsMobileMenuOpen(false)}>วิธีการเล่น</Link>
           </div>
         )}
       </nav>

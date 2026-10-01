@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import './settings-theme.css';
@@ -22,6 +23,8 @@ import ClassTestResult from './pages/ClassTestResult';
 import Feedback from './pages/Feedback';
 import LegalNotice from './pages/LegalNotice';
 import ResetPassword from './pages/ResetPassword';
+import HowToPlay from './pages/HowToPlay';
+import Suspended from './pages/Suspended';
 import { Dice3DProvider } from './components/dice3d/Dice3DProvider';
 import Dice3DCanvas from './components/dice3d/Dice3DCanvas';
 
@@ -43,9 +46,35 @@ function App() {
 
 function AppContent() {
   const location = useLocation();
+  const navigate = useNavigate();
   const isLoginPage = location.pathname === '/login' || location.pathname === '/admin-login';
   const isAdminPage = location.pathname.startsWith('/admin') && location.pathname !== '/admin-login';
   const isPlaySheetPage = location.pathname.startsWith('/character/');
+
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      const savedUser = localStorage.getItem('dnd_user');
+      if (savedUser && !isAdminPage && location.pathname !== '/suspended') {
+        try {
+          const user = JSON.parse(savedUser);
+          const res = await fetch('http://localhost:5000/api/auth/check_status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: user.user_id })
+          });
+          const json = await res.json();
+          if (json.status === 'suspended' || json.status === 'banned') {
+            localStorage.removeItem('dnd_user');
+            navigate('/suspended');
+            window.location.reload();
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    };
+    checkUserStatus();
+  }, [location.pathname, navigate, isAdminPage]);
 
   return (
     <div className="app-container" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -56,6 +85,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/workshop" element={<Workshop />} />
+          <Route path="/suspended" element={<Suspended />} />
           
           {/* Compendium Routes */}
           <Route path="/compendium" element={<CompendiumHub />} />
@@ -72,6 +102,7 @@ function AppContent() {
           <Route path="/class-test-result" element={<ClassTestResult />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/legal" element={<LegalNotice />} />
+          <Route path="/how-to-play" element={<HowToPlay />} />
           
           {/* เส้นทางลับสำหรับ DM */}
           <Route path="/admin" element={<AdminDashboard />} />

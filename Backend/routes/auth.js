@@ -39,6 +39,12 @@ router.post('/login', async (req, res) => {
         const user = users[0];
 
         if (user && await bcrypt.compare(password, user.user_password)) {
+            if (user.status === 'suspended') {
+                return res.status(403).json({ status: 'error', message: 'บัญชีนี้ถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ' });
+            }
+            if (user.status === 'banned') {
+                return res.status(403).json({ status: 'error', message: 'บัญชีนี้ถูกระงับการใช้งานอย่างถาวร' });
+            }
             delete user.user_password;
             res.json({ status: 'success', user });
         } else {
@@ -224,3 +230,18 @@ router.post('/reset-password', async (req, res) => {
 });
 
 module.exports = router;
+
+router.post('/check_status', async (req, res) => {
+    try {
+        const { user_id } = req.body;
+        if (!user_id) return res.json({ status: 'active' });
+        
+        const [users] = await pool.query("SELECT status FROM users WHERE user_id = ?", [user_id]);
+        if (users.length > 0) {
+            return res.json({ status: users[0].status });
+        }
+        return res.json({ status: 'active' });
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: err.message });
+    }
+});

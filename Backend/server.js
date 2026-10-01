@@ -62,6 +62,9 @@ app.use((req, res, next) => {
                 case 'verify_password':
                     req.url = '/api/auth/verify_password';
                     break;
+                case 'check_status':
+                    req.url = '/api/auth/check_status';
+                    break;
                 
                 // Logs
                 case 'add_character_log':

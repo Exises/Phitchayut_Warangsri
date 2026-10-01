@@ -535,7 +535,7 @@ a {
 /* Feature Cards */
 .card {
     background-color: var(--bg-white);
-    border: 1px solid #e5e7eb;
+    /* border: 1px solid #e5e7eb; replaced */
     /* border-gray-200 */
     padding: 24px;
     text-align: left;
@@ -1407,6 +1407,9 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
     justify-content: center;
     padding: 20px;
     background-color: var(--bg-paper);
+    /* เพิ่มมิติความลึกด้วย Vignette ดำๆ ขอบจอ */
+    background-image: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.15) 120%);
+    position: relative;
 }
 
 .auth-split-card {
@@ -1421,7 +1424,8 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
     overflow: hidden;
     border: 1px solid #e5e7eb;
     /* เพิ่มขอบสีเทาอ่อนรอบการ์ด */
-    box-shadow: 0 50px 120px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3), 0 10px 40px rgba(113, 26, 25, 0.15);
+      border: 1px solid #d4c5b0; /* สีขอบให้ดูเป็นกระดาษเก่าๆ นิดนึง */
     position: relative;
     animation: fadeIn 0.8s ease-out;
 }
@@ -1442,7 +1446,9 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 /* Left Panel */
 .auth-left-panel {
     flex: 1;
-    background-color: #8b8d81;
+    /* เปลี่ยนเป็น Gradient ไล่สีเขียวมะกอกเข้มๆ ไปดำ */
+      background: linear-gradient(135deg, #5b5e53 0%, #2a2d24 100%);
+      box-shadow: inset -10px 0 30px rgba(0,0,0,0.2); /* เงาด้านในสร้างมิติรอยพับ */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1480,10 +1486,10 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 /* Right Panel */
 .auth-right-panel {
     flex: 1.3;
-    /* ปรับสัดส่วนฝั่งขวาให้กว้างขึ้นเล็กน้อย */
     padding: 90px 100px;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     background-color: var(--bg-white);
 }
 
@@ -3728,4 +3734,130 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   color: #711a19 !important;
   font-weight: 800 !important;
   font-size: 0.95rem !important;
+}
+
+.quiz-choice-btn.selected {
+    border-color: var(--color-red);
+    background-color: rgba(113, 26, 25, 0.05);
+}
+
+.quiz-choice-btn.selected .choice-radio-circle {
+    border-color: var(--color-red);
+    background-color: var(--color-red);
+    box-shadow: inset 0 0 0 3px white;
+}
+
+
+/* Input Autofill fix */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: var(--color-ink) !important;
+}
+
+/* Forgot Password Link Enhancements */
+.forgot-link {
+    color: #991b1b !important;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+.forgot-link:hover {
+    color: #ef4444 !important;
+    text-decoration: underline;
+}
+
+/* Increase spacing between icon and input text */
+.input-with-icon input {
+    padding-left: 55px !important; 
+}
+.input-with-icon i {
+    left: 20px !important;
+}
+
+
+.input-with-icon input {
+    background-color: #faf9f6; /* สีออฟไวท์ */
+    border: 1px solid #d1d5db;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04); /* เงาหลุมตื้นๆ */
+}
+.input-with-icon input:focus {
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(113, 26, 25, 0.1), inset 0 2px 4px rgba(0, 0, 0, 0.02);
+    border-color: #711a19;
+}
+
+
+/* =========================================
+   ADMIN DASHBOARD ENHANCEMENTS
+   ========================================= */
+.admin-kpi-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.admin-kpi-card:hover {
+    transform: translateY(-4px);
+}
+
+.admin-kpi-card.glow-blue:hover {
+    border-color: #38bdf8 !important;
+    box-shadow: 0 10px 25px rgba(56, 189, 248, 0.15), 0 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+.admin-kpi-card.glow-green:hover {
+    border-color: #4ade80 !important;
+    box-shadow: 0 10px 25px rgba(74, 222, 128, 0.15), 0 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+.admin-kpi-card.glow-purple:hover {
+    border-color: #c084fc !important;
+    box-shadow: 0 10px 25px rgba(192, 132, 252, 0.15), 0 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+.admin-kpi-card.glow-yellow:hover {
+    border-color: #fbbf24 !important;
+    box-shadow: 0 10px 25px rgba(251, 191, 36, 0.15), 0 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+.admin-kpi-card.glow-red:hover {
+    border-color: #f87171 !important;
+    box-shadow: 0 10px 25px rgba(248, 113, 113, 0.15), 0 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+.admin-progress-bar {
+    display: flex;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 10px;
+    background-color: #334155;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.admin-progress-segment {
+    height: 100%;
+    transition: width 1s ease-out;
+}
+
+/* Admin Catalog Table Row Hover */
+.admin-catalog-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.admin-catalog-table tbody tr:hover {
+    background-color: rgba(56, 189, 248, 0.05) !important;
+}
+
+.admin-catalog-table select,
+.admin-catalog-table input {
+    outline: none;
+}
+
+.admin-catalog-table select:focus,
+.admin-catalog-table input:focus {
+    border-color: #38bdf8 !important;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
 }

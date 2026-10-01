@@ -3652,17 +3652,11 @@ export default function Step7Review({
               >
                 <i className="fa-solid fa-file-export"></i> Export Character JSON
               </button>
-              <button
-                onClick={() => window.print()}
-                style={{ backgroundColor: 'var(--color-ink)', color: 'var(--bg-white)', padding: '14px 28px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.15)', display: 'inline-flex', alignItems: 'center', gap: '10px' }}
-              >
-                <i className="fa-solid fa-print"></i> Print Sheet / PDF
-              </button>
             </div>
             {/* TOAST: Dice Roller */}
             <DiceResultToast diceModalData={diceModalData} setDiceModalData={setDiceModalData} />
 
-            {/* MODAL: Manage Hit Points (5e RAW) */}
+            {/* MODAL: จัดการพลังชีวิต (Hit Points) */}
             {showHpAdjustModal && ReactDOM.createPortal(
               (() => {
                 const activeDeathSucc = deathSaves?.succ ? deathSaves.succ.filter(Boolean).length : deathSaveSuccess;
@@ -3692,12 +3686,12 @@ export default function Step7Review({
                       {/* Summary Bar */}
                       <div style={{ backgroundColor: '#f8f4e9', border: '1px solid #e2d8c3', borderRadius: '8px', padding: '10px 14px', marginBottom: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                          <span style={{ fontSize: '0.75rem', color: 'var(--color-gray)', fontWeight: 'bold' }}>CURRENT HP: </span>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--color-gray)', fontWeight: 'bold' }}>HP ปัจจุบัน: </span>
                           <strong style={{ fontFamily: 'Cinzel, serif', fontSize: '1.35rem', color: curHp <= 0 ? '#dc2626' : '#711a19' }}>{curHp}</strong>
                           <span style={{ color: 'var(--color-gray)', fontSize: '1rem' }}> / {maxHp}</span>
                         </div>
                         <div style={{ borderLeft: '1px solid #e2d8c3', paddingLeft: '14px', textAlign: 'right' }}>
-                          <span style={{ fontSize: '0.75rem', color: 'var(--color-gray)', fontWeight: 'bold' }}>TEMP HP: </span>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--color-gray)', fontWeight: 'bold' }}>HP ชั่วคราว: </span>
                           <strong style={{ fontFamily: 'Cinzel, serif', fontSize: '1.25rem', color: reviewHpTemp > 0 ? '#2563eb' : 'var(--color-gray)' }}>{reviewHpTemp > 0 ? `+${reviewHpTemp}` : '--'}</strong>
                         </div>
                       </div>
@@ -3714,7 +3708,7 @@ export default function Step7Review({
                             fontWeight: 'bold', fontSize: '0.78rem', cursor: 'pointer', transition: 'all 0.15s'
                           }}
                         >
-                          ❤️ HP & Damage
+                          ❤️ พลังชีวิต & ดาเมจ
                         </button>
                         <button
                           type="button"
@@ -3762,7 +3756,7 @@ export default function Step7Review({
 
                           <div style={{ marginBottom: '14px' }}>
                             <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 'bold', color: 'var(--color-gray)', marginBottom: '6px' }}>
-                              Enter Amount / ระบุตัวเลข:
+                              กรอกจำนวนตัวเลข:
                             </label>
 
                             {/* Quick Amount Chips */}
@@ -3788,7 +3782,7 @@ export default function Step7Review({
                               type="number"
                               value={hpAdjustVal}
                               onChange={e => setHpAdjustVal(e.target.value)}
-                              placeholder="Enter amount e.g. 8"
+                              placeholder="กรอกตัวเลข เช่น 8"
                               style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem', outline: 'none', backgroundColor: 'var(--bg-white)' }}
                             />
                           </div>
@@ -3813,7 +3807,7 @@ export default function Step7Review({
                                 }
                                 const newHP = Math.max(0, curHp - remainingDmg);
                                 syncHpAndSave(newHP, newTemp);
-                                logHpAction(`Take Damage (-${amount})`, `Remaining HP: ${newHP}/${maxHp}` + (reviewHpTemp > 0 ? ` (Absorbed by Temp HP)` : ''), `${newHP}/${maxHp}`);
+                                logHpAction(`รับดาเมจ (-${amount})`, `Remaining HP: ${newHP}/${maxHp}` + (reviewHpTemp > 0 ? ` (Absorbed by Temp HP)` : ''), `${newHP}/${maxHp}`);
                                 setHpAdjustVal('');
                                 if (newHP === 0) setActiveHpTab('deathsaves');
                               }}
@@ -3828,7 +3822,7 @@ export default function Step7Review({
                                 if (amount <= 0) return;
                                 const newHP = Math.min(maxHp, curHp + amount);
                                 syncHpAndSave(newHP, reviewHpTemp);
-                                logHpAction(`Regain HP (+${amount})`, `Recovered to: ${newHP}/${maxHp}`, `${newHP}/${maxHp}`);
+                                logHpAction(`ฮีล (ฟื้นฟู) (+${amount})`, `Recovered to: ${newHP}/${maxHp}`, `${newHP}/${maxHp}`);
                                 setHpAdjustVal('');
                               }}
                               style={{ padding: '12px', backgroundColor: '#16a34a', color: 'var(--bg-white)', border: 'none', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.15s' }}
@@ -3851,13 +3845,13 @@ export default function Step7Review({
                               }}
                               style={{ padding: '10px', backgroundColor: '#2563eb', color: 'var(--bg-white)', border: 'none', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.15s' }}
                             >
-                              <i className="fa-solid fa-shield-halved"></i> +Gain Temp HP
+                              <i className="fa-solid fa-shield-halved"></i> +เพิ่ม HP ชั่วคราว
                             </button>
                             <button
                               type="button"
                               onClick={() => {
                                 syncHpAndSave(curHp, 0);
-                                logHpAction(`Clear Temp HP`, `Temp HP reset to 0`, `0`);
+                                logHpAction(`ลบ HP ชั่วคราว`, `Temp HP reset to 0`, `0`);
                                 setHpAdjustVal('');
                               }}
                               style={{ padding: '10px', backgroundColor: 'var(--bg-sidebar)', color: 'var(--color-gray)', border: '1px solid #cbd5e1', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.15s' }}
@@ -4122,7 +4116,7 @@ export default function Step7Review({
                           onClick={() => setShowHpAdjustModal(false)}
                           style={{ backgroundColor: '#711a19', color: 'var(--bg-white)', padding: '8px 20px', borderRadius: '6px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
                         >
-                          Done / Close
+                          เสร็จสิ้น / ปิดหน้าต่าง
                         </button>
                       </div>
                     </div>

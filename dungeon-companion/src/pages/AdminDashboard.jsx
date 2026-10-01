@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -71,6 +72,10 @@ export default function AdminDashboard() {
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
   const [filterSubcategory, setFilterSubcategory] = useState('all');
+  const [filterSpellSchool, setFilterSpellSchool] = useState('all');
+  const [filterSpellLevel, setFilterSpellLevel] = useState('all');
+  const [filterClassHitDie, setFilterClassHitDie] = useState('all');
+  const [filterFeatType, setFilterFeatType] = useState('all');
 
   // Modal & Form States
   const [modalType, setModalType] = useState(null); // 'user_edit' | 'feedback_respond' | 'item_form' | 'spell_form' | 'race_form' | 'class_form' | 'delete_confirm'
@@ -149,7 +154,7 @@ export default function AdminDashboard() {
 
     } catch (err) {
       console.error("Error refreshing admin data:", err);
-      showToast("❌ ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์ได้", "error");
+      showToast("ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์ได้", "error");
     } finally {
       setLoading(false);
     }
@@ -201,19 +206,70 @@ export default function AdminDashboard() {
       });
       const json = await res.json();
       if (json.status === 'success') {
-        showToast("✅ อัปเดตข้อมูลผู้ใช้งานเรียบร้อย");
+        showToast("อัปเดตข้อมูลผู้ใช้งานเรียบร้อย");
         setModalType(null);
         refreshAllData();
       } else {
         showToast(`❌ ${json.message}`, "error");
       }
     } catch (err) {
-      showToast("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล", "error");
+      showToast("เกิดข้อผิดพลาดในการบันทึกข้อมูล", "error");
+    }
+  };
+
+
+  const handleToggleUserStatus = async (user, newStatus) => {
+    const actionText = newStatus === 'suspended' ? 'ระงับ' : 'ปลดระงับ';
+    const result = await Swal.fire({
+      title: 'ยืนยันการดำเนินการ',
+      text: "คุณต้องการทำรายการนี้ใช่หรือไม่?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#334155',
+      confirmButtonText: 'ใช่, ดำเนินการ',
+      cancelButtonText: 'ยกเลิก',
+      background: '#1e293b',
+      color: '#f8fafc'
+    });
+    if (!result.isConfirmed) return;
+    try {
+      const res = await fetch('http://localhost:5000/api', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_user',
+          admin_id: adminUser.user_id,
+          target_user_id: user.user_id,
+          status: newStatus
+        })
+      });
+      const json = await res.json();
+      if (json.status === 'success') {
+        showToast(`${actionText}บัญชีผู้ใช้เรียบร้อยแล้ว`);
+        refreshAllData();
+      } else {
+        showToast(`❌ ${json.message}`, "error");
+      }
+    } catch (err) {
+      showToast(`เกิดข้อผิดพลาดในการ${actionText}ผู้ใช้`, "error");
     }
   };
 
   const handleDeleteUser = async (user) => {
-    if (!window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบบัญชีผู้ใช้ "${user.user_name}"?`)) return;
+    const result = await Swal.fire({
+      title: 'ยืนยันการดำเนินการ',
+      text: "คุณต้องการทำรายการนี้ใช่หรือไม่?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#334155',
+      confirmButtonText: 'ใช่, ดำเนินการ',
+      cancelButtonText: 'ยกเลิก',
+      background: '#1e293b',
+      color: '#f8fafc'
+    });
+    if (!result.isConfirmed) return;
     try {
       const res = await fetch('http://localhost:5000/api', {
         method: 'POST',
@@ -226,13 +282,13 @@ export default function AdminDashboard() {
       });
       const json = await res.json();
       if (json.status === 'success') {
-        showToast("🗑️ ลบบัญชีผู้ใช้เรียบร้อยแล้ว");
+        showToast(<> <i className="fa-solid fa-circle-check" style={{marginRight:"4px"}}></i> ลบบัญชีผู้ใช้เรียบร้อยแล้ว </>);
         refreshAllData();
       } else {
         showToast(`❌ ${json.message}`, "error");
       }
     } catch (err) {
-      showToast("❌ เกิดข้อผิดพลาดในการลบผู้ใช้", "error");
+      showToast("เกิดข้อผิดพลาดในการลบผู้ใช้", "error");
     }
   };
 
@@ -284,19 +340,31 @@ export default function AdminDashboard() {
       });
       const json = await res.json();
       if (json.status === 'success') {
-        showToast("✅ อัปเดตการตอบกลับเรียบร้อย");
+        showToast("อัปเดตการตอบกลับเรียบร้อย");
         setModalType(null);
         refreshAllData();
       } else {
         showToast(`❌ ${json.message}`, "error");
       }
     } catch (err) {
-      showToast("❌ เกิดข้อผิดพลาดในการอัปเดตข้อเสนอแนะ", "error");
+      showToast("เกิดข้อผิดพลาดในการอัปเดตข้อเสนอแนะ", "error");
     }
   };
 
   const handleDeleteFeedback = async (fbId) => {
-    if (!window.confirm("คุณต้องการลบข้อเสนอแนะรายการนี้หรือไม่?")) return;
+    const result = await Swal.fire({
+      title: 'ยืนยันการดำเนินการ',
+      text: "คุณต้องการทำรายการนี้ใช่หรือไม่?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#334155',
+      confirmButtonText: 'ใช่, ดำเนินการ',
+      cancelButtonText: 'ยกเลิก',
+      background: '#1e293b',
+      color: '#f8fafc'
+    });
+    if (!result.isConfirmed) return;
     try {
       const res = await fetch('http://localhost:5000/api', {
         method: 'POST',
@@ -309,13 +377,13 @@ export default function AdminDashboard() {
       });
       const json = await res.json();
       if (json.status === 'success') {
-        showToast("🗑️ ลบข้อเสนอแนะเรียบร้อย");
+        showToast(<> <i className="fa-solid fa-circle-check" style={{marginRight:"4px"}}></i> ลบข้อเสนอแนะเรียบร้อย </>);
         refreshAllData();
       } else {
         showToast(`❌ ${json.message}`, "error");
       }
     } catch (err) {
-      showToast("❌ เกิดข้อผิดพลาดในการลบข้อเสนอแนะ", "error");
+      showToast("เกิดข้อผิดพลาดในการลบข้อเสนอแนะ", "error");
     }
   };
 
@@ -369,12 +437,24 @@ export default function AdminDashboard() {
         showToast(`❌ ${json.message}`, "error");
       }
     } catch (err) {
-      showToast("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล", "error");
+      showToast("เกิดข้อผิดพลาดในการบันทึกข้อมูล", "error");
     }
   };
 
   const handleDeleteCatalogItem = async (table, itemId) => {
-    if (!window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบรายการรหัส "${itemId}" ออกจากคลังข้อมูล?`)) return;
+    const result = await Swal.fire({
+      title: 'ยืนยันการดำเนินการ',
+      text: "คุณต้องการทำรายการนี้ใช่หรือไม่?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#334155',
+      confirmButtonText: 'ใช่, ดำเนินการ',
+      cancelButtonText: 'ยกเลิก',
+      background: '#1e293b',
+      color: '#f8fafc'
+    });
+    if (!result.isConfirmed) return;
     try {
       const res = await fetch('http://localhost:5000/api', {
         method: 'POST',
@@ -388,13 +468,13 @@ export default function AdminDashboard() {
       });
       const json = await res.json();
       if (json.status === 'success') {
-        showToast("🗑️ ลบรายการข้อมูลเรียบร้อยแล้ว");
+        showToast(<> <i className="fa-solid fa-circle-check" style={{marginRight:"4px"}}></i> ลบรายการข้อมูลเรียบร้อยแล้ว </>);
         refreshAllData();
       } else {
         showToast(`❌ ${json.message}`, "error");
       }
     } catch (err) {
-      showToast("❌ เกิดข้อผิดพลาดในการลบข้อมูล", "error");
+      showToast("เกิดข้อผิดพลาดในการลบข้อมูล", "error");
     }
   };
 
@@ -423,7 +503,8 @@ export default function AdminDashboard() {
   }, [feedbackList, searchTerm, filterCategory, filterPriority, filterStatus]);
 
   const filteredItems = useMemo(() => {
-    return (ccData.items || []).filter(i => {
+
+  return (ccData.items || []).filter(i => {
       const q = searchTerm.toLowerCase();
       const matchQuery = (i.item_name || '').toLowerCase().includes(q) || (i.item_type || '').toLowerCase().includes(q) || (i.item_desc || '').toLowerCase().includes(q);
       const matchSub = filterSubcategory === 'all' || i.item_type === filterSubcategory;
@@ -435,17 +516,23 @@ export default function AdminDashboard() {
     return (ccData.spells || []).filter(s => {
       const q = searchTerm.toLowerCase();
       const matchQuery = (s.spell_name || '').toLowerCase().includes(q) || (s.school || '').toLowerCase().includes(q) || (s.spell_desc || '').toLowerCase().includes(q);
-      return matchQuery;
+      const matchSchool = filterSpellSchool === 'all' || (s.school || '') === filterSpellSchool;
+      const matchLevel = filterSpellLevel === 'all' || String(s.spell_level) === filterSpellLevel;
+      return matchQuery && matchSchool && matchLevel;
     });
-  }, [ccData.spells, searchTerm]);
+  }, [ccData.spells, searchTerm, filterSpellSchool, filterSpellLevel]);
 
   const filteredRaces = useMemo(() => {
     return (ccData.races || []).filter(r => (r.species_name || '').toLowerCase().includes(searchTerm.toLowerCase()));
   }, [ccData.races, searchTerm]);
 
   const filteredClasses = useMemo(() => {
-    return (ccData.classes || []).filter(c => (c.class_name || '').toLowerCase().includes(searchTerm.toLowerCase()));
-  }, [ccData.classes, searchTerm]);
+    return (ccData.classes || []).filter(c => {
+      const matchQuery = (c.class_name || '').toLowerCase().includes(searchTerm.toLowerCase());
+      const matchHitDie = filterClassHitDie === 'all' || String(c.hit_die) === filterClassHitDie;
+      return matchQuery && matchHitDie;
+    });
+  }, [ccData.classes, searchTerm, filterClassHitDie]);
 
   const filteredSubclasses = useMemo(() => {
     return (ccData.subclasses || []).filter(s => (s.subclass_name || '').toLowerCase().includes(searchTerm.toLowerCase()));
@@ -456,12 +543,74 @@ export default function AdminDashboard() {
   }, [ccData.backgrounds, searchTerm]);
 
   const filteredFeats = useMemo(() => {
-    return (ccData.feats || []).filter(f => (f.feat_name || '').toLowerCase().includes(searchTerm.toLowerCase()));
-  }, [ccData.feats, searchTerm]);
+    return (ccData.feats || []).filter(f => {
+      const matchQuery = (f.feat_name || '').toLowerCase().includes(searchTerm.toLowerCase());
+      const matchType = filterFeatType === 'all' || (f.feat_type || '') === filterFeatType;
+      return matchQuery && matchType;
+    });
+  }, [ccData.feats, searchTerm, filterFeatType]);
 
+    // 📊 Calculate Spell Distribution (By Level)
+  const spellLevels = useMemo(() => {
+    if (!ccData.spells) return { cantrips: 0, low: 0, mid: 0, high: 0, total: 1 };
+    return ccData.spells.reduce((acc, spell) => {
+      const lvl = parseInt(spell.spell_level ?? spell.level ?? 0);
+      if (lvl === 0) acc.cantrips++;
+      else if (lvl <= 3) acc.low++;
+      else if (lvl <= 6) acc.mid++;
+      else acc.high++;
+      return acc;
+    }, { cantrips: 0, low: 0, mid: 0, high: 0, total: ccData.spells.length || 1 });
+  }, [ccData.spells]);
 
-  return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0f172a', color: '#f8fafc', display: 'flex', flexDirection: 'column', fontFamily: 'Inter, system-ui, sans-serif' }}>
+  // 📊 Calculate Item Distribution (By Type - Real DB values)
+  const itemTypes = useMemo(() => {
+    if (!ccData.items) return { weapon: 0, armor: 0, magicItem: 0, gear: 0, tool: 0, vehicle: 0, total: 1 };
+    return ccData.items.reduce((acc, item) => {
+      const t = (item.item_type || '').toLowerCase();
+      if (t === 'weapon') acc.weapon++;
+      else if (t === 'armor') acc.armor++;
+      else if (t === 'magic item') acc.magicItem++;
+      else if (t === 'tool') acc.tool++;
+      else if (t === 'vehicle' || t === 'mount') acc.vehicle++;
+      else acc.gear++;
+      return acc;
+    }, { weapon: 0, armor: 0, magicItem: 0, gear: 0, tool: 0, vehicle: 0, total: ccData.items.length || 1 });
+  }, [ccData.items]);
+
+  // 📊 Calculate Class Distribution (By Hit Dice)
+  const classHitDice = useMemo(() => {
+    if (!ccData.classes) return { d6: 0, d8: 0, d10: 0, d12: 0, total: 1 };
+    return ccData.classes.reduce((acc, cls) => {
+      const hd = parseInt(cls.hit_die) || 8;
+      if (hd <= 6) acc.d6++;
+      else if (hd === 8) acc.d8++;
+      else if (hd === 10) acc.d10++;
+      else acc.d12++;
+      return acc;
+    }, { d6: 0, d8: 0, d10: 0, d12: 0, total: ccData.classes.length || 1 });
+  }, [ccData.classes]);
+
+  // Chart Gradient Helpers
+  const spC = (spellLevels.cantrips / spellLevels.total) * 360;
+  const spL = (spellLevels.low / spellLevels.total) * 360;
+  const spM = (spellLevels.mid / spellLevels.total) * 360;
+  const spellConic = `conic-gradient(#94a3b8 0deg ${spC}deg, #4ade80 ${spC}deg ${spC+spL}deg, #38bdf8 ${spC+spL}deg ${spC+spL+spM}deg, #c084fc ${spC+spL+spM}deg 360deg)`;
+
+  const itW = (itemTypes.weapon / itemTypes.total) * 360;
+  const itA = (itemTypes.armor / itemTypes.total) * 360;
+  const itMI = (itemTypes.magicItem / itemTypes.total) * 360;
+  const itT = (itemTypes.tool / itemTypes.total) * 360;
+  const itV = (itemTypes.vehicle / itemTypes.total) * 360;
+  const itemConic = `conic-gradient(#ef4444 0deg ${itW}deg, #3b82f6 ${itW}deg ${itW+itA}deg, #a855f7 ${itW+itA}deg ${itW+itA+itMI}deg, #f59e0b ${itW+itA+itMI}deg ${itW+itA+itMI+itT}deg, #14b8a6 ${itW+itA+itMI+itT}deg ${itW+itA+itMI+itT+itV}deg, #94a3b8 ${itW+itA+itMI+itT+itV}deg 360deg)`;
+
+  const cl6 = (classHitDice.d6 / classHitDice.total) * 360;
+  const cl8 = (classHitDice.d8 / classHitDice.total) * 360;
+  const cl10 = (classHitDice.d10 / classHitDice.total) * 360;
+  const classConic = `conic-gradient(#38bdf8 0deg ${cl6}deg, #a855f7 ${cl6}deg ${cl6+cl8}deg, #f43f5e ${cl6+cl8}deg ${cl6+cl8+cl10}deg, #f59e0b ${cl6+cl8+cl10}deg 360deg)`;
+
+return (
+<div style={{ minHeight: '100vh', backgroundColor: '#0f172a', color: '#f8fafc', display: 'flex', flexDirection: 'column', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
       {/* Toast Alert */}
       {toastMessage && (
@@ -485,54 +634,32 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Top Header Bar */}
-      <header style={{ backgroundColor: '#1e293b', borderBottom: '1px solid #334155', padding: '16px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '42px', height: '42px', borderRadius: '10px', backgroundColor: 'var(--color-crimson, #991b1b)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.4rem', fontWeight: 'bold' }}>
-            ⚡
-          </div>
-          <div>
-            <h1 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, letterSpacing: '0.5px', color: '#f1f5f9' }}>
-              ADMIN CONTROL CENTER
-            </h1>
-            <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: 0 }}>
-              ระบบบริหารจัดการข้อมูล D&D Companion | สิทธิ์ผู้ดูแลระบบสูงสุด
-            </p>
-          </div>
-        </div>
-
-        {/* User Info & Refresh */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button
-            onClick={refreshAllData}
-            disabled={loading}
-            style={{ backgroundColor: '#334155', color: '#e2e8f0', border: '1px solid #475569', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            {loading ? '🔄 กำลังโหลด...' : '🔄 รีเฟรชข้อมูล'}
-          </button>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#0f172a', padding: '6px 12px', borderRadius: '20px', border: '1px solid #334155' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e' }}></span>
-            <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#cbd5e1' }}>
-              {adminUser?.user_name || 'Admin'}
-            </span>
-          </div>
-
-          <button
-            onClick={handleAdminLogout}
-            style={{ backgroundColor: '#7f1d1d', color: '#fca5a5', border: '1px solid #991b1b', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '700' }}
-          >
-            🚪 ออกจากระบบ
-          </button>
-        </div>
-      </header>
+      
 
       {/* Main Container Layout */}
       <div style={{ display: 'flex', flex: 1 }}>
         
         {/* Sidebar Navigation */}
         <aside style={{ width: '260px', backgroundColor: '#1e293b', borderRight: '1px solid #334155', padding: '20px 14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', padding: '0 8px 8px 8px' }}>
+          {/* User Info & Refresh */}
+          <div style={{ padding: '0 8px 16px 8px', borderBottom: '1px solid #334155', marginBottom: '8px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#0f172a', padding: '8px 12px', borderRadius: '8px', border: '1px solid #334155' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e' }}></span>
+              <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#cbd5e1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {adminUser?.user_name || 'Admin'}
+              </span>
+            </div>
+            
+            <button
+              onClick={refreshAllData}
+              disabled={loading}
+              style={{ width: '100%', backgroundColor: 'transparent', color: '#38bdf8', border: '1px solid #38bdf8', padding: '8px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.2s' }}
+            >
+              {loading ? <><i className="fa-solid fa-rotate-right fa-spin" style={{marginRight:"4px"}}></i>กำลังโหลด...</> : <><i className="fa-solid fa-rotate-right" style={{marginRight:"4px"}}></i>รีเฟรชข้อมูล</>}
+            </button>
+          </div>
+
+          <div style={{ fontSize: '0.9rem', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px', padding: '8px 8px 12px 8px' }}>
             เมนูควบคุมระบบ
           </div>
 
@@ -544,7 +671,7 @@ export default function AdminDashboard() {
               fontWeight: '700', fontSize: '0.88rem', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s'
             }}
           >
-            <span>📊 ภาพรวมระบบ (Overview)</span>
+            <span><i className="fa-solid fa-chart-pie" style={{marginRight:"8px"}}></i>ภาพรวมระบบ</span>
           </button>
 
           <button
@@ -555,7 +682,7 @@ export default function AdminDashboard() {
               fontWeight: '700', fontSize: '0.88rem', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s'
             }}
           >
-            <span>📚 จัดการคลังข้อมูล (Compendium)</span>
+            <span><i className="fa-solid fa-book-journal-whills" style={{marginRight:"8px"}}></i>จัดการคลังข้อมูล</span>
             <span style={{ backgroundColor: '#0f172a', padding: '2px 8px', borderRadius: '12px', fontSize: '0.72rem', color: '#cbd5e1' }}>
               {(ccData.items?.length || 0) + (ccData.spells?.length || 0)}
             </span>
@@ -569,7 +696,7 @@ export default function AdminDashboard() {
               fontWeight: '700', fontSize: '0.88rem', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s'
             }}
           >
-            <span>👥 จัดการบัญชีผู้ใช้ (Users)</span>
+            <span><i className="fa-solid fa-users" style={{marginRight:"8px"}}></i>จัดการบัญชีผู้ใช้</span>
             <span style={{ backgroundColor: '#0f172a', padding: '2px 8px', borderRadius: '12px', fontSize: '0.72rem', color: '#cbd5e1' }}>
               {usersList.length}
             </span>
@@ -583,7 +710,7 @@ export default function AdminDashboard() {
               fontWeight: '700', fontSize: '0.88rem', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s'
             }}
           >
-            <span>💬 ข้อเสนอแนะ & แจ้งปัญหา</span>
+            <span><i className="fa-solid fa-comments" style={{marginRight:"8px"}}></i>ข้อเสนอแนะ & แจ้งปัญหา</span>
             {stats.unread_feedbacks > 0 && (
               <span style={{ backgroundColor: '#ef4444', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontSize: '0.72rem', fontWeight: '800' }}>
                 {stats.unread_feedbacks} ใหม่
@@ -599,38 +726,38 @@ export default function AdminDashboard() {
           {activeTab === 'overview' && (
             <div>
               <h2 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '20px', color: '#f1f5f9' }}>
-                📌 ภาพรวมระบบและสถิติหลัก (Master Dashboard)
+                <i className="fa-solid fa-thumbtack" style={{marginRight:"8px"}}></i>ภาพรวมระบบและสถิติหลัก
               </h2>
 
               {/* KPI Cards Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '28px' }}>
                 
-                <div style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '12px', border: '1px solid #334155' }}>
-                  <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase' }}>ผู้ใช้งานทั้งหมด</div>
+                <div className="admin-kpi-card glow-blue" style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '12px', border: '1px solid #334155' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase' }}>ผู้ใช้งานทั้งหมด</div>
                   <div style={{ fontSize: '2rem', fontWeight: '900', color: '#38bdf8', marginTop: '6px' }}>{stats.users}</div>
                   <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>บัญชีในระบบ</div>
                 </div>
 
-                <div style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '12px', border: '1px solid #334155' }}>
-                  <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase' }}>ตัวละครในระบบ</div>
+                <div className="admin-kpi-card glow-green" style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '12px', border: '1px solid #334155' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase' }}>ตัวละครในระบบ</div>
                   <div style={{ fontSize: '2rem', fontWeight: '900', color: '#4ade80', marginTop: '6px' }}>{stats.characters}</div>
                   <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>ตัวละครที่ถูกสร้าง</div>
                 </div>
 
-                <div style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '12px', border: '1px solid #334155' }}>
-                  <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase' }}>คลังคาถาเวทมนตร์</div>
+                <div className="admin-kpi-card glow-purple" style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '12px', border: '1px solid #334155' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase' }}>คลังคาถาเวทมนตร์</div>
                   <div style={{ fontSize: '2rem', fontWeight: '900', color: '#c084fc', marginTop: '6px' }}>{stats.spells}</div>
                   <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>คาถาใน SQL DB</div>
                 </div>
 
-                <div style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '12px', border: '1px solid #334155' }}>
-                  <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase' }}>คลังไอเทม & อุปกรณ์</div>
+                <div className="admin-kpi-card glow-yellow" style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '12px', border: '1px solid #334155' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase' }}>คลังไอเทม & อุปกรณ์</div>
                   <div style={{ fontSize: '2rem', fontWeight: '900', color: '#fbbf24', marginTop: '6px' }}>{stats.items}</div>
                   <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>ไอเทมใน SQL DB</div>
                 </div>
 
-                <div style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '12px', border: '1px solid #334155' }}>
-                  <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase' }}>ข้อเสนอแนะ & บั๊ก</div>
+                <div className="admin-kpi-card glow-red" style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '12px', border: '1px solid #334155' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase' }}>ข้อเสนอแนะ & บั๊ก</div>
                   <div style={{ fontSize: '2rem', fontWeight: '900', color: '#f87171', marginTop: '6px' }}>{stats.feedbacks}</div>
                   <div style={{ fontSize: '0.75rem', color: '#fca5a5', marginTop: '4px' }}>{stats.unread_feedbacks} ยังไม่ได้อ่าน | {stats.bug_feedbacks} รายงานบั๊ก</div>
                 </div>
@@ -640,7 +767,7 @@ export default function AdminDashboard() {
               {/* System Info Quick Summary */}
               <div style={{ backgroundColor: '#1e293b', padding: '24px', borderRadius: '12px', border: '1px solid #334155' }}>
                 <h3 style={{ fontSize: '1rem', fontWeight: '800', margin: '0 0 14px 0', color: '#cbd5e1' }}>
-                  🛠️ ข้อมูลสรุปคลังข้อมูลกฎ D&D (Compendium Health)
+                  <i className="fa-solid fa-screwdriver-wrench" style={{marginRight:"8px"}}></i>ข้อมูลสรุปคลังข้อมูลกฎ D&D 
                 </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
                   <div style={{ backgroundColor: '#0f172a', padding: '12px 16px', borderRadius: '8px', border: '1px solid #334155' }}>
@@ -657,12 +784,81 @@ export default function AdminDashboard() {
                   </div>
                   <div style={{ backgroundColor: '#0f172a', padding: '12px 16px', borderRadius: '8px', border: '1px solid #334155' }}>
                     <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>ประวัติ (Backgrounds):</span>
-                    <strong style={{ display: 'block', fontSize: '1.2rem', color: '#f472b6' }}>{stats.backgrounds} ประวัติ</strong>
+                      <strong style={{ display: 'block', fontSize: '1.2rem', color: '#f472b6' }}>{stats.backgrounds} ประวัติ</strong>
+                    </div>
+                  </div>
+
+                  {/* 📈 NEW DONUT CHARTS DASHBOARD */}
+                  <div style={{ marginTop: '32px', paddingTop: '28px', borderTop: '1px solid #334155' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: '800', marginBottom: '20px', color: '#f8fafc' }}>
+                      <i className="fa-solid fa-chart-pie" style={{marginRight:"8px", color:"#38bdf8"}}></i>สัดส่วนข้อมูลเชิงลึก
+                    </h3>
+                    
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+                      
+                      {/* SPELL CHART */}
+                      <div style={{ backgroundColor: '#0f172a', padding: '20px', borderRadius: '12px', border: '1px solid #334155', display: 'flex', alignItems: 'center', gap: '20px' }}>
+                        <div style={{ position: 'relative', width: '100px', height: '100px', borderRadius: '50%', background: spellConic, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <div style={{ width: '75px', height: '75px', backgroundColor: '#0f172a', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+                            <span style={{ fontSize: '1.1rem', fontWeight: '900', color: '#f1f5f9' }}>{spellLevels.total}</span>
+                            <span style={{ fontSize: '0.55rem', color: '#64748b' }}>SPELLS</span>
+                          </div>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <h4 style={{ margin: '0 0 10px 0', fontSize: '0.85rem', color: '#cbd5e1' }}>หมวดหมู่คาถาเวทมนตร์</h4>
+                          <div style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span><span style={{ color: '#94a3b8' }}>●</span> Cantrip</span> <strong>{spellLevels.cantrips}</strong></div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span><span style={{ color: '#4ade80' }}>●</span> Lv 1-3</span> <strong>{spellLevels.low}</strong></div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span><span style={{ color: '#38bdf8' }}>●</span> Lv 4-6</span> <strong>{spellLevels.mid}</strong></div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span><span style={{ color: '#c084fc' }}>●</span> Lv 7-9</span> <strong>{spellLevels.high}</strong></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ITEM CHART */}
+                      <div style={{ backgroundColor: '#0f172a', padding: '20px', borderRadius: '12px', border: '1px solid #334155', display: 'flex', alignItems: 'center', gap: '20px' }}>
+                        <div style={{ position: 'relative', width: '100px', height: '100px', borderRadius: '50%', background: itemConic, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <div style={{ width: '75px', height: '75px', backgroundColor: '#0f172a', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+                            <span style={{ fontSize: '1.1rem', fontWeight: '900', color: '#f1f5f9' }}>{itemTypes.total}</span>
+                            <span style={{ fontSize: '0.55rem', color: '#64748b' }}>ITEMS</span>
+                          </div>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <h4 style={{ margin: '0 0 10px 0', fontSize: '0.85rem', color: '#cbd5e1' }}>ประเภทไอเทมและอุปกรณ์</h4>
+                          <div style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span><span style={{ color: '#ef4444' }}>●</span> Weapons</span> <strong>{itemTypes.weapon}</strong></div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span><span style={{ color: '#3b82f6' }}>●</span> Armor</span> <strong>{itemTypes.armor}</strong></div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span><span style={{ color: '#a855f7' }}>●</span> Magic Items</span> <strong>{itemTypes.magicItem}</strong></div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span><span style={{ color: '#f59e0b' }}>●</span> Tools</span> <strong>{itemTypes.tool}</strong></div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span><span style={{ color: '#14b8a6' }}>●</span> Vehicles</span> <strong>{itemTypes.vehicle}</strong></div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span><span style={{ color: '#94a3b8' }}>●</span> Gear/Packs</span> <strong>{itemTypes.gear}</strong></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* CLASS CHART */}
+                      <div style={{ backgroundColor: '#0f172a', padding: '20px', borderRadius: '12px', border: '1px solid #334155', display: 'flex', alignItems: 'center', gap: '20px' }}>
+                        <div style={{ position: 'relative', width: '100px', height: '100px', borderRadius: '50%', background: classConic, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <div style={{ width: '75px', height: '75px', backgroundColor: '#0f172a', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+                            <span style={{ fontSize: '1.1rem', fontWeight: '900', color: '#f1f5f9' }}>{classHitDice.total}</span>
+                            <span style={{ fontSize: '0.55rem', color: '#64748b' }}>CLASSES</span>
+                          </div>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <h4 style={{ margin: '0 0 10px 0', fontSize: '0.85rem', color: '#cbd5e1' }}>สัดส่วนประเภทคลาส</h4>
+                          <div style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span><span style={{ color: '#38bdf8' }}>●</span> d6 (Caster)</span> <strong>{classHitDice.d6}</strong></div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span><span style={{ color: '#a855f7' }}>●</span> d8 (Mid)</span> <strong>{classHitDice.d8}</strong></div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span><span style={{ color: '#f43f5e' }}>●</span> d10 (Martial)</span> <strong>{classHitDice.d10}</strong></div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span><span style={{ color: '#f59e0b' }}>●</span> d12 (Tank)</span> <strong>{classHitDice.d12}</strong></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* TAB 2: COMPENDIUM / DATA CATALOG MANAGEMENT */}
           {activeTab === 'catalog' && (
@@ -670,7 +866,7 @@ export default function AdminDashboard() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <div>
                   <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: 0, color: '#f1f5f9' }}>
-                    📚 จัดการคลังข้อมูลหลัก (Master Data Catalog)
+                    <i className="fa-solid fa-book-journal-whills" style={{marginRight:"8px"}}></i>จัดการคลังข้อมูลหลัก
                   </h2>
                   <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: '4px 0 0 0' }}>
                     เพิ่ม แก้ไข และลบ ข้อมูลคาถา ไอเทม เผ่าพันธุ์ คลาส ประวัติ และความสามารถพิเศษในระบบ
@@ -681,24 +877,24 @@ export default function AdminDashboard() {
                   onClick={() => handleOpenCatalogModal('add', catalogSubTab)}
                   style={{ backgroundColor: '#991b1b', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
                 >
-                  ➕ เพิ่มรายการใหม่ในหมวดนี้
+                  <i className="fa-solid fa-plus" style={{marginRight:"6px"}}></i>เพิ่มรายการใหม่ในหมวดนี้
                 </button>
               </div>
 
               {/* Sub-Category Switcher Tabs */}
               <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '1px solid #334155', paddingBottom: '12px', overflowX: 'auto' }}>
                 {[
-                  { id: 'items', label: '🗡️ ไอเทม & อุปกรณ์', count: ccData.items?.length },
-                  { id: 'spells', label: '🔮 เวทมนตร์', count: ccData.spells?.length },
-                  { id: 'races', label: '🧬 เผ่าพันธุ์ (Species)', count: ccData.races?.length },
-                  { id: 'classes', label: '🛡️ คลาสอาชีพ (Classes)', count: ccData.classes?.length },
-                  { id: 'subclasses', label: '⚔️ เส้นทางอาชีพ (Subclasses)', count: ccData.subclasses?.length },
-                  { id: 'backgrounds', label: '📜 ประวัติ (Backgrounds)', count: ccData.backgrounds?.length },
-                  { id: 'feats', label: '✨ ความสามารถพิเศษ (Feats)', count: ccData.feats?.length }
+                  { id: 'items', label: 'ไอเทม & อุปกรณ์', count: ccData.items?.length },
+                  { id: 'spells', label: 'เวทมนตร์', count: ccData.spells?.length },
+                  { id: 'races', label: 'เผ่าพันธุ์ (Species)', count: ccData.races?.length },
+                  { id: 'classes', label: 'คลาสอาชีพ (Classes)', count: ccData.classes?.length },
+                  { id: 'subclasses', label: 'เส้นทางอาชีพ (Subclasses)', count: ccData.subclasses?.length },
+                  { id: 'backgrounds', label: 'ประวัติ (Backgrounds)', count: ccData.backgrounds?.length },
+                  { id: 'feats', label: 'ความสามารถพิเศษ (Feats)', count: ccData.feats?.length }
                 ].map(sub => (
                   <button
                     key={sub.id}
-                    onClick={() => { setCatalogSubTab(sub.id); setSearchTerm(''); }}
+                    onClick={() => { setCatalogSubTab(sub.id); setSearchTerm(''); setFilterSubcategory('all'); setFilterSpellSchool('all'); setFilterSpellLevel('all'); setFilterClassHitDie('all'); setFilterFeatType('all'); }}
                     style={{
                       padding: '8px 16px', borderRadius: '20px', border: 'none',
                       backgroundColor: catalogSubTab === sub.id ? '#991b1b' : '#1e293b',
@@ -716,7 +912,7 @@ export default function AdminDashboard() {
               <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
                 <input
                   type="text"
-                  placeholder={`🔍 ค้นหาชื่อในหมวด ${catalogSubTab}...`}
+                  placeholder={`ค้นหาชื่อในหมวด ${catalogSubTab}...`}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   style={{ flex: 1, backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f8fafc', padding: '10px 14px', borderRadius: '8px', fontSize: '0.85rem' }}
@@ -734,14 +930,91 @@ export default function AdminDashboard() {
                     <option value="Gear">สัมภาระ (Gear)</option>
                     <option value="Tool">เครื่องมือ (Tool)</option>
                     <option value="Magic Item">ไอเทมเวทมนตร์ (Magic Item)</option>
+                    <option value="Mount">พาหนะ (Mount)</option>
+                    <option value="Vehicle">ยานพาหนะ (Vehicle)</option>
+                    <option value="Pack">ชุดสัมภาระ (Pack)</option>
                   </select>
                 )}
+
+                {catalogSubTab === 'spells' && (<>
+                  <select value={filterSpellLevel} onChange={(e) => setFilterSpellLevel(e.target.value)}
+                    style={{ backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f8fafc', padding: '10px 14px', borderRadius: '8px', fontSize: '0.85rem' }}>
+                    <option value="all">ทุกระดับ</option>
+                    <option value="0">Cantrip</option>
+                    <option value="1">Level 1</option>
+                    <option value="2">Level 2</option>
+                    <option value="3">Level 3</option>
+                    <option value="4">Level 4</option>
+                    <option value="5">Level 5</option>
+                    <option value="6">Level 6</option>
+                    <option value="7">Level 7</option>
+                    <option value="8">Level 8</option>
+                    <option value="9">Level 9</option>
+                  </select>
+                  <select value={filterSpellSchool} onChange={(e) => setFilterSpellSchool(e.target.value)}
+                    style={{ backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f8fafc', padding: '10px 14px', borderRadius: '8px', fontSize: '0.85rem' }}>
+                    <option value="all">ทุกสำนักเวท</option>
+                    <option value="Abjuration">Abjuration</option>
+                    <option value="Conjuration">Conjuration</option>
+                    <option value="Divination">Divination</option>
+                    <option value="Enchantment">Enchantment</option>
+                    <option value="Evocation">Evocation</option>
+                    <option value="Illusion">Illusion</option>
+                    <option value="Necromancy">Necromancy</option>
+                    <option value="Transmutation">Transmutation</option>
+                  </select>
+                </>)}
+
+                {catalogSubTab === 'classes' && (
+                  <select value={filterClassHitDie} onChange={(e) => setFilterClassHitDie(e.target.value)}
+                    style={{ backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f8fafc', padding: '10px 14px', borderRadius: '8px', fontSize: '0.85rem' }}>
+                    <option value="all">Hit Die ทั้งหมด</option>
+                    <option value="6">d6 (สายเวท)</option>
+                    <option value="8">d8 (สายซัพพอร์ต)</option>
+                    <option value="10">d10 (สายปะทะ)</option>
+                    <option value="12">d12 (สายแทงค์)</option>
+                  </select>
+                )}
+
+                {catalogSubTab === 'feats' && (
+                  <select value={filterFeatType} onChange={(e) => setFilterFeatType(e.target.value)}
+                    style={{ backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f8fafc', padding: '10px 14px', borderRadius: '8px', fontSize: '0.85rem' }}>
+                    <option value="all">ทุกประเภท</option>
+                    <option value="Origin Feat">Origin Feat</option>
+                    <option value="General Feat">General Feat</option>
+                    <option value="Fighting Style Feat">Fighting Style Feat</option>
+                    <option value="Epic Boon Feat">Epic Boon Feat</option>
+                  </select>
+                )}
+              </div>
+
+              {/* Result Count Bar */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', padding: '8px 16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
+                <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                  แสดง <strong style={{ color: '#f8fafc' }}>
+                    {catalogSubTab === 'items' ? filteredItems.length :
+                     catalogSubTab === 'spells' ? filteredSpells.length :
+                     catalogSubTab === 'races' ? filteredRaces.length :
+                     catalogSubTab === 'classes' ? filteredClasses.length :
+                     catalogSubTab === 'subclasses' ? filteredSubclasses.length :
+                     catalogSubTab === 'backgrounds' ? filteredBackgrounds.length :
+                     catalogSubTab === 'feats' ? filteredFeats.length : 0}
+                  </strong> จาก <strong style={{ color: '#f8fafc' }}>
+                    {catalogSubTab === 'items' ? (ccData.items?.length || 0) :
+                     catalogSubTab === 'spells' ? (ccData.spells?.length || 0) :
+                     catalogSubTab === 'races' ? (ccData.races?.length || 0) :
+                     catalogSubTab === 'classes' ? (ccData.classes?.length || 0) :
+                     catalogSubTab === 'subclasses' ? (ccData.subclasses?.length || 0) :
+                     catalogSubTab === 'backgrounds' ? (ccData.backgrounds?.length || 0) :
+                     catalogSubTab === 'feats' ? (ccData.feats?.length || 0) : 0}
+                  </strong> รายการ
+                </span>
               </div>
 
               {/* SUB-SECTION 1: ITEMS TABLE */}
               {catalogSubTab === 'items' && (
                 <div style={{ backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                  <table className="admin-catalog-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#0f172a', borderBottom: '1px solid #334155', color: '#94a3b8' }}>
                         <th style={{ padding: '12px 16px' }}>รหัส / ชื่อไอเทม</th>
@@ -764,8 +1037,8 @@ export default function AdminDashboard() {
                             </span>
                           </td>
                           <td style={{ padding: '12px 16px' }}>
-                            <div style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>💰 {item.cost || '-'} | ⚖️ {item.weight || 0} lb.</div>
-                            <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>✨ {item.rarity || 'Common'}</div>
+                            <div style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>{item.cost || '-'} | {item.weight || 0} lb.</div>
+                            <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>{item.rarity || 'Common'}</div>
                           </td>
                           <td style={{ padding: '12px 16px', maxWidth: '350px' }}>
                             <p style={{ margin: 0, fontSize: '0.78rem', color: '#94a3b8', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
@@ -774,8 +1047,8 @@ export default function AdminDashboard() {
                           </td>
                           <td style={{ padding: '12px 16px' }}>
                             <div style={{ display: 'flex', gap: '8px' }}>
-                              <button onClick={() => handleOpenCatalogModal('edit', 'items', item)} style={{ backgroundColor: '#334155', color: '#38bdf8', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>✏️ แก้ไข</button>
-                              <button onClick={() => handleDeleteCatalogItem('items', item.item_id)} style={{ backgroundColor: '#7f1d1d', color: '#fca5a5', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>🗑️ ลบ</button>
+                              <button onClick={() => handleOpenCatalogModal('edit', 'items', item)} style={{ backgroundColor: 'transparent', color: '#38bdf8', border: '1px solid #38bdf8', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-pen-to-square" style={{marginRight:"4px"}}></i>แก้ไข</button>
+                              <button onClick={() => handleDeleteCatalogItem('items', item.item_id)} style={{ backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-trash" style={{marginRight:"4px"}}></i>ลบ</button>
                             </div>
                           </td>
                         </tr>
@@ -788,7 +1061,7 @@ export default function AdminDashboard() {
               {/* SUB-SECTION 2: SPELLS TABLE */}
               {catalogSubTab === 'spells' && (
                 <div style={{ backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                  <table className="admin-catalog-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#0f172a', borderBottom: '1px solid #334155', color: '#94a3b8' }}>
                         <th style={{ padding: '12px 16px' }}>ชื่อคาถา</th>
@@ -809,11 +1082,11 @@ export default function AdminDashboard() {
                             <span style={{ backgroundColor: sp.spell_level === 0 ? '#166534' : '#581c87', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: '800' }}>
                               {sp.spell_level === 0 ? 'Cantrip' : `Level ${sp.spell_level}`}
                             </span>
-                            <div style={{ fontSize: '0.75rem', color: '#c084fc', marginTop: '4px' }}>✨ {sp.school || 'Evocation'}</div>
+                            <div style={{ fontSize: '0.75rem', color: '#c084fc', marginTop: '4px' }}>{sp.school || 'Evocation'}</div>
                           </td>
                           <td style={{ padding: '12px 16px', fontSize: '0.78rem', color: '#cbd5e1' }}>
-                            <div>⏱️ {sp.casting_time || '1 Action'}</div>
-                            <div>📏 {sp.range_dist || sp.spell_range || '60 ft'}</div>
+                            <div>{sp.casting_time || '1 Action'}</div>
+                            <div>{sp.range_dist || sp.spell_range || '60 ft'}</div>
                           </td>
                           <td style={{ padding: '12px 16px', maxWidth: '350px' }}>
                             <p style={{ margin: 0, fontSize: '0.78rem', color: '#94a3b8', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
@@ -822,8 +1095,8 @@ export default function AdminDashboard() {
                           </td>
                           <td style={{ padding: '12px 16px' }}>
                             <div style={{ display: 'flex', gap: '8px' }}>
-                              <button onClick={() => handleOpenCatalogModal('edit', 'spells', sp)} style={{ backgroundColor: '#334155', color: '#38bdf8', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>✏️ แก้ไข</button>
-                              <button onClick={() => handleDeleteCatalogItem('spells', sp.spell_id)} style={{ backgroundColor: '#7f1d1d', color: '#fca5a5', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>🗑️ ลบ</button>
+                              <button onClick={() => handleOpenCatalogModal('edit', 'spells', sp)} style={{ backgroundColor: 'transparent', color: '#38bdf8', border: '1px solid #38bdf8', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-pen-to-square" style={{marginRight:"4px"}}></i>แก้ไข</button>
+                              <button onClick={() => handleDeleteCatalogItem('spells', sp.spell_id)} style={{ backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-trash" style={{marginRight:"4px"}}></i>ลบ</button>
                             </div>
                           </td>
                         </tr>
@@ -836,7 +1109,7 @@ export default function AdminDashboard() {
               {/* SUB-SECTION 3: RACES */}
               {catalogSubTab === 'races' && (
                 <div style={{ backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                  <table className="admin-catalog-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#0f172a', borderBottom: '1px solid #334155', color: '#94a3b8' }}>
                         <th style={{ padding: '12px 16px' }}>ชื่อเผ่าพันธุ์</th>
@@ -849,7 +1122,7 @@ export default function AdminDashboard() {
                       {filteredRaces.map(rc => (
                         <tr key={rc.species_id} style={{ borderBottom: '1px solid #334155' }}>
                           <td style={{ padding: '12px 16px' }}>
-                            <strong style={{ color: '#f1f5f9' }}>🧬 {rc.species_name}</strong>
+                            <strong style={{ color: '#f1f5f9' }}>{rc.species_name}</strong>
                           </td>
                           <td style={{ padding: '12px 16px', fontSize: '0.78rem', color: '#cbd5e1' }}>
                             Size: {rc.size || 'Medium'} | Speed: {rc.speed || '30 ft.'}
@@ -859,8 +1132,8 @@ export default function AdminDashboard() {
                           </td>
                           <td style={{ padding: '12px 16px' }}>
                             <div style={{ display: 'flex', gap: '8px' }}>
-                              <button onClick={() => handleOpenCatalogModal('edit', 'species', rc)} style={{ backgroundColor: '#334155', color: '#38bdf8', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>✏️ แก้ไข</button>
-                              <button onClick={() => handleDeleteCatalogItem('species', rc.species_id)} style={{ backgroundColor: '#7f1d1d', color: '#fca5a5', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>🗑️ ลบ</button>
+                              <button onClick={() => handleOpenCatalogModal('edit', 'species', rc)} style={{ backgroundColor: 'transparent', color: '#38bdf8', border: '1px solid #38bdf8', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-pen-to-square" style={{marginRight:"4px"}}></i>แก้ไข</button>
+                              <button onClick={() => handleDeleteCatalogItem('species', rc.species_id)} style={{ backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-trash" style={{marginRight:"4px"}}></i>ลบ</button>
                             </div>
                           </td>
                         </tr>
@@ -873,7 +1146,7 @@ export default function AdminDashboard() {
               {/* SUB-SECTION 4: CLASSES */}
               {catalogSubTab === 'classes' && (
                 <div style={{ backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                  <table className="admin-catalog-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#0f172a', borderBottom: '1px solid #334155', color: '#94a3b8' }}>
                         <th style={{ padding: '12px 16px' }}>คลาส</th>
@@ -886,7 +1159,7 @@ export default function AdminDashboard() {
                       {filteredClasses.map(cl => (
                         <tr key={cl.class_id} style={{ borderBottom: '1px solid #334155' }}>
                           <td style={{ padding: '12px 16px' }}>
-                            <strong style={{ color: '#f1f5f9' }}>🛡️ {cl.class_name}</strong>
+                            <strong style={{ color: '#f1f5f9' }}>{cl.class_name}</strong>
                           </td>
                           <td style={{ padding: '12px 16px', fontSize: '0.78rem', color: '#4ade80' }}>
                             Hit Die: 1{cl.hit_die || 'd8'} | Primary: {cl.primary_ability || 'STR'}
@@ -896,8 +1169,8 @@ export default function AdminDashboard() {
                           </td>
                           <td style={{ padding: '12px 16px' }}>
                             <div style={{ display: 'flex', gap: '8px' }}>
-                              <button onClick={() => handleOpenCatalogModal('edit', 'classes', cl)} style={{ backgroundColor: '#334155', color: '#38bdf8', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>✏️ แก้ไข</button>
-                              <button onClick={() => handleDeleteCatalogItem('classes', cl.class_id)} style={{ backgroundColor: '#7f1d1d', color: '#fca5a5', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>🗑️ ลบ</button>
+                              <button onClick={() => handleOpenCatalogModal('edit', 'classes', cl)} style={{ backgroundColor: 'transparent', color: '#38bdf8', border: '1px solid #38bdf8', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-pen-to-square" style={{marginRight:"4px"}}></i>แก้ไข</button>
+                              <button onClick={() => handleDeleteCatalogItem('classes', cl.class_id)} style={{ backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-trash" style={{marginRight:"4px"}}></i>ลบ</button>
                             </div>
                           </td>
                         </tr>
@@ -910,7 +1183,7 @@ export default function AdminDashboard() {
               {/* SUB-SECTION 4.5: SUBCLASSES */}
               {catalogSubTab === 'subclasses' && (
                 <div style={{ backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                  <table className="admin-catalog-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#0f172a', borderBottom: '1px solid #334155', color: '#94a3b8' }}>
                         <th style={{ padding: '12px 16px' }}>ชื่อซับคลาส</th>
@@ -925,7 +1198,7 @@ export default function AdminDashboard() {
                         return (
                           <tr key={sub.subclass_id} style={{ borderBottom: '1px solid #334155' }}>
                             <td style={{ padding: '12px 16px' }}>
-                              <strong style={{ color: '#f1f5f9' }}>⚔️ {sub.subclass_name}</strong>
+                              <strong style={{ color: '#f1f5f9' }}>{sub.subclass_name}</strong>
                               <div style={{ fontSize: '0.7rem', color: '#64748b' }}>ID: {sub.subclass_id}</div>
                             </td>
                             <td style={{ padding: '12px 16px' }}>
@@ -940,8 +1213,8 @@ export default function AdminDashboard() {
                             </td>
                             <td style={{ padding: '12px 16px' }}>
                               <div style={{ display: 'flex', gap: '8px' }}>
-                                <button onClick={() => handleOpenCatalogModal('edit', 'subclasses', sub)} style={{ backgroundColor: '#334155', color: '#38bdf8', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>✏️ แก้ไข</button>
-                                <button onClick={() => handleDeleteCatalogItem('subclasses', sub.subclass_id)} style={{ backgroundColor: '#7f1d1d', color: '#fca5a5', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>🗑️ ลบ</button>
+                                <button onClick={() => handleOpenCatalogModal('edit', 'subclasses', sub)} style={{ backgroundColor: 'transparent', color: '#38bdf8', border: '1px solid #38bdf8', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-pen-to-square" style={{marginRight:"4px"}}></i>แก้ไข</button>
+                                <button onClick={() => handleDeleteCatalogItem('subclasses', sub.subclass_id)} style={{ backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-trash" style={{marginRight:"4px"}}></i>ลบ</button>
                               </div>
                             </td>
                           </tr>
@@ -955,7 +1228,7 @@ export default function AdminDashboard() {
               {/* SUB-SECTION 5: BACKGROUNDS */}
               {catalogSubTab === 'backgrounds' && (
                 <div style={{ backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                  <table className="admin-catalog-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#0f172a', borderBottom: '1px solid #334155', color: '#94a3b8' }}>
                         <th style={{ padding: '12px 16px' }}>ชื่อประวัติ</th>
@@ -968,7 +1241,7 @@ export default function AdminDashboard() {
                       {filteredBackgrounds.map(bg => (
                         <tr key={bg.background_id} style={{ borderBottom: '1px solid #334155' }}>
                           <td style={{ padding: '12px 16px' }}>
-                            <strong style={{ color: '#f1f5f9' }}>📜 {bg.background_name}</strong>
+                            <strong style={{ color: '#f1f5f9' }}>{bg.background_name}</strong>
                           </td>
                           <td style={{ padding: '12px 16px', fontSize: '0.78rem', color: '#f472b6' }}>
                             {(() => {
@@ -986,8 +1259,8 @@ export default function AdminDashboard() {
                           </td>
                           <td style={{ padding: '12px 16px' }}>
                             <div style={{ display: 'flex', gap: '8px' }}>
-                              <button onClick={() => handleOpenCatalogModal('edit', 'backgrounds', bg)} style={{ backgroundColor: '#334155', color: '#38bdf8', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>✏️ แก้ไข</button>
-                              <button onClick={() => handleDeleteCatalogItem('backgrounds', bg.background_id)} style={{ backgroundColor: '#7f1d1d', color: '#fca5a5', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>🗑️ ลบ</button>
+                              <button onClick={() => handleOpenCatalogModal('edit', 'backgrounds', bg)} style={{ backgroundColor: 'transparent', color: '#38bdf8', border: '1px solid #38bdf8', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-pen-to-square" style={{marginRight:"4px"}}></i>แก้ไข</button>
+                              <button onClick={() => handleDeleteCatalogItem('backgrounds', bg.background_id)} style={{ backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-trash" style={{marginRight:"4px"}}></i>ลบ</button>
                             </div>
                           </td>
                         </tr>
@@ -1000,7 +1273,7 @@ export default function AdminDashboard() {
               {/* SUB-SECTION 6: FEATS */}
               {catalogSubTab === 'feats' && (
                 <div style={{ backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                  <table className="admin-catalog-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#0f172a', borderBottom: '1px solid #334155', color: '#94a3b8' }}>
                         <th style={{ padding: '12px 16px' }}>ชื่อ Feat</th>
@@ -1013,7 +1286,7 @@ export default function AdminDashboard() {
                       {filteredFeats.map(ft => (
                         <tr key={ft.feat_id} style={{ borderBottom: '1px solid #334155' }}>
                           <td style={{ padding: '12px 16px' }}>
-                            <strong style={{ color: '#f1f5f9' }}>✨ {ft.feat_name}</strong>
+                            <strong style={{ color: '#f1f5f9' }}>{ft.feat_name}</strong>
                           </td>
                           <td style={{ padding: '12px 16px', fontSize: '0.78rem', color: '#facc15' }}>
                             Type: {ft.feat_type || 'General'} | Pre: {ft.prerequisite || 'None'}
@@ -1023,8 +1296,8 @@ export default function AdminDashboard() {
                           </td>
                           <td style={{ padding: '12px 16px' }}>
                             <div style={{ display: 'flex', gap: '8px' }}>
-                              <button onClick={() => handleOpenCatalogModal('edit', 'feats', ft)} style={{ backgroundColor: '#334155', color: '#38bdf8', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>✏️ แก้ไข</button>
-                              <button onClick={() => handleDeleteCatalogItem('feats', ft.feat_id)} style={{ backgroundColor: '#7f1d1d', color: '#fca5a5', border: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>🗑️ ลบ</button>
+                              <button onClick={() => handleOpenCatalogModal('edit', 'feats', ft)} style={{ backgroundColor: 'transparent', color: '#38bdf8', border: '1px solid #38bdf8', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-pen-to-square" style={{marginRight:"4px"}}></i>แก้ไข</button>
+                              <button onClick={() => handleDeleteCatalogItem('feats', ft.feat_id)} style={{ backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-trash" style={{marginRight:"4px"}}></i>ลบ</button>
                             </div>
                           </td>
                         </tr>
@@ -1043,7 +1316,7 @@ export default function AdminDashboard() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <div>
                   <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: 0, color: '#f1f5f9' }}>
-                    👥 จัดการบัญชีผู้ใช้งาน (User Account Management)
+                    <i className="fa-solid fa-users" style={{marginRight:"8px"}}></i>จัดการบัญชีผู้ใช้งาน
                   </h2>
                   <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: '4px 0 0 0' }}>
                     ค้นหา กำหนดสิทธิ์ เปลี่ยนสถานะ รีเซ็ตรหัสผ่าน และลบบัญชีผู้ใช้ในระบบ
@@ -1055,7 +1328,7 @@ export default function AdminDashboard() {
               <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
                 <input
                   type="text"
-                  placeholder="🔍 ค้นหาชื่อผู้ใช้ หรืออีเมล..."
+                  placeholder="ค้นหาชื่อผู้ใช้ หรืออีเมล..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   style={{ flex: 1, backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f8fafc', padding: '10px 14px', borderRadius: '8px', fontSize: '0.85rem' }}
@@ -1068,8 +1341,8 @@ export default function AdminDashboard() {
                 >
                   <option value="all">สิทธิ์ทั้งหมด (All Roles)</option>
                   <option value="admin">ผู้ดูแลระบบ (Admin)</option>
-                  <option value="dm">Dungeon Master (DM)</option>
-                  <option value="user">ผู้เล่นทั่วไป (Player)</option>
+
+                  <option value="user">ผู้ใช้งานทั่วไป (User)</option>
                 </select>
 
                 <select
@@ -1086,7 +1359,7 @@ export default function AdminDashboard() {
 
               {/* Users Table */}
               <div style={{ backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155', overflow: 'hidden' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                <table className="admin-catalog-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                   <thead>
                     <tr style={{ backgroundColor: '#0f172a', borderBottom: '1px solid #334155', color: '#94a3b8' }}>
                       <th style={{ padding: '14px 18px' }}>ผู้ใช้งาน</th>
@@ -1105,9 +1378,17 @@ export default function AdminDashboard() {
                         <tr key={user.user_id} style={{ borderBottom: '1px solid #334155' }}>
                           <td style={{ padding: '14px 18px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                              <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: avatar.bg, color: avatar.text, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800' }}>
-                                {(user.user_name || 'U').charAt(0).toUpperCase()}
-                              </div>
+                              {user.avatar_url || user.avatar ? (
+                                <img 
+                                  src={user.avatar_url || user.avatar} 
+                                  alt={user.user_name} 
+                                  style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #334155' }} 
+                                />
+                              ) : (
+                                <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: avatar.bg, color: avatar.text, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800' }}>
+                                  {(user.user_name || 'U').charAt(0).toUpperCase()}
+                                </div>
+                              )}
                               <div>
                                 <strong style={{ color: '#f1f5f9', display: 'block' }}>{user.user_name}</strong>
                                 <span style={{ fontSize: '0.72rem', color: '#64748b' }}>ID: {user.user_id}</span>
@@ -1118,11 +1399,11 @@ export default function AdminDashboard() {
                           <td style={{ padding: '14px 18px' }}>
                             <span style={{
                               padding: '3px 10px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: '800',
-                              backgroundColor: user.role === 'admin' ? '#7f1d1d' : (user.role === 'dm' ? '#1e1b4b' : '#0f172a'),
-                              color: user.role === 'admin' ? '#fca5a5' : (user.role === 'dm' ? '#a5b4fc' : '#94a3b8'),
+                              backgroundColor: user.role === 'admin' ? '#7f1d1d' : '#0f172a',
+                              color: user.role === 'admin' ? '#fca5a5' : '#94a3b8',
                               border: '1px solid #334155'
                             }}>
-                              {user.role === 'admin' ? '🛡️ Admin' : (user.role === 'dm' ? '🎲 DM' : '👤 Player')}
+                              {user.role === 'admin' ? 'Admin' : 'User'}
                             </span>
                           </td>
                           <td style={{ padding: '14px 18px' }}>
@@ -1131,7 +1412,7 @@ export default function AdminDashboard() {
                               backgroundColor: user.status === 'banned' ? '#450a0a' : (user.status === 'suspended' ? '#451a03' : '#064e3b'),
                               color: user.status === 'banned' ? '#f87171' : (user.status === 'suspended' ? '#fbbf24' : '#34d399')
                             }}>
-                              {user.status === 'banned' ? '⛔ Banned' : (user.status === 'suspended' ? '⚠️ Suspended' : '✅ Active')}
+                              {user.status === 'banned' ? 'Banned' : (user.status === 'suspended' ? 'Suspended' : 'Active')}
                             </span>
                           </td>
                           <td style={{ padding: '14px 18px', fontWeight: '700', color: '#38bdf8' }}>
@@ -1142,9 +1423,16 @@ export default function AdminDashboard() {
                           </td>
                           <td style={{ padding: '14px 18px' }}>
                             <div style={{ display: 'flex', gap: '8px' }}>
-                              <button onClick={() => handleOpenUserEdit(user)} style={{ backgroundColor: '#334155', color: '#38bdf8', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>✏️ แก้ไข</button>
+                              <button onClick={() => handleOpenUserEdit(user)} style={{ backgroundColor: 'transparent', color: '#38bdf8', border: '1px solid #38bdf8', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-pen-to-square" style={{marginRight:"4px"}}></i>แก้ไข</button>
                               {user.role !== 'admin' && (
-                                <button onClick={() => handleDeleteUser(user)} style={{ backgroundColor: '#7f1d1d', color: '#fca5a5', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>🗑️ ลบ</button>
+                                <>
+                                  {user.status === 'active' ? (
+                                    <button onClick={() => handleToggleUserStatus(user, 'suspended')} style={{ backgroundColor: 'transparent', color: '#f59e0b', border: '1px solid #f59e0b', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-ban" style={{marginRight:"4px"}}></i>ระงับบัญชี</button>
+                                  ) : (
+                                    <button onClick={() => handleToggleUserStatus(user, 'active')} style={{ backgroundColor: 'transparent', color: '#10b981', border: '1px solid #10b981', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-check" style={{marginRight:"4px"}}></i>ปลดระงับ</button>
+                                  )}
+                                  <button onClick={() => handleDeleteUser(user)} style={{ backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}><i className="fa-solid fa-trash" style={{marginRight:"4px"}}></i>ลบ</button>
+                                </>
                               )}
                             </div>
                           </td>
@@ -1163,10 +1451,10 @@ export default function AdminDashboard() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <div>
                   <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: 0, color: '#f1f5f9' }}>
-                    📥 Support Inbox
+                    <i className="fa-solid fa-inbox" style={{marginRight:"8px"}}></i>กล่องข้อความช่วยเหลือ
                   </h2>
                   <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: '4px 0 0 0' }}>
-                    Manage feedback, bug reports, and user inquiries in a professional email-style layout.
+                    จัดการความคิดเห็น รายงานข้อผิดพลาด และข้อซักถามจากผู้ใช้ในรูปแบบเลย์เอาต์อีเมลระดับมืออาชีพ
                   </p>
                 </div>
               </div>
@@ -1178,7 +1466,7 @@ export default function AdminDashboard() {
                   <div style={{ padding: '16px', borderBottom: '1px solid #334155', backgroundColor: '#0f172a' }}>
                     <input
                       type="text"
-                      placeholder="🔍 Search tickets..."
+                      placeholder="ค้นหาคำร้อง..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       style={{ width: '100%', backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f8fafc', padding: '10px 14px', borderRadius: '8px', fontSize: '0.85rem', marginBottom: '12px' }}
@@ -1189,21 +1477,21 @@ export default function AdminDashboard() {
                         onChange={(e) => setFilterCategory(e.target.value)}
                         style={{ flex: 1, backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f8fafc', padding: '8px', borderRadius: '6px', fontSize: '0.75rem' }}
                       >
-                        <option value="all">All Types</option>
-                        <option value="bug">Bug</option>
-                        <option value="feature">Feature</option>
+                        <option value="all">ประเภททั้งหมด</option>
+                        <option value="bug">ข้อผิดพลาด</option>
+                        <option value="feature">ฟีเจอร์</option>
                         <option value="ui">UI/UX</option>
-                        <option value="general">General</option>
+                        <option value="general">ทั่วไป</option>
                       </select>
                       <select
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value)}
                         style={{ flex: 1, backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f8fafc', padding: '8px', borderRadius: '6px', fontSize: '0.75rem' }}
                       >
-                        <option value="all">All Status</option>
-                        <option value="new">New</option>
-                        <option value="in_review">Reviewing</option>
-                        <option value="resolved">Resolved</option>
+                        <option value="all">สถานะทั้งหมด</option>
+                        <option value="new">ใหม่</option>
+                        <option value="in_review">กำลังตรวจสอบ</option>
+                        <option value="resolved">แก้ไขแล้ว</option>
                       </select>
                     </div>
                   </div>
@@ -1213,9 +1501,8 @@ export default function AdminDashboard() {
                     {filteredFeedbacks.map(fb => {
                       const isUnread = !fb.is_read || fb.is_read === 0;
                       const isSelected = selectedItem && selectedItem.feedback_id === fb.feedback_id;
-                      
-                      return (
-                        <div 
+  return (
+<div 
                           key={fb.feedback_id} 
                           onClick={() => handleSelectFeedback(fb)}
                           style={{ 
@@ -1299,7 +1586,7 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <button onClick={() => handleDeleteFeedback(selectedItem.feedback_id)} style={{ backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '800', fontSize: '0.8rem', transition: 'all 0.2s' }}>
-                          <i className="fa-solid fa-trash"></i> Delete
+                          <i className="fa-solid fa-trash"></i> ลบ
                         </button>
                       </div>
 
@@ -1318,14 +1605,14 @@ export default function AdminDashboard() {
                         {/* Admin Action Box */}
                         <div style={{ backgroundColor: '#1e293b', border: '1px solid #38bdf8', borderRadius: '8px', padding: '24px', position: 'relative' }}>
                           <div style={{ position: 'absolute', top: '-12px', left: '20px', backgroundColor: '#1e293b', padding: '0 10px', color: '#38bdf8', fontWeight: '800', fontSize: '0.8rem' }}>
-                            ADMIN RESPONSE
+                            คำตอบจากผู้ดูแลระบบ
                           </div>
                           <form onSubmit={handleSaveFeedback} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             <textarea 
                               rows="5" 
                               value={formData.admin_response} 
                               onChange={e => setFormData({ ...formData, admin_response: e.target.value })} 
-                              placeholder="Write a professional response to the user..." 
+                              placeholder="พิมพ์ข้อความตอบกลับผู้ใช้..." 
                               style={{ width: '100%', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', padding: '16px', borderRadius: '6px', fontSize: '0.9rem', resize: 'vertical' }} 
                             />
                             
@@ -1351,7 +1638,7 @@ export default function AdminDashboard() {
                                 </div>
                               </div>
                               <button type="submit" style={{ backgroundColor: '#38bdf8', color: '#0f172a', border: 'none', padding: '10px 24px', borderRadius: '6px', fontWeight: '800', fontSize: '0.9rem', cursor: 'pointer', boxShadow: '0 4px 10px rgba(56, 189, 248, 0.2)', transition: 'all 0.2s' }}>
-                                <i className="fa-solid fa-paper-plane"></i> Send Response
+                                <i className="fa-solid fa-paper-plane"></i>ส่งการตอบกลับ
                               </button>
                             </div>
                           </form>
@@ -1361,8 +1648,8 @@ export default function AdminDashboard() {
                   ) : (
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>
                       <i className="fa-solid fa-envelope-open-text" style={{ fontSize: '4rem', marginBottom: '20px', color: '#334155' }}></i>
-                      <h3 style={{ fontSize: '1.2rem', fontWeight: '600', margin: '0 0 8px 0', color: '#94a3b8' }}>Select a ticket to view details</h3>
-                      <p style={{ fontSize: '0.9rem' }}>Choose from the inbox on the left to start responding.</p>
+                      <h3 style={{ fontSize: '1.2rem', fontWeight: '600', margin: '0 0 8px 0', color: '#94a3b8' }}>เลือกรายการเพื่อดูรายละเอียด</h3>
+                      <p style={{ fontSize: '0.9rem' }}>เลือกจากกล่องข้อความทางด้านซ้ายเพื่อเริ่มตอบกลับ</p>
                     </div>
                   )}
                 </div>
@@ -1382,7 +1669,7 @@ export default function AdminDashboard() {
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
           <div style={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '12px', width: '100%', maxWidth: '480px', padding: '24px' }}>
             <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 16px 0', color: '#f8fafc' }}>
-              ✏️ แก้ไขข้อมูลผู้ใช้ ({selectedItem?.user_name})
+              <i className="fa-solid fa-pen-to-square" style={{marginRight:"4px"}}></i>แก้ไขข้อมูลผู้ใช้ ({selectedItem?.user_name})
             </h3>
             <form onSubmit={handleSaveUser} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
@@ -1395,29 +1682,18 @@ export default function AdminDashboard() {
                 <input type="email" value={formData.user_email} onChange={e => setFormData({ ...formData, user_email: e.target.value })} required style={{ width: '100%', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', padding: '8px 12px', borderRadius: '6px' }} />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div>
-                  <label style={{ fontSize: '0.78rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>สิทธิ์ (Role):</label>
-                  <select value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })} style={{ width: '100%', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', padding: '8px 12px', borderRadius: '6px' }}>
-                    <option value="user">Player (ผู้เล่น)</option>
-                    <option value="dm">Dungeon Master (DM)</option>
-                    <option value="admin">Admin (ผู้ดูแล)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ fontSize: '0.78rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>สถานะ (Status):</label>
-                  <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })} style={{ width: '100%', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', padding: '8px 12px', borderRadius: '6px' }}>
-                    <option value="active">ปกติ (Active)</option>
-                    <option value="suspended">ระงับชั่วคราว (Suspended)</option>
-                    <option value="banned">ระงับถาวร (Banned)</option>
-                  </select>
-                </div>
+              <div>
+                <label style={{ fontSize: '0.78rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>สิทธิ์ (Role):</label>
+                <select value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })} style={{ width: '100%', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', padding: '8px 12px', borderRadius: '6px' }}>
+                  <option value="user">User (ผู้ใช้งาน)</option>
+                  <option value="admin">Admin (ผู้ดูแลระบบ)</option>
+                </select>
               </div>
 
               <div>
-                <label style={{ fontSize: '0.78rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>ตั้งรหัสผ่านใหม่ (ว่างไว้หากไม่เปลี่ยน):</label>
-                <input type="password" placeholder="ป้อนรหัสผ่านใหม่..." value={formData.new_password} onChange={e => setFormData({ ...formData, new_password: e.target.value })} style={{ width: '100%', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', padding: '8px 12px', borderRadius: '6px' }} />
+                <label style={{ fontSize: '0.78rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>เปลี่ยนรหัสผ่าน (เว้นว่างไว้หากไม่ต้องการเปลี่ยน):</label>
+                <input type="password" placeholder="ตั้งรหัสผ่านใหม่..." value={formData.new_password} onChange={e => setFormData({ ...formData, new_password: e.target.value })} style={{ width: '100%', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', padding: '8px 12px', borderRadius: '6px' }} />
+                <p style={{ fontSize: '0.7rem', color: '#ef4444', marginTop: '4px', fontStyle: 'italic' }}>* ไม่สามารถแสดงรหัสผ่านเดิมได้ เนื่องจากระบบเข้ารหัส (Hash) ไว้เพื่อความปลอดภัย</p>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px' }}>
@@ -1436,7 +1712,7 @@ export default function AdminDashboard() {
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
           <div style={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '12px', width: '100%', maxWidth: '600px', padding: '24px', maxHeight: '90vh', overflowY: 'auto' }}>
             <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 16px 0', color: '#f8fafc' }}>
-              {selectedItem ? '✏️ แก้ไขรายการ' : '➕ เพิ่มรายการใหม่'} ({catalogSubTab.toUpperCase()})
+              {selectedItem ? '<i className="fa-solid fa-pen-to-square" style={{marginRight:"4px"}}></i>แก้ไขรายการ' : 'เพิ่มรายการใหม่'} ({catalogSubTab.toUpperCase()})
             </h3>
             {catalogSubTab === 'races' && <SpeciesForm initialData={selectedItem} availableFeats={ccData.feats || []} onSave={(data) => handleSaveCatalogItem({ preventDefault: () => {} }, 'races', selectedItem ? 'edit' : 'add', data)} onCancel={() => setModalType(null)} />}
             {catalogSubTab === 'classes' && <ClassForm initialData={selectedItem} availableFeats={ccData.feats || []} onSave={(data) => handleSaveCatalogItem({ preventDefault: () => {} }, 'classes', selectedItem ? 'edit' : 'add', data)} onCancel={() => setModalType(null)} />}

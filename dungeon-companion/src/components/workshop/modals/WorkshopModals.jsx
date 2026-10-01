@@ -29,18 +29,16 @@ export default function WorkshopModals({
             <div style={{ fontSize: '3rem', color: '#ef4444', marginBottom: '15px' }}>
               <i className="fa-solid fa-triangle-exclamation"></i>
             </div>
-            <h2 style={{ margin: '0 0 10px 0', color: 'var(--color-ink)' }}>Confirm Class Deletion</h2>
+            <h2 style={{ margin: '0 0 10px 0', color: 'var(--color-ink)' }}>ยืนยันการลบคลาสอาชีพ</h2>
             <p style={{ color: 'var(--color-gray)', marginBottom: '25px', lineHeight: '1.5' }}>
-              Are you sure you want to remove this class?<br/>
-              <span style={{ fontSize: '0.85rem', color: '#ef4444' }}>All features, spell selections, and choices for this class will be reset.</span>
+              คุณแน่ใจหรือไม่ว่าต้องการลบคลาสอาชีพนี้?<br/>
+              <span style={{ fontSize: '0.85rem', color: '#ef4444' }}>ความสามารถทั้งหมด เวทมนตร์ที่เลือกไว้ และตัวเลือกต่างๆ ของคลาสนี้จะถูกรีเซ็ตใหม่ทั้งหมด</span>
             </p>
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
               <button 
                 onClick={() => setClassToDeleteIndex(null)}
                 style={{ flex: 1, padding: '10px', border: '1px solid #d1d5db', backgroundColor: 'var(--bg-white)', color: '#374151', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
-              >
-                Cancel
-              </button>
+              >ยกเลิก</button>
               <button 
                 onClick={() => {
                   setCharacterState(prev => {
@@ -57,9 +55,7 @@ export default function WorkshopModals({
                   setClassToDeleteIndex(null);
                 }}
                 style={{ flex: 1, padding: '10px', border: 'none', backgroundColor: '#ef4444', color: 'var(--bg-white)', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
-              >
-                Delete Class
-              </button>
+              >ลบคลาสอาชีพ</button>
             </div>
           </div>
         </div>
@@ -408,15 +404,15 @@ export default function WorkshopModals({
               <div style={{ backgroundColor: '#fee2e2', color: '#dc2626', width: '50px', height: '50px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', flexShrink: 0, boxShadow: '0 4px 6px -1px rgba(239, 68, 68, 0.2)' }}>
                 <i className="fa-solid fa-triangle-exclamation"></i>
               </div>
-              <h3 style={{ margin: 0, color: 'var(--color-ink)', fontSize: '1.3rem', fontWeight: 'bold' }}>Confirm Level Reduction?</h3>
+              <h3 style={{ margin: 0, color: 'var(--color-ink)', fontSize: '1.3rem', fontWeight: 'bold' }}>ยืนยันการลดเลเวลคลาสอาชีพ?</h3>
             </div>
             
             <p style={{ color: 'var(--color-gray)', fontSize: '1rem', lineHeight: '1.5', marginBottom: '15px' }}>
-              You are reducing class level from <strong style={{color: 'var(--color-ink)'}}>Lv.{levelConfirm.currentLevel}</strong> down to <strong style={{color: 'var(--color-ink)'}}>Lv.{levelConfirm.newLevel}</strong>
+              คุณกำลังลดเลเวลคลาสนี้จาก <strong style={{color: 'var(--color-ink)'}}>Lv.{levelConfirm.currentLevel}</strong> ลงมาเป็น <strong style={{color: 'var(--color-ink)'}}>Lv.{levelConfirm.newLevel}</strong>
             </p>
             <div style={{ backgroundColor: '#fef2f2', borderLeft: '4px solid #ef4444', padding: '12px 15px', borderRadius: '0 8px 8px 0', marginBottom: '25px' }}>
               <p style={{ margin: 0, color: '#991b1b', fontSize: '0.9rem', lineHeight: '1.5' }}>
-                <strong>Warning:</strong> Reducing level will permanently reset and remove features gained at higher levels (such as Subclass selection, ASI, and higher-level spells).
+                <strong>คำเตือน:</strong> การลดเลเวลจะทำการลบและรีเซ็ตความสามารถทั้งหมดที่ได้จากเลเวลที่สูงกว่าอย่างถาวร (เช่น การเลือก Subclass, การเพิ่มค่าพลัง ASI, และเวทมนตร์ระดับสูง)
               </p>
             </div>
             
@@ -426,9 +422,7 @@ export default function WorkshopModals({
                 style={{ padding: '10px 20px', borderRadius: '8px', border: '1px solid #d1d5db', backgroundColor: 'var(--bg-white)', color: '#374151', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s', fontSize: '0.95rem' }}
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--bg-white)'}
                 onMouseLeave={e => e.currentTarget.style.backgroundColor = 'var(--bg-white)'}
-              >
-                Cancel
-              </button>
+              >ยกเลิก</button>
               <button 
                 onClick={() => {
                   setCharacterState(prev => {

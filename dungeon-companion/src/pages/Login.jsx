@@ -132,15 +132,11 @@ function Login() {
                         <button 
                             className={`auth-tab ${mode === 'signin' ? 'active' : ''}`}
                             onClick={() => { setMode('signin'); setMessage({type:'', text:''}); }}
-                        >
-                            SIGN IN
-                        </button>
+                        >เข้าสู่ระบบ</button>
                         <button 
                             className={`auth-tab ${mode === 'signup' ? 'active' : ''}`}
                             onClick={() => { setMode('signup'); setMessage({type:'', text:''}); }}
-                        >
-                            CREATE ACCOUNT
-                        </button>
+                        >สร้างบัญชีใหม่</button>
                     </div>
 
                     <div className="auth-form-body">
@@ -153,7 +149,7 @@ function Login() {
                         <form onSubmit={handleSubmit}>
                             {mode === 'signup' && (
                                 <div className="input-container">
-                                    <label>Character / Username <span>*</span></label>
+                                    <label>ชื่อตัวละคร / Username <span>*</span></label>
                                     <div className="input-with-icon">
                                         <i className="fa-solid fa-user"></i>
                                         <input 
@@ -169,7 +165,7 @@ function Login() {
                             )}
 
                             <div className="input-container">
-                                <label>Email Address <span>*</span></label>
+                                <label>อีเมล (Email Address) <span>*</span></label>
                                 <div className="input-with-icon">
                                     <i className="fa-solid fa-envelope"></i>
                                     <input 
@@ -184,7 +180,7 @@ function Login() {
                             </div>
 
                             <div className="input-container">
-                                <label>Password <span>*</span></label>
+                                <label>รหัสผ่าน (Password) <span>*</span></label>
                                 <div className="input-with-icon">
                                     <i className="fa-solid fa-lock"></i>
                                     <input 
@@ -215,7 +211,7 @@ function Login() {
                                             type="checkbox" 
                                             checked={rememberMe}
                                             onChange={handleRememberChange}
-                                        /> Remember me
+                                        /> จดจำการเข้าสู่ระบบ
                                     </label>
                                     <a 
                                         href="#" 
@@ -263,7 +259,7 @@ function Login() {
                                                 });
                                             });
                                         }}
-                                    >Forgot Password?</a>
+                                    >ลืมรหัสผ่าน?</a>
                                 </div>
                             )}
 
@@ -273,7 +269,7 @@ function Login() {
                                         ENTER THE REALM <i className="fa-solid fa-arrow-right-to-bracket" style={{ fontSize: '0.8rem' }}></i>
                                     </button>
                                 ) : (
-                                    <button type="submit" className="btn-auth-signup">
+                                    <button type="submit" className="btn-auth-submit">
                                         FORGE YOUR LEGEND <i className="fa-solid fa-hammer" style={{ fontSize: '0.8rem' }}></i>
                                     </button>
                                 )}

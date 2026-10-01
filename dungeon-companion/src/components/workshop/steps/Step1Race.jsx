@@ -376,7 +376,7 @@ export default function Step1Race({
               onClick={() => setConfirmChangeRace(true)}
               style={{ padding: '8px 16px', border: '1px solid #ef4444', backgroundColor: 'var(--bg-white)', color: '#ef4444', borderRadius: '6px', cursor: 'pointer' }}
             >
-              <i className="fa-solid fa-rotate"></i> Change Species
+              <i className="fa-solid fa-rotate"></i> เปลี่ยนเผ่าพันธุ์ (Change Species)
             </button>
           </div>
 
@@ -607,10 +607,10 @@ export default function Step1Race({
             <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 }}>
               <div className="modal-content animate-fade-in" style={{ backgroundColor: 'var(--bg-white)', padding: '30px', borderRadius: '12px', maxWidth: '400px', width: '90%', textAlign: 'center' }}>
                 <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: '3rem', color: '#f59e0b', marginBottom: '15px' }}></i>
-                <h3 style={{ margin: '0 0 10px 0', color: 'var(--color-ink)' }}>Are you sure?</h3>
-                <p style={{ color: 'var(--color-gray)', marginBottom: '25px', fontSize: '0.95rem' }}>Changing your species will reset your lineage and language selections on this page.</p>
+                <h3 style={{ margin: '0 0 10px 0', color: 'var(--color-ink)' }}>ยืนยันการเปลี่ยนเผ่าพันธุ์?</h3>
+                <p style={{ color: 'var(--color-gray)', marginBottom: '25px', fontSize: '0.95rem' }}>การเปลี่ยนเผ่าพันธุ์จะทำให้สายเลือดและภาษาที่เลือกไว้ในหน้านี้ถูกรีเซ็ตใหม่ทั้งหมด</p>
                 <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                  <button onClick={() => setConfirmChangeRace(false)} style={{ padding: '8px 16px', border: '1px solid #d1d5db', backgroundColor: 'var(--bg-white)', borderRadius: '6px', cursor: 'pointer', flex: 1 }}>Cancel</button>
+                  <button onClick={() => setConfirmChangeRace(false)} style={{ padding: '8px 16px', border: '1px solid #d1d5db', backgroundColor: 'var(--bg-white)', borderRadius: '6px', cursor: 'pointer', flex: 1 }}>ยกเลิก</button>
                   <button 
                     onClick={() => {
                       setCharacterState(prev => ({...prev, race: { id: null, lineageId: null, languages: [], traits: [], asiChoices: {} }}));
@@ -618,7 +618,7 @@ export default function Step1Race({
                     }} 
                     style={{ padding: '8px 16px', border: 'none', backgroundColor: '#ef4444', color: 'var(--bg-white)', borderRadius: '6px', cursor: 'pointer', flex: 1 }}
                   >
-                    Confirm Change Species
+                    ยืนยันการเปลี่ยนแปลง
                   </button>
                 </div>
               </div>

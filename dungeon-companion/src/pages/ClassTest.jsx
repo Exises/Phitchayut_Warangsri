@@ -22,6 +22,7 @@ function ClassTest() {
     const [currentState, setCurrentState] = useState('start'); // start, quiz, result
     const [currentQuestionId, setCurrentQuestionId] = useState('Q1_Main');
     const [questionCount, setQuestionCount] = useState(1);
+    const [selectedOption, setSelectedOption] = useState(null);
     const [scores, setScores] = useState({
         Barbarian: 0, Bard: 0, Cleric: 0, Druid: 0, Fighter: 0, Monk: 0,
         Paladin: 0, Ranger: 0, Rogue: 0, Sorcerer: 0, Warlock: 0, Wizard: 0
@@ -49,13 +50,22 @@ function ClassTest() {
         setCurrentState('quiz');
         setCurrentQuestionId('Q1_Main');
         setQuestionCount(1);
+        setSelectedOption(null);
         setScores({
             Barbarian: 0, Bard: 0, Cleric: 0, Druid: 0, Fighter: 0, Monk: 0,
             Paladin: 0, Ranger: 0, Rogue: 0, Sorcerer: 0, Warlock: 0, Wizard: 0
         });
     };
 
-    const handleAnswer = (choice) => {
+    const handleSelectOption = (choice) => {
+        setSelectedOption(choice);
+    };
+
+    const handleConfirmAnswer = () => {
+        if (!selectedOption) return;
+        
+        const choice = selectedOption;
+        
         // อัปเดตคะแนน
         if (choice.scores) {
             setScores(prev => {
@@ -66,6 +76,9 @@ function ClassTest() {
                 return newScores;
             });
         }
+
+        // รีเซ็ตตัวเลือกสำหรับข้อถัดไป
+        setSelectedOption(null);
 
         // ไปข้อถัดไปหรือจบ
         if (choice.next_id === 'END') {
@@ -237,13 +250,35 @@ function ClassTest() {
                             {quizData[currentQuestionId].choices.map((choice, index) => (
                                 <button 
                                     key={index} 
-                                    className="quiz-choice-btn"
-                                    onClick={() => handleAnswer(choice)}
+                                    className={`quiz-choice-btn ${selectedOption === choice ? 'selected' : ''}`}
+                                    onClick={() => handleSelectOption(choice)}
                                 >
                                     <div className="choice-radio-circle"></div>
                                     <span className="choice-text">{choice.text}</span>
                                 </button>
                             ))}
+                        </div>
+                        
+                        {/* ปุ่มยืนยัน (แสดงเฉพาะตอนที่เลือกคำตอบแล้ว) */}
+                        <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'center' }}>
+                            <button 
+                                className="btn-primary" 
+                                style={{ 
+                                    opacity: selectedOption ? 1 : 0.5, 
+                                    cursor: selectedOption ? 'pointer' : 'not-allowed',
+                                    padding: '12px 40px',
+                                    fontSize: '1.1rem',
+                                    transition: 'all 0.3s'
+                                }}
+                                onClick={handleConfirmAnswer}
+                                disabled={!selectedOption}
+                            >
+                                {questionCount === 10 ? (
+                                    <>ดูผลลัพธ์บทสรุปของคุณ <i className="fa-solid fa-scroll" style={{ marginLeft: '8px' }}></i></>
+                                ) : (
+                                    <>ยืนยันคำตอบ และไปต่อ <i className="fa-solid fa-arrow-right" style={{ marginLeft: '8px' }}></i></>
+                                )}
+                            </button>
                         </div>
                     </div>
                 </div>

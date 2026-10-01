@@ -1,5 +1,6 @@
 const express = require('express');
 const pool = require('../db');
+const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 
@@ -76,7 +77,7 @@ router.post('/users', checkAdmin, async (req, res) => {
 
 router.post('/update_user', checkAdmin, async (req, res) => {
     try {
-        const { target_user_id, role, status } = req.body;
+        const { target_user_id, role, status, user_name, user_email, new_password } = req.body;
         
         if (target_user_id === req.body.admin_id && status && status !== 'active') {
              return res.status(400).json({ status: 'error', message: 'คุณไม่สามารถระงับบัญชีตัวเองได้' });
@@ -85,6 +86,14 @@ router.post('/update_user', checkAdmin, async (req, res) => {
         let query = "UPDATE users SET ";
         let params = [];
         
+        if (user_name) {
+            query += "user_name = ?, ";
+            params.push(user_name);
+        }
+        if (user_email) {
+            query += "user_email = ?, ";
+            params.push(user_email);
+        }
         if (role) {
             query += "role = ?, ";
             params.push(role);
@@ -93,7 +102,17 @@ router.post('/update_user', checkAdmin, async (req, res) => {
             query += "status = ?, ";
             params.push(status);
         }
+        if (new_password) {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(new_password, salt);
+            query += "user_password = ?, ";
+            params.push(hashedPassword);
+        }
         
+        if (params.length === 0) {
+            return res.json({ status: 'success', message: 'ไม่มีข้อมูลที่ต้องอัปเดต' });
+        }
+
         query = query.slice(0, -2); 
         query += " WHERE user_id = ?";
         params.push(target_user_id);

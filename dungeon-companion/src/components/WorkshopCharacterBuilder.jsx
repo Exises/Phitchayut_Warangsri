@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import useLocalStorageState from '../hooks/useLocalStorageState';
+import { useSettings } from '../context/SettingsContext';
 import useCharacterCalculations from '../hooks/useCharacterCalculations';
 import WARLOCK_INVOCATIONS from '../data/warlock_invocations.json';
 import { resolveCharacterMechanics } from '../utils/mechanicsResolver';
@@ -97,7 +98,8 @@ function WorkshopCharacterBuilder({ onCancel }) {
   const [previewClassId, setPreviewClassId] = useState(null);
   const [showFullClassInfo, setShowFullClassInfo] = useState(false);
   const [showFeatDetails, setShowFeatDetails] = useState({});
-  const [showDebug, setShowDebug] = useState(false);
+  const { settings } = useSettings();
+  const showDebug = settings?.showDebugView || false;
   const [isSpellbookView, setIsSpellbookView] = useState(false);
   const [activeSpellClassTab, setActiveSpellClassTab] = useState('');
   const [spellSearchTerm, setSpellSearchTerm] = useState('');
@@ -574,12 +576,12 @@ function WorkshopCharacterBuilder({ onCancel }) {
     // Validation before moving to the next step
     if (currentStep === 1) {
       if (!characterState.race.id) {
-        alert("Please select a species (race).");
+        alert("กรุณาเลือกเผ่าพันธุ์ (Species) ของคุณ");
         return;
       }
       const selectedRace = dbData.races?.find(r => r.species_id === characterState.race.id);
       if (selectedRace && selectedRace.size && selectedRace.size.includes(' or ') && !characterState.race.sizeChoice) {
-        alert("Please choose your character's size.");
+        alert("กรุณาเลือกขนาดตัวละคร (Size) ของคุณ");
         return;
       }
       
@@ -592,7 +594,7 @@ function WorkshopCharacterBuilder({ onCancel }) {
             const hasNestedOptions = t.logic && t.logic.choices && t.logic.choices.options;
             if (hasDirectOptions || hasNestedOptions) {
               if (!characterState.race.traitChoices?.[t.name]) {
-                alert(`Please make a selection for ${t.name}.`);
+                alert(`กรุณาเลือกตัวเลือกสำหรับ ${t.name}`);
                 return;
               }
             }
@@ -603,7 +605,7 @@ function WorkshopCharacterBuilder({ onCancel }) {
       const availableLineages = dbData.lineages?.filter(l => l.species_id === characterState.race.id) || [];
       if (availableLineages.length > 0) {
         if (!characterState.race.lineageId) {
-          alert("Please select a lineage or subrace.");
+          alert("กรุณาเลือกสายเลือด (Lineage) หรือเผ่าย่อย");
           return;
         }
         
@@ -615,11 +617,11 @@ function WorkshopCharacterBuilder({ onCancel }) {
             const requiresAbilityChoice = spells.some(s => s.ability && s.ability.includes('or '));
             const choiceSpell = spells.find(s => s.is_choice === 1);
             if (requiresAbilityChoice && !characterState.race.lineageSpellAbility) {
-              alert("Please choose a Spellcasting Ability for your lineage spells.");
+              alert("กรุณาเลือกความสามารถในการร่ายเวท (Spellcasting Ability) สำหรับสายเลือดของคุณ");
               return;
             }
             if (choiceSpell && !characterState.race.lineageSpellChoice) {
-              alert("Please select your lineage spell.");
+              alert("กรุณาเลือกเวทมนตร์ประจำสายเลือดของคุณ");
               return;
             }
           } catch { /* ignore */ }
@@ -627,7 +629,7 @@ function WorkshopCharacterBuilder({ onCancel }) {
       }
 
       if (!characterState.race.languages || characterState.race.languages.length === 0) {
-        alert("Please choose at least 1 language (up to 2 languages).");
+        alert("��س����͡�������ҧ���� 1 ���� (�٧�ش 2 ����)");
         return;
       }
     }
@@ -635,7 +637,7 @@ function WorkshopCharacterBuilder({ onCancel }) {
     if (currentStep === 2) {
       const classList = characterState.classData.classes;
       if (classList.length === 0) {
-        alert("Please select your primary class.");
+        alert("กรุณาเลือกอาชีพหลัก (Primary Class) ของคุณ");
         return;
       }
       
@@ -646,7 +648,7 @@ function WorkshopCharacterBuilder({ onCancel }) {
         
         // For simplicity, if there are subclasses available, require selection at level 3 onwards
         if (cl.level >= 3 && availableSubclasses.length > 0 && !cl.subclassId) {
-          alert(`Please select a subclass for ${classInfo?.class_name || cl.classId}.`);
+          alert(`กรุณาเลือก Subclass สำหรับ ${classInfo?.class_name || cl.classId}`);
           return;
         }
       }
@@ -654,7 +656,7 @@ function WorkshopCharacterBuilder({ onCancel }) {
     
     if (currentStep === 3) {
       if (!characterState.background?.id) {
-        alert("Please select a background.");
+        alert("กรุณาเลือกประวัติตัวละคร (Background)");
         return;
       }
     }
@@ -674,28 +676,28 @@ function WorkshopCharacterBuilder({ onCancel }) {
     }
     if (currentStep === 1 || targetStepId > 1) {
       if (!characterState.race.id) {
-        alert("Please select a species (race) first.");
+        alert("กรุณาเลือกเผ่าพันธุ์ (Species) ก่อน");
         return;
       }
       const selectedRace = dbData.races?.find(r => r.species_id === characterState.race.id);
       if (selectedRace && selectedRace.size && selectedRace.size.includes(' or ') && !characterState.race.sizeChoice) {
-        alert("Please choose your character's size first.");
+        alert("กรุณาเลือกขนาดตัวละคร (Size) ก่อน");
         return;
       }
       const availableLineages = dbData.lineages?.filter(l => l.species_id === characterState.race.id) || [];
       if (availableLineages.length > 0 && !characterState.race.lineageId) {
-        alert("Please select a lineage or subrace first.");
+        alert("กรุณาเลือกสายเลือด (Lineage) หรือเผ่าย่อยก่อน");
         return;
       }
       if (!characterState.race.languages || characterState.race.languages.length === 0) {
-        alert("Please choose at least 1 language first.");
+        alert("กรุณาเลือกภาษาอย่างน้อย 1 ภาษาก่อน");
         return;
       }
     }
     if (currentStep <= 2 && targetStepId > 2) {
       const classList = characterState.classData?.classes || [];
       if (classList.length === 0) {
-        alert("Please select your primary class first.");
+        alert("กรุณาเลือกอาชีพหลัก (Primary Class) ก่อน");
         return;
       }
       for (let i = 0; i < classList.length; i++) {
@@ -703,14 +705,14 @@ function WorkshopCharacterBuilder({ onCancel }) {
         const classInfo = dbData.classes?.find(c => c.class_id === cl.classId);
         const availableSubclasses = deduplicateSubclasses(dbData.subclasses?.filter(sc => sc.class_id === cl.classId) || [], cl.subclassId);
         if (cl.level >= 3 && availableSubclasses.length > 0 && !cl.subclassId) {
-          alert(`Please select a subclass for ${classInfo?.class_name || cl.classId} first.`);
+          alert(`กรุณาเลือก Subclass สำหรับ ${classInfo?.class_name || cl.classId} ก่อน`);
           return;
         }
       }
     }
     if (currentStep <= 3 && targetStepId > 3) {
       if (!characterState.background?.id) {
-        alert("Please select a background first.");
+        alert("กรุณาเลือกประวัติตัวละคร (Background) ก่อน");
         return;
       }
     }
@@ -1255,23 +1257,16 @@ function WorkshopCharacterBuilder({ onCancel }) {
         dbData={dbData}
       />
             {/* --- DEBUG VIEW --- */}
-      <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999 }}>
-        <button 
-          onClick={() => setShowDebug(!showDebug)}
-          style={{ backgroundColor: 'var(--color-ink)', color: 'var(--bg-white)', padding: '10px 15px', borderRadius: '8px', border: 'none', cursor: 'pointer', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', fontWeight: 'bold' }}
-        >
-          <i className="fa-solid fa-bug" style={{ marginRight: '8px' }}></i>
-          {showDebug ? 'Hide Debug View' : 'Show Real-time Debug View'}
-        </button>
-        {showDebug && (
-          <div style={{ position: 'absolute', bottom: '50px', right: '0', width: '400px', maxHeight: '500px', overflowY: 'auto', backgroundColor: 'var(--color-ink)', color: '#10b981', padding: '15px', borderRadius: '8px', boxShadow: '0 10px 15px rgba(0,0,0,0.3)', fontSize: '0.8rem', fontFamily: 'monospace' }}>
-            <h4 style={{ margin: '0 0 10px 0', color: 'var(--bg-white)' }}>characterState & Resolved Mechanics</h4>
+      {showDebug && (
+        <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999 }}>
+          <div style={{ width: '400px', maxHeight: '500px', overflowY: 'auto', backgroundColor: 'var(--color-ink)', color: '#10b981', padding: '15px', borderRadius: '8px', boxShadow: '0 10px 15px rgba(0,0,0,0.3)', fontSize: '0.8rem', fontFamily: 'monospace' }}>
+            <h4 style={{ margin: '0 0 10px 0', color: 'var(--bg-white)' }}><i className="fa-solid fa-bug" style={{ marginRight: '8px' }}></i> Real-time Debug View</h4>
             <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
               {JSON.stringify({ ...characterState, abilities: totalStats, resolvedMechanics }, null, 2)}
             </pre>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
     </div>
   );

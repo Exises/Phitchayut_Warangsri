@@ -67,7 +67,7 @@ function Home() {
                         >
                             <i className="fa-solid fa-hammer"></i> เข้าสู่ WORKSHOP
                         </Link>
-                        <Link to="/compendium" className="btn btn-secondary" onClick={(e) => handleProtectedClick(e, '/compendium')}><i className="fa-solid fa-book-open"></i> ค้นหากฎ</Link>
+                        <Link to="/compendium" className="btn btn-secondary"><i className="fa-solid fa-book-open"></i> ค้นหากฎ</Link>
                     </div>
                 </div>
             </section>
@@ -91,7 +91,7 @@ function Home() {
                         <div className="card-link">เริ่มสร้าง <i className="fa-solid fa-arrow-right"></i></div>
                     </Link>
 
-                    <Link to="/compendium" className="card" onClick={(e) => handleProtectedClick(e, '/compendium')}>
+                    <Link to="/compendium" className="card">
                         <div className="card-icon"><i className="fa-solid fa-book-skull"></i></div>
                         <h3 className="card-title">COMPENDIUM</h3>
                         <p>ค้นหาคาถา มอนสเตอร์ และกฎ 5th Edition ได้ทันที</p>

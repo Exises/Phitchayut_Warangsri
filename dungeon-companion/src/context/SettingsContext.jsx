@@ -9,7 +9,8 @@ export const SettingsProvider = ({ children }) => {
         diceTheme: 'divine-marble', // 'divine-marble', 'obsidian', 'mystic'
         diceSoundEnabled: true,
         diceSoundVolume: 0.5,
-        enable3DDice: true
+        enable3DDice: true,
+        showDebugView: false
     };
 
     const [settings, setSettings] = useState(() => {

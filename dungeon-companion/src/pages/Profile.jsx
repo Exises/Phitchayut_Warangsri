@@ -626,6 +626,18 @@ function Profile() {
                                     </label>
                                 </div>
 
+                                <div className="setting-toggle-group">
+                                    <label className="setting-toggle">
+                                        <input 
+                                            type="checkbox"
+                                            checked={settings.showDebugView || false}
+                                            onChange={(e) => updateSetting('showDebugView', e.target.checked)}
+                                        />
+                                        <span className="toggle-slider"></span>
+                                        <span className="toggle-label">แสดงหน้าต่าง Debug (Real-time Debug View) ใน Workshop</span>
+                                    </label>
+                                </div>
+
                                 {settings.diceSoundEnabled && (
                                     <div className="profile-form-group" style={{ marginTop: '16px' }}>
                                         <label>ระดับเสียงทอยลูกเต๋า: {Math.round(settings.diceSoundVolume * 100)}%</label>

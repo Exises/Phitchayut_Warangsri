@@ -11,11 +11,15 @@ import Swal from 'sweetalert2';
 window.alert = (message) => {
   Swal.fire({
     text: message,
-    icon: 'info',
-    confirmButtonText: 'OK',
-    confirmButtonColor: '#3085d6',
-    background: '#1a1a1a',
-    color: '#ffffff'
+    icon: 'warning',
+    iconColor: '#711a19', // Crimson red
+    confirmButtonText: 'ตกลง',
+    confirmButtonColor: '#711a19',
+    background: '#fdf9ec', // Parchment
+    color: '#333333', // Ink
+    backdrop: `
+      rgba(0,0,0,0.5)
+    `
   });
 };
 

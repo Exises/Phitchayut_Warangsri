@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 
@@ -29,6 +30,7 @@ export default function TopCombatStrip({
   setGameplayRollHistory
 }) {
   const [showShortRestModal, setShowShortRestModal] = useState(false);
+  const [showLongRestModal, setShowLongRestModal] = useState(false);
   const [localExpendedHd, setLocalExpendedHd] = useState(0);
   const expendedHitDice = propExpendedHd !== undefined ? propExpendedHd : localExpendedHd;
   const setExpendedHitDice = propSetExpendedHd || setLocalExpendedHd;
@@ -106,8 +108,30 @@ export default function TopCombatStrip({
     setShowShortRestModal(false);
   };
 
-  const handleLongRest = () => {
-    if (!window.confirm("Perform a Long Rest? This will fully restore HP, all spell slots, half your Hit Dice, and all feature pools.")) return;
+  const handleLongRest = async () => {
+    const result = await Swal.fire({
+      title: '🌙 พักผ่อนระยะยาว (Long Rest)',
+      html: `
+        <div style="text-align: left; font-size: 0.9em; line-height: 1.5; color: var(--color-ink);">
+          <p>คุณต้องการทำการ <strong>Long Rest</strong> ใช่หรือไม่?</p>
+          <ul style="margin-top: 10px; padding-left: 20px; color: #711a19; font-weight: bold;">
+            <li>ฟื้นฟูพลังชีวิต (HP) จนเต็มระดับสูงสุด</li>
+            <li>ฟื้นฟูช่องเวทมนตร์ (Spell Slots) ทั้งหมด</li>
+            <li>ฟื้นฟูแต้ม Hit Dice (อย่างน้อยครึ่งหนึ่ง)</li>
+            <li>รีเซ็ตความสามารถ (Features) ทั้งหมด</li>
+          </ul>
+        </div>
+      `,
+      icon: 'question',
+      showยกเลิกButton: true,
+      confirmButtonText: '🌙 พักผ่อนเลย',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonColor: '#711a19',
+      cancelButtonColor: '#a8a29e',
+      background: 'var(--bg-paper, #fdf9ec)',
+      color: 'var(--color-ink, #333333)'
+    });
+    if (!result.isConfirmed) return;
 
     // Restore HP
     setReviewHpCur(maxHp);
@@ -183,7 +207,7 @@ export default function TopCombatStrip({
 
       <button
         type="button"
-        onClick={handleLongRest}
+        onClick={() => setShowLongRestModal(true)}
         style={{
           backgroundColor: '#711a19',
           border: '1.5px solid #711a19',
@@ -199,7 +223,7 @@ export default function TopCombatStrip({
           boxShadow: '0 1px 3px rgba(113, 26, 25, 0.3)',
           transition: 'all 0.15s'
         }}
-        title="Perform a Long Rest to fully restore HP, spell slots, features, and half Hit Dice"
+        title="พักผ่อนระยะยาวเพื่อฟื้นฟูพลังชีวิต, ช่องเวท, ความสามารถ และแต้ม Hit Dice อย่างเต็มที่"
       >
         <span>🌙</span> Long Rest
       </button>
@@ -227,19 +251,19 @@ export default function TopCombatStrip({
             color: 'var(--color-ink)'
           }}>
             <h3 style={{ margin: '0 0 8px 0', color: '#711a19', fontFamily: 'Cinzel, serif', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              ☕ Take a Short Rest
+              ☕ พักผ่อนระยะสั้น (Short Rest)
             </h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--color-gray)', margin: '0 0 16px 0', lineHeight: '1.4' }}>
-              Spend Hit Dice to recover Hit Points (1d{hitDiceList[0]?.hitDie || 8} + CON modifier per die).
+              ใช้แต้ม Hit Dice เพื่อฟื้นฟูพลังชีวิต (ทอย 1d{hitDiceList[0]?.hitDie || 8} + ค่าโบนัส CON ต่อ 1 แต้มที่ใช้)
             </p>
 
             <div style={{ backgroundColor: '#fefcf8', border: '1px solid #e2d8c3', borderRadius: '8px', padding: '12px', marginBottom: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.85rem' }}>
-                <span style={{ color: 'var(--color-gray)', fontWeight: '600' }}>Total Available:</span>
+                <span style={{ color: 'var(--color-gray)', fontWeight: '600' }}>แต้มคงเหลือ:</span>
                 <strong style={{ color: '#711a19' }}>{availHd} / {totalHdCount} HD</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '8px' }}>
-                <span style={{ color: 'var(--color-gray)', fontWeight: '600' }}>Current HP:</span>
+                <span style={{ color: 'var(--color-gray)', fontWeight: '600' }}>พลังชีวิตปัจจุบัน:</span>
                 <strong style={{ color: 'var(--color-ink)' }}>{curHp} / {maxHp}</strong>
               </div>
               
@@ -282,12 +306,86 @@ export default function TopCombatStrip({
                 onClick={handleFinishShortRest}
                 style={{ padding: '8px 16px', backgroundColor: '#711a19', color: 'var(--bg-white)', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}
               >
-                Finish Rest & Recover Features
+                สิ้นสุดการพักผ่อน (ฟื้นฟู HP/ฟีเจอร์)
               </button>
             </div>
           </div>
         </div>
       ), document.body)}
+
+      {/* Long Rest Modal (Portaled & Parchment Theme) */}
+      {showLongRestModal && ReactDOM.createPortal((
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(0,0,0,0.65)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2500,
+          padding: '16px'
+        }}>
+          <div className="animate-scale-up" style={{
+            backgroundColor: 'var(--bg-paper)',
+            borderRadius: '14px',
+            padding: '24px',
+            width: '100%',
+            maxWidth: '420px',
+            boxShadow: '0 25px 50px -12px rgba(113, 26, 25, 0.35)',
+            border: '2px solid #711a19',
+            color: 'var(--color-ink)'
+          }}>
+            <h3 style={{ margin: '0 0 12px 0', color: '#711a19', fontFamily: 'Cinzel, serif', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              🌙 พักผ่อนระยะยาว (Long Rest)
+            </h3>
+            
+            <div style={{ backgroundColor: '#fefcf8', border: '1px solid #e2d8c3', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
+              <p style={{ color: 'var(--color-ink)', fontWeight: 'bold', margin: '0 0 12px 0' }}>
+                คุณต้องการทำการ Long Rest ใช่หรือไม่?
+              </p>
+              <ul style={{ margin: 0, paddingLeft: '20px', color: '#711a19', fontSize: '0.9rem', lineHeight: '1.6', fontWeight: 'bold' }}>
+                <li>ฟื้นฟูพลังชีวิต (HP) จนเต็มระดับสูงสุด</li>
+                <li>ฟื้นฟูช่องเวทมนตร์ (Spell Slots) ทั้งหมด</li>
+                <li>ฟื้นฟูแต้ม Hit Dice (อย่างน้อยครึ่งหนึ่ง)</li>
+                <li>รีเซ็ตความสามารถ (Features) ทั้งหมด</li>
+              </ul>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <button
+                onClick={() => setShowLongRestModal(false)}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: 'var(--bg-white)',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  color: 'var(--color-gray)',
+                  cursor: 'pointer',
+                  fontWeight: 'bold'
+                }}
+              >
+                ยกเลิก
+              </button>
+              <button
+                onClick={handleLongRest}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: '#711a19',
+                  border: 'none',
+                  borderRadius: '8px',
+                  color: 'var(--bg-white)',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  boxShadow: '0 2px 4px rgba(113, 26, 25, 0.3)'
+                }}
+              >
+                🌙 พักผ่อนเลย
+              </button>
+            </div>
+          </div>
+        </div>
+      ), document.body)}
+
     </div>
   );
 }

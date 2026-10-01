@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -123,10 +124,72 @@ function Sheets() {
     }
   };
 
+  const handleImportJson = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importedData = JSON.parse(e.target.result);
+        if (!importedData.description || !importedData.classData) {
+          throw new Error('ไฟล์ไม่ถูกต้องหรือไม่ใช่ไฟล์ตัวละคร D&D Companion');
+        }
+        
+        // ลบ ID ออกเพื่อให้ถือเป็นการสร้างตัวละครใหม่ (ไม่เซฟทับตัวเก่าถ้าเคยมี)
+        delete importedData.char_id;
+        
+        // บันทึกลง LocalStorage ให้ Workshop อ่านเป็น Draft
+        localStorage.setItem('workshop_characterState', JSON.stringify(importedData));
+        localStorage.setItem('workshop_currentStep', "1");
+        localStorage.removeItem('workshop_load_char_id');
+        
+        // พาไปหน้า Workshop เพื่อให้ผู้ใช้กดยืนยันเซฟ
+        navigate('/workshop?autoOpen=true&step=1');
+      } catch (err) {
+        alert('เกิดข้อผิดพลาดในการอ่านไฟล์: ' + err.message);
+      }
+      // รีเซ็ตค่า input เผื่อต้องการอัปโหลดไฟล์เดิมอีกครั้ง
+      event.target.value = '';
+    };
+    reader.readAsText(file);
+  };
+
   const handleDelete = async (charId, charName) => {
-    if (!window.confirm(`คุณแน่ใจหรือไม่ที่จะลบตัวละคร "${charName}" ? การกระทำนี้ไม่สามารถย้อนกลับได้`)) {
+    const { value: typedText } = await Swal.fire({
+      title: '⚠️ ยืนยันการลบตัวละคร',
+      html: `
+        <div style="text-align: left; margin-top: 10px;">
+          <p style="margin-bottom: 10px;">คุณกำลังจะลบตัวละคร <strong>"${charName}"</strong> อย่างถาวร</p>
+          <p style="color: #991b1b; font-size: 0.9em; margin-bottom: 15px; padding: 10px; background-color: #fee2e2; border-left: 4px solid #dc2626; border-radius: 4px;">
+            ⚠️ <strong>คำเตือน:</strong> ข้อมูลแผ่นตัวละคร (Character Sheet), สถิติ, พลังชีวิต, และสิ่งของในช่องเก็บของทั้งหมดของตัวละครนี้ จะถูกลบทิ้งจากฐานข้อมูลและ<strong>ไม่สามารถกู้คืนได้อีก</strong>
+          </p>
+          <p style="font-size: 0.9em; font-weight: bold; margin-bottom: 5px;">
+            โปรดยืนยันโดยการพิมพ์คำว่า <span style="color: #dc2626; letter-spacing: 1px; user-select: none;">DELETE</span> ลงในช่องด้านล่าง:
+          </p>
+        </div>
+      `,
+      input: 'text',
+      inputPlaceholder: 'พิมพ์ DELETE',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#711a19',
+      cancelButtonColor: '#a8a29e',
+      confirmButtonText: '<i className="fa-solid fa-trash"></i> ลบตัวละครถาวร',
+      cancelButtonText: 'ยกเลิก',
+      background: 'var(--bg-paper, #fdf9ec)',
+      color: 'var(--color-ink, #333333)',
+      inputValidator: (value) => {
+        if (value !== 'DELETE') {
+          return 'กรุณาพิมพ์คำว่า DELETE ตัวพิมพ์ใหญ่ทั้งหมดให้ถูกต้องเพื่อยืนยัน';
+        }
+      }
+    });
+
+    if (typedText !== 'DELETE') {
       return;
     }
+
     setDeletingId(charId);
     try {
       const res = await fetch('http://localhost:5000/api', {
@@ -137,11 +200,35 @@ function Sheets() {
       const data = await res.json();
       if (data.status === 'success') {
         setCharacters(prev => prev.filter(c => c.char_id !== charId));
+        Swal.fire({
+          title: 'ลบสำเร็จ',
+          text: `ตัวละคร "${charName}" ถูกลบออกจากสารบบแล้ว`,
+          icon: 'success',
+          background: 'var(--bg-paper, #fdf9ec)',
+          color: 'var(--color-ink, #333333)',
+          confirmButtonColor: '#711a19',
+          timer: 2000,
+          showConfirmButton: false
+        });
       } else {
-        alert('ลบไม่สำเร็จ: ' + (data.message || 'Unknown error'));
+        Swal.fire({
+          title: 'ลบไม่สำเร็จ',
+          text: data.message || 'Unknown error',
+          icon: 'error',
+          background: 'var(--bg-paper, #fdf9ec)',
+          color: 'var(--color-ink, #333333)',
+          confirmButtonColor: '#711a19'
+        });
       }
     } catch (err) {
-      alert('เกิดข้อผิดพลาดในการลบ: ' + err.message);
+      Swal.fire({
+        title: 'เกิดข้อผิดพลาด',
+        text: err.message,
+        icon: 'error',
+        background: 'var(--bg-paper, #fdf9ec)',
+        color: 'var(--color-ink, #333333)',
+        confirmButtonColor: '#711a19'
+      });
     } finally {
       setDeletingId(null);
     }
@@ -275,7 +362,43 @@ function Sheets() {
             </p>
           </div>
 
-          <div>
+          <div style={{ display: 'flex', gap: '15px' }}>
+            <input 
+              type="file" 
+              id="import-json-input" 
+              accept=".json" 
+              style={{ display: 'none' }} 
+              onChange={handleImportJson} 
+            />
+            <button
+              onClick={() => document.getElementById('import-json-input').click()}
+              style={{
+                backgroundColor: 'transparent',
+                color: '#d4af37',
+                padding: '14px 24px',
+                borderRadius: '8px',
+                border: '2px solid #d4af37',
+                fontWeight: '800',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                transition: 'all 0.2s',
+                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+              }}
+              onMouseOver={e => {
+                e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.1)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseOut={e => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              <i className="fa-solid fa-file-import text-lg"></i> นำเข้าตัวละคร
+            </button>
+
             <button
               onClick={handleCreateNew}
               style={{

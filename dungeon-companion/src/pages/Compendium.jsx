@@ -179,14 +179,7 @@ function Compendium() {
     const { category } = useParams();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
 
-    useEffect(() => {
-        const user = localStorage.getItem('dnd_user');
-        if (!user) {
-            setIsLoggedIn(false);
-        }
-    }, []);
 
     // State สำหรับเก็บข้อมูล
     const [categories, setCategories] = useState({ classes: [], backgrounds: [], species: [], feats: [], items: [], spells: [] });
@@ -442,71 +435,7 @@ function Compendium() {
         return { __html: formatted };
     };
 
-    if (!isLoggedIn) {
-        return (
-            <div className="flex-1 flex items-center justify-center p-6 min-h-[70vh] bg-cream" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <div className="access-denied-container animate-slide-down" style={{
-                    backgroundColor: 'var(--bg-white)',
-                    padding: '40px',
-                    borderRadius: '8px',
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
-                    maxWidth: '500px',
-                    width: '100%',
-                    textAlign: 'center',
-                    border: '1px solid #e5e7eb'
-                }}>
-                    <div className="denied-icon-wrapper" style={{
-                        width: '60px',
-                        height: '60px',
-                        backgroundColor: '#fef2f2',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 20px auto',
-                        color: '#ef4444',
-                        fontSize: '1.8rem'
-                    }}>
-                        <i className="fa-solid fa-lock"></i>
-                    </div>
-                    <h2 className="denied-title" style={{ fontFamily: 'var(--font-header)', color: 'var(--color-ink)', fontSize: '1.5rem', marginBottom: '10px' }}>สิทธิ์การเข้าถึงถูกจำกัด</h2>
-                    <p className="denied-subtitle" style={{ color: 'var(--color-gray)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '30px' }}>
-                        คุณไม่สามารถเข้าถึงส่วนนี้ได้ <br />
-                        เนื่องจากฟีเจอร์นี้เปิดให้ใช้งานเฉพาะสมาชิกเท่านั้น
-                    </p>
-                    <div className="denied-actions" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        <Link to="/login" style={{
-                            padding: '12px 20px',
-                            backgroundColor: '#711a19',
-                            color: 'var(--bg-white)',
-                            borderRadius: '4px',
-                            textDecoration: 'none',
-                            fontWeight: 'bold',
-                            fontSize: '0.9rem',
-                            letterSpacing: '1px',
-                            textTransform: 'uppercase',
-                            transition: 'all 0.3s'
-                        }} className="btn-denied-main">
-                            สมัครสมาชิก / เข้าสู่ระบบ
-                        </Link>
-                        <Link to="/" style={{
-                            padding: '12px 20px',
-                            backgroundColor: 'var(--bg-white)',
-                            color: 'var(--color-gray)',
-                            borderRadius: '4px',
-                            textDecoration: 'none',
-                            border: '1px solid #d1d5db',
-                            fontWeight: '500',
-                            fontSize: '0.9rem',
-                            transition: 'all 0.3s'
-                        }} className="btn-denied-secondary">
-                            กลับหน้าแรก
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+
 
     return (
         <div id="page-compendium" className="page">
