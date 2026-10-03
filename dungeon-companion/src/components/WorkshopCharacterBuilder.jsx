@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import Swal from 'sweetalert2';
 import useLocalStorageState from '../hooks/useLocalStorageState';
 import { useSettings } from '../context/SettingsContext';
 import useCharacterCalculations from '../hooks/useCharacterCalculations';
@@ -736,25 +737,51 @@ function WorkshopCharacterBuilder({ onCancel }) {
   };
 
   const [savingDbStatus, setSavingDbStatus] = useState('');
-  const handleSaveToDatabase = async () => {
+  const handleSaveToDatabase = async (redirectToPlayMode = false) => {
     // TF-WIZ-003 Frontend Validation
     if (!characterState.race?.id) {
-      alert("กรุณาเลือกเผ่าพันธุ์ (Race) ของตัวละครก่อนบันทึก!");
+      Swal.fire({ title: 'ข้อมูลไม่ครบถ้วน', text: "กรุณาเลือกเผ่าพันธุ์ (Race) ของตัวละครก่อนบันทึก!", icon: 'warning', confirmButtonColor: '#991b1b', background: '#fdf9ec', color: '#333333' });
       setCurrentStep(1);
       return;
     }
     if (!characterState.classData?.classes || characterState.classData.classes.length === 0 || !characterState.classData.classes[0].classId) {
-      alert("กรุณาเลือกสายอาชีพ (Class) ของตัวละครก่อนบันทึก!");
+      Swal.fire({ title: 'ข้อมูลไม่ครบถ้วน', text: "กรุณาเลือกสายอาชีพ (Class) ของตัวละครก่อนบันทึก!", icon: 'warning', confirmButtonColor: '#991b1b', background: '#fdf9ec', color: '#333333' });
       setCurrentStep(2);
       return;
     }
     if (!characterState.description?.name || characterState.description.name.trim() === '') {
-      alert("กรุณาตั้งชื่อตัวละครในหน้า Details ก่อนบันทึก!");
+      Swal.fire({ title: 'ข้อมูลไม่ครบถ้วน', text: "กรุณาตั้งชื่อตัวละครในหน้า Details ก่อนบันทึก!", icon: 'warning', confirmButtonColor: '#991b1b', background: '#fdf9ec', color: '#333333' });
       setCurrentStep(6);
       return;
     }
 
+    const result = await Swal.fire({
+      title: 'ยืนยันการบันทึกตัวละคร?',
+      text: redirectToPlayMode ? "ต้องการบันทึกและเริ่มเล่นด้วยตัวละครนี้เลยหรือไม่?" : "ต้องการบันทึกตัวละครนี้ลงในฐานข้อมูลหรือไม่?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#15803d',
+      cancelButtonColor: '#991b1b',
+      confirmButtonText: 'ตกลง (Save)',
+      cancelButtonText: 'ยกเลิก',
+      background: '#fdf9ec',
+      color: '#333333'
+    });
+
+    if (!result.isConfirmed) return;
+
     setSavingDbStatus('กำลังบันทึกลงฐานข้อมูล...');
+    Swal.fire({
+      title: 'กำลังบันทึก...',
+      text: 'โปรดรอสักครู่',
+      allowOutsideClick: false,
+      background: '#fdf9ec',
+      color: '#333333',
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
     const totalLvl = (characterState.classData?.classes || []).reduce((sum, c) => sum + (parseInt(c.level) || 1), 0) || 1;
     try {
       const payload = {
@@ -807,7 +834,6 @@ function WorkshopCharacterBuilder({ onCancel }) {
       });
       const data = await res.json();
       if (data.status === 'success') {
-        setSavingDbStatus('✅ บันทึกตัวละครลงฐานข้อมูลเรียบร้อยแล้ว! กำลังนำคุณไปยังแผ่นตัวละคร...');
         const targetId = data.char_id || characterState.char_id;
         
         // Log Character Save event to database
@@ -833,23 +859,32 @@ function WorkshopCharacterBuilder({ onCancel }) {
         localStorage.removeItem('workshop_characterState');
         localStorage.removeItem('workshop_currentStep');
 
-        setTimeout(() => {
+        Swal.fire({
+          title: 'บันทึกสำเร็จ!',
+          text: redirectToPlayMode ? 'กำลังพาคุณเข้าสู่หน้าเล่น...' : 'กำลังพาคุณกลับไปยังหน้ารายการตัวละคร...',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+          background: '#fdf9ec',
+          color: '#333333'
+        }).then(() => {
           setSavingDbStatus('');
-          if (targetId) {
+          if (redirectToPlayMode && targetId) {
             window.location.href = `/character/${targetId}`;
           } else {
             window.location.href = '/sheets';
           }
-        }, 1200);
+        });
       } else {
-        setSavingDbStatus('❌ บันทึกไม่สำเร็จ: ' + (data.message || 'Unknown error'));
+        Swal.fire({ title: 'บันทึกไม่สำเร็จ', text: data.message || 'Unknown error', icon: 'error', background: '#fdf9ec', color: '#333333' });
+        setSavingDbStatus('');
       }
     } catch (err) {
       console.error("Save to DB Error:", err);
-      setSavingDbStatus(`❌ เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล: ${err.message}`);
+      Swal.fire({ title: 'ข้อผิดพลาด', text: `ไม่สามารถเชื่อมต่อฐานข้อมูลได้: ${err}`, icon: 'error', background: '#fdf9ec', color: '#333333' });
+      setSavingDbStatus('');
     }
   };
-
   const renderStepContent = () => {
     switch(currentStep) {
       case 1:
@@ -1218,7 +1253,7 @@ function WorkshopCharacterBuilder({ onCancel }) {
               </button>
             ) : (
               <button 
-                onClick={handleSaveToDatabase}
+                onClick={() => handleSaveToDatabase(false)}
                 className="btn-builder-submit"
                 style={{
                   padding: '10px 20px',

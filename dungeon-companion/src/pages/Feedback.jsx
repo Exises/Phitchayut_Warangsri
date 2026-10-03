@@ -5,8 +5,7 @@ function Feedback() {
     const [rating, setRating] = useState(5);
     const [category, setCategory] = useState('general');
     const [title, setTitle] = useState('');
-    const [priority, setPriority] = useState('medium');
-    const [deviceInfo, setDeviceInfo] = useState('Desktop');
+        const [deviceInfo, setDeviceInfo] = useState('Desktop');
     const [message, setMessage] = useState('');
     const [status, setStatus] = useState({ type: '', text: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,7 +48,7 @@ function Feedback() {
                     rating: rating,
                     category: category,
                     title: title,
-                    priority: priority,
+                    priority: 'medium',
                     device_info: deviceInfo,
                     message: message
                 })
@@ -149,6 +148,20 @@ function Feedback() {
                                 </div>
                             )}
 
+                            {/* หัวข้อเรื่อง (Full Width) */}
+                            <div style={{ marginBottom: '24px' }}>
+                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>
+                                    หัวข้อเรื่อง <span style={{ color: '#ef4444' }}>*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    placeholder="สรุปหัวข้อปัญหาหรือข้อเสนอแนะสั้นๆ..."
+                                    style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.95rem', color: '#1e293b', backgroundColor: '#f8fafc', outline: 'none', transition: 'border-color 0.2s' }}
+                                />
+                            </div>
+
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
                                 {/* Category Dropdown */}
                                 <div>
@@ -165,39 +178,6 @@ function Feedback() {
                                         <option value="ui">ข้อเสนอแนะเกี่ยวกับหน้าเว็บ (UI/UX Feedback)</option>
                                         <option value="bug">แจ้งปัญหาการใช้งาน / บั๊ก (Bug Report)</option>
                                     </select>
-                                </div>
-
-                                {/* Priority Dropdown */}
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>
-                                        ระดับความสำคัญ <span style={{ color: '#ef4444' }}>*</span>
-                                    </label>
-                                    <select
-                                        value={priority}
-                                        onChange={(e) => setPriority(e.target.value)}
-                                        style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.95rem', color: '#1e293b', backgroundColor: '#f8fafc', outline: 'none', transition: 'border-color 0.2s', appearance: 'none', cursor: 'pointer' }}
-                                    >
-                                        <option value="low">ต่ำ (Low)</option>
-                                        <option value="medium">ปานกลาง (Medium)</option>
-                                        <option value="high">สูง (High)</option>
-                                        <option value="critical">วิกฤต / ระบบพัง (Critical)</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', marginBottom: '24px' }}>
-                                {/* Title Input */}
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>
-                                        หัวข้อเรื่อง <span style={{ color: '#ef4444' }}>*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
-                                        placeholder="สรุปหัวข้อปัญหาหรือข้อเสนอแนะสั้นๆ..."
-                                        style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.95rem', color: '#1e293b', backgroundColor: '#f8fafc', outline: 'none', transition: 'border-color 0.2s' }}
-                                    />
                                 </div>
 
                                 {/* Device Input */}
@@ -218,6 +198,8 @@ function Feedback() {
                                     </select>
                                 </div>
                             </div>
+
+
 
                             {/* Message Textarea */}
                             <div style={{ marginBottom: '32px' }}>

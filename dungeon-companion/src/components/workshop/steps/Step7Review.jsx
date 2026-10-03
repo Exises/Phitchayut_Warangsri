@@ -3630,22 +3630,12 @@ export default function Step7Review({
             )}
             <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
               <button
-                onClick={() => typeof handleSaveToDatabase === 'function' && handleSaveToDatabase(false)}
+                onClick={() => typeof handleSaveToDatabase === 'function' && handleSaveToDatabase(true)}
                 style={{ backgroundColor: '#15803d', color: 'var(--bg-white)', padding: '14px 28px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.15)', display: 'inline-flex', alignItems: 'center', gap: '10px' }}
               >
                 <i className="fa-solid fa-database"></i> {isPlayMode ? 'Save Character Progress (บันทึกสถานะ)' : 'Save & Enter Play Mode (บันทึกและเล่นจริง)'}
               </button>
-              {!isPlayMode && (
-                <button
-                  onClick={() => {
-                    localStorage.setItem('workshop_characterState', JSON.stringify(characterState));
-                    window.location.href = `/character/${characterState.char_id || 'current'}`;
-                  }}
-                  style={{ backgroundColor: '#2563eb', color: 'var(--bg-white)', padding: '14px 28px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.15)', display: 'inline-flex', alignItems: 'center', gap: '10px' }}
-                >
-                  <i className="fa-solid fa-gamepad"></i> Test Play Sheet (ทดสอบเล่นทันที)
-                </button>
-              )}
+
               <button
                 onClick={handleExportCharacter}
                 style={{ backgroundColor: '#711a19', color: 'var(--bg-white)', padding: '14px 28px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.15)', display: 'inline-flex', alignItems: 'center', gap: '10px' }}

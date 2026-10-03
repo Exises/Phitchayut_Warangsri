@@ -80,6 +80,8 @@ export default function AdminDashboard() {
   // Modal & Form States
   const [modalType, setModalType] = useState(null); // 'user_edit' | 'feedback_respond' | 'item_form' | 'spell_form' | 'race_form' | 'class_form' | 'delete_confirm'
   const [selectedItem, setSelectedItem] = useState(null);
+  const [feedbackDeviceFilter, setFeedbackDeviceFilter] = useState('All');
+  const [feedbackPage, setFeedbackPage] = useState(1);
   const [formData, setFormData] = useState({});
   const [toastMessage, setToastMessage] = useState(null);
 
@@ -300,7 +302,6 @@ export default function AdminDashboard() {
     setFormData({
       feedback_id: fb.feedback_id,
       status: fb.status || 'new',
-      priority: fb.priority || 'medium',
       admin_response: fb.admin_response || ''
     });
 
@@ -315,7 +316,10 @@ export default function AdminDashboard() {
             feedback_id: fb.feedback_id
           })
         });
-        refreshAllData(); // Refresh to update the unread count and UI
+        // Update local state immediately so unread dot disappears
+        setFeedbackList(prev => prev.map(f => 
+          f.feedback_id === fb.feedback_id ? { ...f, is_read: 1 } : f
+        ));
       } catch (e) {
         console.error("Error marking feedback as read:", e);
       }
@@ -501,6 +505,22 @@ export default function AdminDashboard() {
       return matchQuery && matchCat && matchPrio && matchStatus;
     });
   }, [feedbackList, searchTerm, filterCategory, filterPriority, filterStatus]);
+
+
+  const feedbackStats = useMemo(() => {
+    let filtered = feedbackList || [];
+    if (feedbackDeviceFilter !== 'All') {
+      filtered = filtered.filter(f => f.device_info === feedbackDeviceFilter);
+    }
+    const total = filtered.length;
+    const unread = filtered.filter(f => f.is_read === 0 || f.status === 'new').length;
+    
+    // Calculate average rating
+    const totalRating = filtered.reduce((acc, f) => acc + (parseInt(f.rating) || 5), 0);
+    const avgRating = total > 0 ? (totalRating / total).toFixed(1) : '0.0';
+    
+    return { total, unread, avgRating };
+  }, [feedbackList, feedbackDeviceFilter]);
 
   const filteredItems = useMemo(() => {
 
@@ -1459,6 +1479,47 @@ return (
                 </div>
               </div>
 
+
+              {/* FEEDBACK KPI SUMMARY DASHBOARD */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '20px' }}>
+                <div className="admin-kpi-card glow-blue" style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ color: '#94a3b8', fontSize: '0.9rem', fontWeight: '600' }}>เรตติ้งเฉลี่ย (Average)</span>
+                    <i className="fa-solid fa-star" style={{ color: '#3b82f6', fontSize: '1.2rem' }}></i>
+                  </div>
+                  <div style={{ fontSize: '2rem', fontWeight: '800', color: '#f8fafc' }}>{feedbackStats.avgRating} <span style={{fontSize:'1rem', color:'#64748b'}}>/ 5</span></div>
+                  
+                  {/* Device Filter inside Rating card for UI compactness */}
+                  <select 
+                    value={feedbackDeviceFilter}
+                    onChange={(e) => setFeedbackDeviceFilter(e.target.value)}
+                    style={{ marginTop: '12px', backgroundColor: '#1e293b', border: '1px solid #334155', color: '#cbd5e1', padding: '6px 10px', borderRadius: '6px', fontSize: '0.75rem', outline: 'none' }}
+                  >
+                    <option value="All">ทุกอุปกรณ์ (All Devices)</option>
+                    <option value="Desktop">คอมพิวเตอร์ / โน้ตบุ๊ก (Desktop)</option>
+                    <option value="Mobile (iOS)">ไอโฟน / ไอแพด (iOS)</option>
+                    <option value="Mobile (Android)">สมาร์ทโฟน Android</option>
+                    <option value="Tablet">แท็บเล็ต (Tablet)</option>
+                    <option value="Other">อื่นๆ (Other)</option>
+                  </select>
+                </div>
+
+                <div className="admin-kpi-card glow-purple" style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ color: '#94a3b8', fontSize: '0.9rem', fontWeight: '600' }}>ข้อความทั้งหมด</span>
+                    <i className="fa-solid fa-envelope" style={{ color: '#8b5cf6', fontSize: '1.2rem' }}></i>
+                  </div>
+                  <div style={{ fontSize: '2rem', fontWeight: '800', color: '#f8fafc' }}>{feedbackStats.total}</div>
+                </div>
+
+                <div className="admin-kpi-card glow-red" style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ color: '#94a3b8', fontSize: '0.9rem', fontWeight: '600' }}>รอการตรวจสอบ (Unread)</span>
+                    <i className="fa-solid fa-bell" style={{ color: '#ef4444', fontSize: '1.2rem' }}></i>
+                  </div>
+                  <div style={{ fontSize: '2rem', fontWeight: '800', color: '#f8fafc' }}>{feedbackStats.unread}</div>
+                </div>
+              </div>
               <div style={{ display: 'flex', gap: '20px', flex: 1, minHeight: 0 }}>
                 {/* LEFT PANE (Inbox List) */}
                 <div style={{ width: '380px', display: 'flex', flexDirection: 'column', backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155', overflow: 'hidden' }}>
@@ -1497,58 +1558,137 @@ return (
                   </div>
 
                   {/* Ticket List */}
-                  <div style={{ flex: 1, overflowY: 'auto' }}>
-                    {filteredFeedbacks.map(fb => {
-                      const isUnread = !fb.is_read || fb.is_read === 0;
-                      const isSelected = selectedItem && selectedItem.feedback_id === fb.feedback_id;
-  return (
-<div 
-                          key={fb.feedback_id} 
-                          onClick={() => handleSelectFeedback(fb)}
-                          style={{ 
-                            padding: '16px', 
-                            borderBottom: '1px solid #334155', 
-                            cursor: 'pointer',
-                            backgroundColor: isSelected ? '#334155' : (isUnread ? 'rgba(56, 189, 248, 0.05)' : 'transparent'),
-                            borderLeft: isSelected ? '4px solid #38bdf8' : (isUnread ? '4px solid #38bdf8' : '4px solid transparent'),
-                            transition: 'background-color 0.2s'
-                          }}
-                        >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#38bdf8', fontWeight: 'bold', fontSize: '0.75rem' }}>
-                                {fb.user_name ? fb.user_name.charAt(0).toUpperCase() : 'U'}
+                  <div style={{ flex: 1, overflow: 'hidden' }}>
+                    {(() => {
+                      const ITEMS_PER_PAGE = 10;
+                      const totalPages = Math.max(1, Math.ceil(filteredFeedbacks.length / ITEMS_PER_PAGE));
+                      const currentPage = Math.min(feedbackPage, totalPages);
+                      const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+                      const paginatedFeedbacks = filteredFeedbacks.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+
+                      return (
+                        <>
+                          {paginatedFeedbacks.map(fb => {
+                            const isUnread = !fb.is_read || fb.is_read === 0;
+                            const isSelected = selectedItem && selectedItem.feedback_id === fb.feedback_id;
+                            return (
+                              <div 
+                                key={fb.feedback_id} 
+                                onClick={() => handleSelectFeedback(fb)}
+                                style={{ 
+                                  padding: '5px 10px', 
+                                  borderBottom: '1px solid #334155', 
+                                  cursor: 'pointer',
+                                  backgroundColor: isSelected ? '#334155' : (isUnread ? 'rgba(56, 189, 248, 0.05)' : 'transparent'),
+                                  borderLeft: isSelected ? '3px solid #38bdf8' : (isUnread ? '3px solid #ef4444' : '3px solid transparent'),
+                                  transition: 'background-color 0.15s'
+                                }}
+                              >
+                                {/* Row 1: Avatar + Name + Date */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#38bdf8', fontWeight: 'bold', fontSize: '0.6rem', flexShrink: 0 }}>
+                                      {fb.user_name ? fb.user_name.charAt(0).toUpperCase() : 'U'}
+                                    </div>
+                                    <span style={{ fontSize: '0.75rem', fontWeight: isUnread ? '800' : '600', color: isUnread ? '#f8fafc' : '#cbd5e1', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                      {isUnread && <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#ef4444', display: 'inline-block', flexShrink: 0 }}></span>}
+                                      {fb.user_name}
+                                    </span>
+                                  </div>
+                                  <span style={{ fontSize: '0.6rem', color: '#64748b', flexShrink: 0 }}>
+                                    {new Date(fb.created_at).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                {/* Row 2: Title + Tags */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <span style={{ fontSize: '0.75rem', fontWeight: isUnread ? '700' : '500', color: isUnread ? '#e2e8f0' : '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>
+                                    {fb.title}
+                                  </span>
+                                  <span style={{ padding: '0px 5px', borderRadius: '6px', fontSize: '0.55rem', fontWeight: 'bold', backgroundColor: fb.category === 'bug' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(56, 189, 248, 0.15)', color: fb.category === 'bug' ? '#fca5a5' : '#7dd3fc', flexShrink: 0 }}>
+                                    {fb.category.toUpperCase()}
+                                  </span>
+                                  <span style={{ padding: '0px 5px', borderRadius: '6px', fontSize: '0.55rem', fontWeight: 'bold', backgroundColor: fb.status === 'resolved' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)', color: fb.status === 'resolved' ? '#6ee7b7' : '#fcd34d', flexShrink: 0 }}>
+                                    {fb.status.toUpperCase()}
+                                  </span>
+                                </div>
                               </div>
-                              <span style={{ fontSize: '0.85rem', fontWeight: isUnread ? '800' : '600', color: isUnread ? '#f8fafc' : '#cbd5e1' }}>
-                                {fb.user_name}
-                              </span>
+                            );
+                          })}
+                          {filteredFeedbacks.length === 0 && (
+                            <div style={{ padding: '30px 20px', textAlign: 'center', color: '#64748b', fontSize: '0.8rem' }}>
+                              ไม่พบข้อความ
                             </div>
-                            <span style={{ fontSize: '0.7rem', color: '#64748b' }}>
-                              {new Date(fb.created_at).toLocaleDateString()}
-                            </span>
-                          </div>
-                          <h4 style={{ fontSize: '0.9rem', fontWeight: isUnread ? '800' : '600', color: isUnread ? '#f8fafc' : '#94a3b8', margin: '0 0 6px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {fb.title}
-                          </h4>
-                          <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '0 0 10px 0', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                            {fb.description || fb.message}
-                          </p>
-                          <div style={{ display: 'flex', gap: '6px' }}>
-                            <span style={{ padding: '2px 8px', borderRadius: '10px', fontSize: '0.65rem', fontWeight: 'bold', backgroundColor: fb.category === 'bug' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(56, 189, 248, 0.1)', color: fb.category === 'bug' ? '#fca5a5' : '#7dd3fc' }}>
-                              {fb.category.toUpperCase()}
-                            </span>
-                            <span style={{ padding: '2px 8px', borderRadius: '10px', fontSize: '0.65rem', fontWeight: 'bold', backgroundColor: fb.status === 'resolved' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)', color: fb.status === 'resolved' ? '#6ee7b7' : '#fcd34d' }}>
-                              {fb.status.toUpperCase()}
-                            </span>
-                          </div>
-                        </div>
+                          )}
+                        </>
                       );
-                    })}
-                    {filteredFeedbacks.length === 0 && (
-                      <div style={{ padding: '40px 20px', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }}>
-                        No tickets found.
-                      </div>
-                    )}
+                    })()}
+                  </div>
+
+                  {/* Pagination Controls - Always visible at bottom */}
+                  <div style={{ padding: '6px 12px', borderTop: '1px solid #334155', backgroundColor: '#0f172a', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+                    <button 
+                      onClick={() => setFeedbackPage(p => Math.max(1, (Number(p) || 1) - 1))}
+                      disabled={Number(feedbackPage) <= 1}
+                      style={{ padding: '4px 12px', borderRadius: '4px', border: '1px solid #334155', backgroundColor: Number(feedbackPage) <= 1 ? '#1e293b' : '#334155', color: Number(feedbackPage) <= 1 ? '#475569' : '#f8fafc', cursor: Number(feedbackPage) <= 1 ? 'not-allowed' : 'pointer', fontSize: '0.75rem', fontWeight: '600' }}
+                    >
+                      <i className="fa-solid fa-chevron-left"></i>
+                    </button>
+                    
+                    {/* Page Input Box */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#94a3b8' }}>
+                      <span>หน้า</span>
+                      <input 
+                        type="number"
+                        min="1"
+                        max={Math.max(1, Math.ceil(filteredFeedbacks.length / 10))}
+                        value={feedbackPage}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const maxP = Math.max(1, Math.ceil(filteredFeedbacks.length / 10));
+                          if (val === '') {
+                            setFeedbackPage('');
+                          } else {
+                            const num = parseInt(val, 10);
+                            if (!isNaN(num)) {
+                              if (num > maxP) setFeedbackPage(maxP);
+                              else if (num < 1) setFeedbackPage(1);
+                              else setFeedbackPage(num);
+                            }
+                          }
+                        }}
+                        onBlur={() => {
+                          if (!feedbackPage || Number(feedbackPage) < 1) {
+                            setFeedbackPage(1);
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.target.blur();
+                          }
+                        }}
+                        style={{
+                          width: '45px',
+                          padding: '3px 6px',
+                          borderRadius: '4px',
+                          border: '1px solid #38bdf8',
+                          backgroundColor: '#1e293b',
+                          color: '#f8fafc',
+                          fontSize: '0.75rem',
+                          fontWeight: '700',
+                          textAlign: 'center',
+                          outline: 'none'
+                        }}
+                      />
+                      <span>/ {Math.max(1, Math.ceil(filteredFeedbacks.length / 10))}</span>
+                    </div>
+
+                    <button 
+                      onClick={() => setFeedbackPage(p => Math.min(Math.ceil(filteredFeedbacks.length / 10), (Number(p) || 1) + 1))}
+                      disabled={Number(feedbackPage) >= Math.ceil(filteredFeedbacks.length / 10) || filteredFeedbacks.length <= 10}
+                      style={{ padding: '4px 12px', borderRadius: '4px', border: '1px solid #334155', backgroundColor: (Number(feedbackPage) >= Math.ceil(filteredFeedbacks.length / 10) || filteredFeedbacks.length <= 10) ? '#1e293b' : '#334155', color: (Number(feedbackPage) >= Math.ceil(filteredFeedbacks.length / 10) || filteredFeedbacks.length <= 10) ? '#475569' : '#f8fafc', cursor: (Number(feedbackPage) >= Math.ceil(filteredFeedbacks.length / 10) || filteredFeedbacks.length <= 10) ? 'not-allowed' : 'pointer', fontSize: '0.75rem', fontWeight: '600' }}
+                    >
+                      <i className="fa-solid fa-chevron-right"></i>
+                    </button>
                   </div>
                 </div>
 
@@ -1560,15 +1700,7 @@ return (
                       <div style={{ padding: '24px', borderBottom: '1px solid #334155', backgroundColor: '#0f172a', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
                           <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
-                            <span style={{ padding: '4px 12px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '800', backgroundColor: '#334155', color: '#f8fafc', border: '1px solid #475569' }}>
-                              Ticket #{selectedItem.feedback_id}
-                            </span>
-                            <span style={{ padding: '4px 12px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '800', backgroundColor: selectedItem.status === 'resolved' ? 'rgba(16, 185, 129, 0.1)' : (selectedItem.status === 'in_review' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(59, 130, 246, 0.1)'), color: selectedItem.status === 'resolved' ? '#6ee7b7' : (selectedItem.status === 'in_review' ? '#fcd34d' : '#93c5fd'), border: `1px solid ${selectedItem.status === 'resolved' ? 'rgba(16, 185, 129, 0.2)' : (selectedItem.status === 'in_review' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(59, 130, 246, 0.2)')}` }}>
-                              {selectedItem.status.toUpperCase()}
-                            </span>
-                            <span style={{ padding: '4px 12px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '800', backgroundColor: selectedItem.priority === 'critical' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(248, 250, 252, 0.1)', color: selectedItem.priority === 'critical' ? '#fca5a5' : '#cbd5e1', border: `1px solid ${selectedItem.priority === 'critical' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(248, 250, 252, 0.2)'}` }}>
-                              PRIORITY: {selectedItem.priority ? selectedItem.priority.toUpperCase() : 'MEDIUM'}
-                            </span>
+                            
                           </div>
                           <h2 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#f8fafc', margin: '0 0 16px 0' }}>
                             {selectedItem.title}
@@ -1627,15 +1759,7 @@ return (
                                     <option value="closed">Closed</option>
                                   </select>
                                 </div>
-                                <div>
-                                  <label style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Set Priority:</label>
-                                  <select value={formData.priority} onChange={e => setFormData({ ...formData, priority: e.target.value })} style={{ backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', padding: '8px 12px', borderRadius: '6px', fontSize: '0.8rem' }}>
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
-                                    <option value="critical">Critical</option>
-                                  </select>
-                                </div>
+                                
                               </div>
                               <button type="submit" style={{ backgroundColor: '#38bdf8', color: '#0f172a', border: 'none', padding: '10px 24px', borderRadius: '6px', fontWeight: '800', fontSize: '0.9rem', cursor: 'pointer', boxShadow: '0 4px 10px rgba(56, 189, 248, 0.2)', transition: 'all 0.2s' }}>
                                 <i className="fa-solid fa-paper-plane"></i>ส่งการตอบกลับ
