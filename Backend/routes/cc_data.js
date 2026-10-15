@@ -26,9 +26,9 @@ router.get('/', async (req, res) => {
         // 2. All Indices for Sidebar
         if (index === 'all') {
             const [classes] = await pool.query("SELECT class_id as id, class_name as name, 'classes' as category FROM classes ORDER BY class_name");
-            const [weapons] = await pool.query("SELECT item_id as id, item_name as name, 'weapons' as category FROM items WHERE item_type = 'weapon' ORDER BY item_name");
-            const [armor] = await pool.query("SELECT item_id as id, item_name as name, 'armor' as category FROM items WHERE item_type = 'armor' ORDER BY item_name");
-            const [items] = await pool.query("SELECT item_id as id, item_name as name, 'items' as category FROM items ORDER BY item_name");
+            const [weapons] = await pool.query("SELECT item_id as id, item_name as name, cost, weight, rarity, item_type, 'weapons' as category FROM items WHERE item_type = 'weapon' ORDER BY item_name");
+            const [armor] = await pool.query("SELECT item_id as id, item_name as name, cost, weight, rarity, item_type, 'armor' as category FROM items WHERE item_type = 'armor' ORDER BY item_name");
+            const [items] = await pool.query("SELECT item_id as id, item_name as name, cost, weight, rarity, item_type, 'items' as category FROM items ORDER BY item_name");
             
             return res.json([...classes, ...weapons, ...armor, ...items]);
         }
@@ -127,24 +127,24 @@ router.get('/', async (req, res) => {
             let sql = '';
             switch (category) {
                 case 'classes':
-                    sql = "SELECT class_id as id, class_name as name FROM classes ORDER BY class_name";
+                    sql = "SELECT class_id as id, class_name as name, hit_die, primary_ability FROM classes WHERE deleted_at IS NULL ORDER BY class_name";
                     break;
                 case 'backgrounds':
-                    sql = "SELECT background_id as id, background_name as name FROM backgrounds ORDER BY background_name";
+                    sql = "SELECT background_id as id, background_name as name, feat_id, ability_scores FROM backgrounds WHERE deleted_at IS NULL ORDER BY background_name";
                     break;
                 case 'species':
-                    sql = "SELECT species_id as id, species_name as name FROM species ORDER BY species_name";
+                    sql = "SELECT species_id as id, species_name as name, size, speed FROM species WHERE deleted_at IS NULL ORDER BY species_name";
                     break;
                 case 'feats':
-                    sql = "SELECT feat_id as id, feat_name as name, feat_type as type, prerequisite FROM feats ORDER BY feat_name";
+                    sql = "SELECT feat_id as id, feat_name as name, feat_type as type, prerequisite FROM feats WHERE deleted_at IS NULL ORDER BY feat_name";
                     break;
                 case 'spells':
-                    sql = "SELECT spell_id as id, spell_name as name, spell_level as level, school FROM spells ORDER BY spell_level, spell_name";
+                    sql = "SELECT spell_id as id, spell_name as name, spell_level as level, school FROM spells WHERE deleted_at IS NULL ORDER BY spell_level, spell_name";
                     break;
                 case 'items':
                 case 'weapons':
                 case 'armor':
-                    sql = "SELECT item_id as id, item_name as name FROM items ORDER BY item_name";
+                    sql = "SELECT item_id as id, item_name as name, cost, weight, rarity, item_type, subcategory FROM items ORDER BY item_name";
                     break;
                 default:
                     return res.json([]);

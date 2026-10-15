@@ -1,4 +1,3 @@
-import Swal from 'sweetalert2';
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 
@@ -108,31 +107,7 @@ export default function TopCombatStrip({
     setShowShortRestModal(false);
   };
 
-  const handleLongRest = async () => {
-    const result = await Swal.fire({
-      title: '🌙 พักผ่อนระยะยาว (Long Rest)',
-      html: `
-        <div style="text-align: left; font-size: 0.9em; line-height: 1.5; color: var(--color-ink);">
-          <p>คุณต้องการทำการ <strong>Long Rest</strong> ใช่หรือไม่?</p>
-          <ul style="margin-top: 10px; padding-left: 20px; color: #711a19; font-weight: bold;">
-            <li>ฟื้นฟูพลังชีวิต (HP) จนเต็มระดับสูงสุด</li>
-            <li>ฟื้นฟูช่องเวทมนตร์ (Spell Slots) ทั้งหมด</li>
-            <li>ฟื้นฟูแต้ม Hit Dice (อย่างน้อยครึ่งหนึ่ง)</li>
-            <li>รีเซ็ตความสามารถ (Features) ทั้งหมด</li>
-          </ul>
-        </div>
-      `,
-      icon: 'question',
-      showยกเลิกButton: true,
-      confirmButtonText: '🌙 พักผ่อนเลย',
-      cancelButtonText: 'ยกเลิก',
-      confirmButtonColor: '#711a19',
-      cancelButtonColor: '#a8a29e',
-      background: 'var(--bg-paper, #fdf9ec)',
-      color: 'var(--color-ink, #333333)'
-    });
-    if (!result.isConfirmed) return;
-
+  const handleLongRest = () => {
     // Restore HP
     setReviewHpCur(maxHp);
     if (setReviewHpTemp) setReviewHpTemp(0);
@@ -141,7 +116,15 @@ export default function TopCombatStrip({
     if (setLiveSpellSlots) setLiveSpellSlots({});
 
     // Restore Feature Charges
-    if (setLiveFeatureCharges) setLiveFeatureCharges({});
+    if (setLiveFeatureCharges) {
+      setLiveFeatureCharges(() => {
+        const updated = {};
+        (dynamicResourceTrackers || []).forEach(tr => {
+          updated[tr.id] = tr.max;
+        });
+        return updated;
+      });
+    }
 
     // Restore half Hit Dice (5e RAW)
     const restoreCount = Math.max(1, Math.floor(totalLvl / 2));
@@ -162,7 +145,7 @@ export default function TopCombatStrip({
     setExpendedHitDice(nextHd);
 
     if (syncHpAndSave) {
-      syncHpAndSave(maxHp, 0, nextHd);
+      syncHpAndSave(maxHp, 0, nextHd, 0, 0);
     }
 
     if (setGameplayRollHistory) {
@@ -173,6 +156,8 @@ export default function TopCombatStrip({
         formula: `HP reset to ${maxHp}/${maxHp}, all Spell Slots, Features, and ${restoreCount - remainingToRecover} HD restored.`
       }, ...prev]);
     }
+
+    setShowLongRestModal(false);
   };
 
   return (

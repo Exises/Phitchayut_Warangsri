@@ -184,7 +184,7 @@ export default function Step2Class({
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                   <div>
                     <h3 className="step-title" style={{ margin: 0 }}>Manage Spells (Spellbook)</h3>
-                    <p className="step-subtitle" style={{ margin: '5px 0 0 0' }}>Select and prepare spells for your class and lineage.</p>
+                    <p className="step-subtitle" style={{ margin: '5px 0 0 0' }}>เลือกและเตรียมเวทมนตร์ (Spells) สำหรับคลาสและสายเลือดของคุณ</p>
                   </div>
                   <button onClick={() => setIsSpellbookView(false)} style={{ padding: '8px 16px', borderRadius: '6px', border: '1px solid #d1d5db', backgroundColor: 'var(--bg-white)', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <i className="fa-solid fa-arrow-left"></i> Back to Class Progression
@@ -715,7 +715,7 @@ export default function Step2Class({
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
                   <div style={{ flex: 1 }}>
                     <h3 className="step-title" style={{ margin: 0 }}>Choose Class & Multiclassing</h3>
-                    <p className="step-subtitle" style={{ margin: '5px 0 10px 0' }}>Your primary class defines your core progression. You can add additional classes for multiclassing.</p>
+                    <p className="step-subtitle" style={{ margin: '5px 0 10px 0' }}>คลาสหลัก (Primary Class) จะเป็นตัวกำหนดทักษะและความก้าวหน้าหลักของตัวละคร คุณสามารถเพิ่มคลาสอื่นเพื่อทำ Multiclassing ได้</p>
 
                     {/* 💡 Beginner Guide Banner for Step 2 (Only visible BEFORE selecting a class) */}
                     {classList.length === 0 && (

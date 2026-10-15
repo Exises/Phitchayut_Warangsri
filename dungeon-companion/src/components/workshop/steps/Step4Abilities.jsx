@@ -152,7 +152,7 @@ export default function Step4Abilities({
         Determine Ability Scores
       </h3>
       <p className="step-subtitle" style={{ color: 'var(--color-gray)', marginBottom: '12px' }}>
-        Choose generation method and assign background ability score improvements (D&D 2024 Rules)
+        เลือกวิธีคำนวณค่าพลังและจัดสรรแต้ม Ability Score Improvements จากภูมิหลังของคุณ (ตามกฎ D&D 2024)
       </p>
 
       {/* 💡 Beginner Guide Banner for Step 4 */}

@@ -263,7 +263,7 @@ export default function Step3Background({
         return (
           <div className="builder-step-content animate-fade-in">
             <h3 className="step-title" style={{ fontSize: '1.6rem', color: 'var(--color-ink)', marginBottom: '4px' }}>Choose Background</h3>
-            <p className="step-subtitle" style={{ color: 'var(--color-gray)', marginBottom: '12px' }}>Your background reveals where you came from, granting skill proficiencies, tool proficiencies, and origin feats.</p>
+            <p className="step-subtitle" style={{ color: 'var(--color-gray)', marginBottom: '12px' }}>ภูมิหลัง (Background) จะบอกเล่าที่มาของคุณ พร้อมมอบ Skill Proficiencies, Tool Proficiencies และ Origin Feats ประจำตัว</p>
 
             {/* 💡 Beginner Guide Banner for Step 3 (Only visible BEFORE selecting a background) */}
             {!selectedBg && (

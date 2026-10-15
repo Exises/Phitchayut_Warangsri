@@ -1644,8 +1644,8 @@ export default function Step7Review({
                     {/* Interactive Spell Slots Tracker */}
                     <div style={{ backgroundColor: 'var(--bg-white)', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '12px', marginBottom: '16px' }}>
                       <h5 style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--color-gray)', textTransform: 'uppercase', margin: '0 0 10px 0', display: 'flex', justifyContent: 'space-between' }}>
-                        <span>✨ Live Spell Slots Tracker (Auto-Consumed on Cast)</span>
-                        <span style={{ fontSize: '0.7rem', fontWeight: 'normal', color: 'var(--color-gray)' }}>Click slot to manually toggle or regain (Resets on Long Rest)</span>
+                        <span>✨ Live Spell Slots Tracker (หักอัตโนมัติเมื่อกดร่าย)</span>
+                        <span style={{ fontSize: '0.7rem', fontWeight: 'normal', color: 'var(--color-gray)' }}>คลิกที่สล็อตเพื่อเปิด/ปิดด้วยตนเอง (ฟื้นฟูทั้งหมดเมื่อ Long Rest)</span>
                       </h5>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(lvl => {
@@ -1748,7 +1748,7 @@ export default function Step7Review({
                               <i className="fa-solid fa-magnifying-glass" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-gray)', fontSize: '0.85rem' }}></i>
                               <input
                                 type="text"
-                                placeholder="Search Spell Names, Casting Times, Damage Types or School..."
+                                placeholder="ค้นหาชื่อคาถา, Casting Time, Damage Type หรือ School..."
                                 value={reviewSpellSearch}
                                 onChange={e => setReviewSpellSearch(e.target.value)}
                                 style={{ width: '100%', padding: '8px 10px 8px 34px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none' }}
@@ -1792,12 +1792,12 @@ export default function Step7Review({
                           )}
 
                           {allSpellsListReview.length === 0 ? (
-                            <p style={{ fontSize: '0.8rem', color: 'var(--color-gray)', fontStyle: 'italic', marginBottom: '16px' }}>No spells prepared or learned yet. Click MANAGE SPELLS to prepare spells.</p>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--color-gray)', fontStyle: 'italic', marginBottom: '16px' }}>ยังไม่มีเวทมนตร์ที่เตรียมไว้หรือเรียนรู้ กดปุ่ม MANAGE SPELLS เพื่อจัดการเวทมนตร์</p>
                           ) : filteredSpells.length === 0 ? (
                             <div style={{ textAlign: 'center', padding: '28px 20px', backgroundColor: 'var(--bg-white)', borderRadius: '8px', border: '1px dashed #cbd5e1', color: 'var(--color-gray)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', margin: '16px 0' }}>
                               <i className="fa-solid fa-filter-circle-xmark" style={{ fontSize: '2.2rem', color: 'var(--color-gray)' }}></i>
-                              <div style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--color-ink)' }}>No spells matching current search or level filter</div>
-                              <div style={{ fontSize: '0.8rem', color: 'var(--color-gray)', maxWidth: '360px', lineHeight: '1.4' }}>Try clearing your search keyword or resetting the level filter to display all your prepared and known spells.</div>
+                              <div style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--color-ink)' }}>ไม่พบเวทมนตร์ที่ตรงกับการค้นหาหรือตัวกรองเลเวลที่เลือก</div>
+                              <div style={{ fontSize: '0.8rem', color: 'var(--color-gray)', maxWidth: '360px', lineHeight: '1.4' }}>ลองล้างคำค้นหาหรือรีเซ็ตตัวกรองเลเวลเพื่อแสดงเวทมนตร์ทั้งหมดของคุณ</div>
                               <button
                                 onClick={() => { setReviewSpellLevelFilter('all'); setReviewSpellSearch(''); }}
                                 style={{ padding: '8px 16px', borderRadius: '6px', border: 'none', backgroundColor: '#711a19', color: 'var(--bg-white)', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 2px 4px rgba(113,26,25,0.2)', transition: 'all 0.2s' }}
@@ -2215,53 +2215,53 @@ export default function Step7Review({
                     const n = (name || '').toLowerCase();
                     
                     // Weapons
-                    if (n.includes('dagger')) return "A light, versatile double-edged blade. Can be used for close-quarters stabbing or thrown at distant enemies (Range 20/60). Features Finesse, allowing you to use Dexterity for attack and damage rolls.";
-                    if (n.includes('quarterstaff')) return "A simple, solid wooden staff favored by travelers, monks, and spellcasters. Can be wielded with one hand (1d6 Bludgeoning) or two hands (1d8 Bludgeoning via Versatile). Also doubles as a walking staff or arcane focus.";
-                    if (n.includes('shortsword')) return "A light, agile blade designed for swift piercing thrusts. Features Finesse and Light properties, making it ideal for dual-wielding.";
-                    if (n.includes('longsword')) return "A versatile martial sword with a long double-edged blade. Can be wielded in one hand (1d8 Slashing) or two hands (1d10 Slashing). A staple weapon for knights and fighters.";
-                    if (n.includes('greatsword')) return "A massive two-handed sword capable of delivering devastating cleaving strikes (2d6 Slashing). Requires high Strength and two hands to wield.";
-                    if (n.includes('rapier')) return "A finely crafted martial blade with a sharp point and protective guard. Deals 1d8 Piercing damage with Finesse.";
-                    if (n.includes('shortbow')) return "A compact bow designed for swift shooting at range (80/320 ft.). Fires arrows to deal 1d6 Piercing damage.";
-                    if (n.includes('longbow')) return "A large, powerful bow with incredible range (150/600 ft.). Deals 1d8 Piercing damage. Heavy and requires two hands.";
-                    if (n.includes('crossbow')) return "A mechanical bow that fires heavy bolts with high velocity. Requires the Loading property between shots.";
-                    if (n.includes('handaxe') || n.includes('axe')) return "A sturdy light axe balanced for melee combat or throwing (Range 20/60). Deals Slashing damage.";
-                    if (n.includes('mace')) return "A heavy metal or wooden club with a spiked or flanged head, designed to crush armor and bone (1d6 Bludgeoning).";
-                    if (n.includes('spear')) return "A long shaft tipped with a sharp point. Can be thrust in melee (1d6 Piercing), thrown (20/60), or used two-handed (1d8 Piercing).";
+                    if (n.includes('dagger')) return "ใบมีดสองคมน้ำหนักเบาและคล่องตัว ใช้แทงระยะประชิดหรือขว้างใส่ศัตรูระยะไกลได้ (Range 20/60) มีคุณสมบัติ Finesse ช่วยให้เลือกใช้ค่า Dexterity ในการทอย Attack และ Damage ได้";
+                    if (n.includes('quarterstaff')) return "พลองไม้เนื้อแข็งเรียบง่าย นิยมใช้ในหมู่นักเดินทาง พระ (Monk) และผู้ใช้เวทมนตร์ ใช้มือเดียว (1d6 Bludgeoning) หรือสองมือ (1d8 Bludgeoning ด้วย Versatile) และใช้เป็นไม้เท้าเดินป่าหรือ Arcane Focus ได้";
+                    if (n.includes('shortsword')) return "ดาบสั้นน้ำหนักเบา ออกแบบมาเพื่อการแทงที่รวดเร็ว มีคุณสมบัติ Finesse และ Light เหมาะสำหรับการต่อสู้แบบถืออาวุธสองมือ";
+                    if (n.includes('longsword')) return "ดาบยาวสองคมของนักรบ ใช้มือเดียว (1d8 Slashing) หรือสองมือ (1d10 Slashing ด้วย Versatile) อาวุธยอดนิยมสำหรับอัศวินและไฟเตอร์";
+                    if (n.includes('greatsword')) return "ดาบใหญ่สองมือทรงพลังที่สามารถฟาดฟันสร้างความเสียหายรุนแรง (2d6 Slashing) ต้องใช้ค่า Strength สูงและถือสองมือ";
+                    if (n.includes('rapier')) return "ดาบเรเปียร์ปลายแหลมพร้อมโกร่งกระบังมือ สร้างความเสียหาย 1d8 Piercing ด้วย Finesse";
+                    if (n.includes('shortbow')) return "ธนูขนาดกะทัดรัด ยิงระยะไกลได้รวดเร็ว (Range 80/320 ฟุต) สร้างความเสียหาย 1d6 Piercing";
+                    if (n.includes('longbow')) return "ธนูยาวทรงพลังที่มีระยะยิงไกลมาก (Range 150/600 ฟุต) สร้างความเสียหาย 1d8 Piercing เป็นอาวุธ Heavy และต้องถือสองมือ";
+                    if (n.includes('crossbow')) return "หน้าไม้กลไกที่ยิงลูกดอกด้วยความเร็วสูง ต้องใช้คุณสมบัติ Loading บรรจุใหม่ระหว่างการยิง";
+                    if (n.includes('handaxe') || n.includes('axe')) return "ขวานเบาที่สมดุลทั้งการฟันระยะประชิดและการขว้าง (Range 20/60) สร้างความเสียหาย Slashing";
+                    if (n.includes('mace')) return "กระบองโลหะหรือไม้เนื้อแข็ง ออกแบบมาเพื่อทุบกระแทกเกราะและกระดูก (1d6 Bludgeoning)";
+                    if (n.includes('spear')) return "หอกด้ามยาวปลายแหลม ใช้แทงระยะประชิด (1d6 Piercing), ขว้าง (Range 20/60) หรือจับสองมือ (1d8 Piercing)";
 
                     // Armor & Shields
-                    if (n.includes('shield')) return "A sturdy wooden or metal shield strapped to the arm. Grants a +2 bonus to Armor Class (AC) when wielded in one hand.";
-                    if (n.includes('leather armor') || n.includes('leather') || n.includes('studded leather')) return "Protective armor crafted from toughened leather. Provides AC 11/12 + Dexterity Modifier without imposing disadvantage on Stealth checks.";
-                    if (n.includes('chain shirt') || n.includes('scale mail') || n.includes('breastplate') || n.includes('half plate')) return "Medium armor combining metal plates or chainmail with padded leather. Provides solid protection (AC 13-15 + Dex max 2).";
-                    if (n.includes('chain mail') || n.includes('plate') || n.includes('ring mail') || n.includes('splint')) return "Heavy armor offering maximal physical protection. Requires high Strength and imposes disadvantage on Stealth checks.";
-                    if (n.includes('robe') || n.includes('clothes')) return "Simple, comfortable garments favored by spellcasters, scholars, and everyday travelers. Imposes no weight penalty or armor restriction.";
+                    if (n.includes('shield')) return "โล่ไม้หรือโลหะที่รัดไว้กับแขน มอบโบนัส +2 Armor Class (AC) เมื่อถือไว้ในมือข้างหนึ่ง";
+                    if (n.includes('leather armor') || n.includes('leather') || n.includes('studded leather')) return "ชุดเกราะหนังเสริมความแข็งแรง มอบ AC 11/12 + Dexterity Modifier โดยไม่ติด Disadvantage ในการทอย Stealth";
+                    if (n.includes('chain shirt') || n.includes('scale mail') || n.includes('breastplate') || n.includes('half plate')) return "เกราะระดับกลาง (Medium Armor) ที่ผสมผสานแผ่นโลหะหรือโซ่ถักเข้ากับหนัง มอบการป้องกันที่ดี (AC 13-15 + Dex สูงสุด 2)";
+                    if (n.includes('chain mail') || n.includes('plate') || n.includes('ring mail') || n.includes('splint')) return "ชุดเกราะหนัก (Heavy Armor) ที่ให้การป้องกันทางกายภาพสูงสุด ต้องใช้ค่า Strength สูงและติด Disadvantage ในการทอย Stealth";
+                    if (n.includes('robe') || n.includes('clothes')) return "เครื่องแต่งกายเรียบง่ายสวมใส่สบาย นิยมใช้ในหมู่นักเวท นักปราชญ์ และนักเดินทางทั่วไป ไม่จำกัดเกราะและไม่มีบทลงโทษเรื่องน้ำหนัก";
 
                     // Spellcasting & Class Items
-                    if (n.includes('spellbook')) return "An essential leather-bound tome used by Wizards to study, transcribe, and memorize arcane spells. Contains intricate diagrams, runes, and incantations.";
-                    if (n.includes('arcane focus') || n.includes('orb') || n.includes('wand') || n.includes('rod') || n.includes('crystal')) return "A special item (orb, crystal, rod, staff, or wand) designed to channel arcane magic, replacing material components without gold costs.";
-                    if (n.includes('holy symbol') || n.includes('amulet') || n.includes('reliquary')) return "A sacred emblem or relic of a deity used by Clerics and Paladins to focus divine spellcasting and Channel Divinity.";
-                    if (n.includes('druidic focus') || n.includes('totem') || n.includes('mistletoe')) return "A natural item (sprig of mistletoe, wooden staff, or Yew wand) used by Druids and Rangers to focus primal nature magic.";
+                    if (n.includes('spellbook')) return "สมุดปกหนังเล่มสำคัญของ Wizard สำหรับศึกษา คัดลอก และจดจำคาถาเวทมนตร์ ประกอบด้วยแผนภาพ อักขระรูน และบทร่ายมนตร์อันซับซ้อน";
+                    if (n.includes('arcane focus') || n.includes('orb') || n.includes('wand') || n.includes('rod') || n.includes('crystal')) return "ไอเทมพิเศษ (ลูกแก้ว, คริสตัล, คทา, หรือไม้เท้า) สำหรับส่งผ่านพลังเวทมนตร์ ใช้แทน Material Component ที่ไม่มีมูลค่าทองได้";
+                    if (n.includes('holy symbol') || n.includes('amulet') || n.includes('reliquary')) return "สัญลักษณ์ศักดิ์สิทธิ์หรือสิ่งตกทอดของเทพเจ้า ใช้โดย Cleric และ Paladin เพื่อรวมสมาธิในการร่ายเวทมนตร์ศักดิ์สิทธิ์และ Channel Divinity";
+                    if (n.includes('druidic focus') || n.includes('totem') || n.includes('mistletoe')) return "ไอเทมธรรมชาติ (กิ่งมิสเซิลโท, ไม้เท้าไม้, หรือคทาไม้ยิว) ใช้โดย Druid และ Ranger เพื่อรวมสมาธิในการร่ายเวทมนตร์แห่งธรรมชาติ";
 
                     // Consumables & Gear
-                    if (n.includes('potion of healing') || n.includes('healing potion')) return "A shimmering red liquid that smells of cane sugar and wild berries. Drinking it (Action or Bonus Action) immediately restores 2d4 + 2 Hit Points.";
-                    if (n.includes('potion')) return "A magical liquid contained in a small glass vial. Drinking it applies its magical effects immediately.";
-                    if (n.includes('scroll')) return "A parchment scroll inscribed with magical incantations. Allows a spellcaster to cast the spell written upon it without consuming spell slots.";
-                    if (n.includes('ration')) return "Dry food suitable for extended travel, including jerky, dried fruit, hardtack, and nuts. Provides nourishment for one full day.";
-                    if (n.includes('torch')) return "A wooden stick wrapped in pitch-soaked rags. Burns for 1 hour, providing bright light in a 20-foot radius and dim light for an additional 20 feet.";
-                    if (n.includes('rope')) return "50 feet of sturdy hempen or silk rope with a breaking strength of 1,000 pounds. Essential for climbing, tying up captives, or securing gear.";
-                    if (n.includes('waterskin')) return "A durable leather pouch designed to hold up to 4 pints of drinkable water for travel.";
-                    if (n.includes('tinderbox')) return "A small container containing flint, fire steel, and dry tinder used to ignite torches, campfires, and lanterns.";
-                    if (n.includes('parchment')) return "One sheet of Parchment can hold about 250 handwritten words. Essential for writing notes, mapping, or scribing scrolls.";
-                    if (n.includes('pen') || n.includes('quill')) return "An Ink Pen requires a vial of Ink to write on parchment or paper.";
-                    if (n.includes('book')) return "A Book contains fiction or nonfiction. If you consult an accurate nonfiction Book about its topic, you gain a +5 bonus to Intelligence (Arcana, History, Nature, or Religion) checks you make about that topic.";
-                    if (n.includes('pack')) return "A comprehensive adventure kit containing essential survival gear, food rations, rope, torches, a mess kit, and a bedroll.";
-                    if (n.includes('tool') || n.includes('supplies') || n.includes('kit')) return "A specialized set of tools and instruments used for crafting, repairing, thievery, or practicing a professional trade.";
+                    if (n.includes('potion of healing') || n.includes('healing potion')) return "ของเหลวสีแดงระยิบระยับ การดื่ม (Action หรือ Bonus Action) จะฟื้นฟู 2d4 + 2 Hit Points ทันที";
+                    if (n.includes('potion')) return "ของเหลวเวทมนตร์บรรจุในขวดแก้วขนาดเล็ก การดื่มจะให้ผลลัพธ์ทางเวทมนตร์ทันที";
+                    if (n.includes('scroll')) return "ม้วนคัมภีร์เวทมนตร์ ช่วยให้ผู้ใช้เวทสามารถร่ายคาถาที่จารึกไว้ได้โดยไม่เสีย Spell Slot";
+                    if (n.includes('ration')) return "เสบียงอาหารแห้งสำหรับการเดินทางไกล เช่น เนื้อเค็ม ผลไม้แห้ง และถั่ว เพียงพอสำหรับการประทังชีวิต 1 วันเต็ม";
+                    if (n.includes('torch')) return "คบเพลิงไม้พันผ้าชุบน้ำมันดิน เผาไหม้ได้ 1 ชั่วโมง ให้แสงสว่างจ้าในระยะ 20 ฟุต และแสงสลัวอีก 20 ฟุต";
+                    if (n.includes('rope')) return "เชือกป่านหรือเชือกไหมยาว 50 ฟุต รับน้ำหนักได้ 1,000 ปอนด์ จำเป็นสำหรับการปีนป่ายหรือมัดสิ่งของ";
+                    if (n.includes('waterskin')) return "ถุงหนังสำหรับบรรจุน้ำดื่มสำหรับการเดินทาง จุได้สูงสุด 4 ไพนต์";
+                    if (n.includes('tinderbox')) return "กล่องอุปกรณ์จุดไฟ บรรจุหินเหล็กไฟ เหล็กจุดไฟ และเชื้อไฟแห้ง สำหรับจุดคบเพลิง กองไฟ และตะเกียง";
+                    if (n.includes('parchment')) return "กระดาษหนัง 1 แผ่น สามารถเขียนข้อความได้ประมาณ 250 คำ จำเป็นสำหรับการจดบันทึก แผนที่ หรือคัดลอกคัมภีร์";
+                    if (n.includes('pen') || n.includes('quill')) return "ปากกาขนนกหรือปากกาหมึก ต้องใช้ร่วมกับขวดหมึกเพื่อเขียนลงบนกระดาษหนัง";
+                    if (n.includes('book')) return "หนังสือที่รวบรวมเนื้อหาความรู้ หากค้นคว้าจากหนังสือที่เกี่ยวข้อง จะได้รับโบนัส +5 ในการทอย Intelligence Check (Arcana, History, Nature, หรือ Religion) เกี่ยวกับหัวข้อนั้น";
+                    if (n.includes('pack')) return "ชุดอุปกรณ์ยังชีพของนักผจญภัย ประกอบด้วยเสบียง เชือก คบเพลิง ถุงนอน และเครื่องใช้จำเป็น";
+                    if (n.includes('tool') || n.includes('supplies') || n.includes('kit')) return "ชุดเครื่องมือและอุปกรณ์เฉพาะทางสำหรับงานช่าง การซ่อมแซม การสะเดาะกลอน หรือการประกอบอาชีพ";
 
                     const details = [];
                     if (damage) details.push(`Damage: ${damage}`);
                     if (acBase) details.push(`Armor Class: +${acBase}`);
                     if (properties) details.push(`Properties: ${properties}`);
 
-                    return `Standard ${category} used by adventurers.${details.length > 0 ? ' (' + details.join(', ') + ')' : ''}`;
+                    return `ไอเทม ${category} มาตรฐานสำหรับนักผจญภัย${details.length > 0 ? ' (' + details.join(', ') + ')' : ''}`;
                   };
 
                   const getItemDetails = (item) => {

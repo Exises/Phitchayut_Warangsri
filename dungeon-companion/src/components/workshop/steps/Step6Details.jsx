@@ -24,7 +24,7 @@ export default function Step6Details({
         </h3>
         <div style={{ backgroundColor: 'var(--bg-white)', padding: '16px 18px', borderRadius: '8px', borderLeft: '4px solid #711a19', border: '1px solid #cbd5e1', borderLeftWidth: '4px', borderLeftColor: '#711a19', marginBottom: '24px' }}>
           <p style={{ color: 'var(--color-gray)', fontSize: '0.9rem', lineHeight: '1.6', margin: 0 }}>
-            Characters are defined by much more than their race and class. They're individuals with their own stories, interests, connections, and capabilities beyond those that class and race define. This section expounds on the details that distinguish characters from one another, including the basics of name and physical description, the rules of backgrounds and languages, and the finer points of personality and alignment.
+            ตัวละครมีความหมายและมิติที่ลึกซึ้งมากกว่าเพียงแค่เผ่าพันธุ์และคลาส พวกเขาคือบุคคลที่มีเรื่องราว ความสนใจ สายสัมพันธ์ และความสามารถเฉพาะตัวที่อยู่นอกเหนือจากสิ่งที่คลาสหรือเผ่ากำหนดไว้ ในส่วนนี้จะช่วยระบุรายละเอียดเพื่อสร้างเอกลักษณ์ให้กับตัวละครของคุณ ตั้งแต่ข้อมูลพื้นฐาน เช่น ชื่อ รูปลักษณ์ภายนอก ภูมิหลัง ภาษา ไปจนถึงบุคลิกภาพและแนวคิดเจตคติ (Alignment)
           </p>
         </div>
 
@@ -38,7 +38,7 @@ export default function Step6Details({
               id="char-name"
               name="char-name"
               type="text"
-              placeholder="e.g. Thorin Oakenshield"
+              placeholder="e.g. Arthur / Roland / หรือชื่อตามต้องการ"
               value={desc.name || ''}
               onChange={(e) => handleDescChange('name', e.target.value)}
               style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.9rem', color: 'var(--color-ink)', fontWeight: '600' }}
@@ -241,7 +241,7 @@ export default function Step6Details({
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Bahamut / Lathander / None"
+                    placeholder="e.g. God of Light / The Sun God / เทพแห่งแสง / None"
                     value={desc.deity || ''}
                     onChange={(e) => handleDescChange('deity', e.target.value)}
                     style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.9rem', color: 'var(--color-ink)', fontWeight: '600' }}
@@ -253,7 +253,7 @@ export default function Step6Details({
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. The Fellowship / Waterdeep"
+                    placeholder="e.g. Silver Vanguard / Guild of Adventurers / กลุ่มผู้กล้าแดนเหนือ"
                     value={desc.partyName || ''}
                     onChange={(e) => handleDescChange('partyName', e.target.value)}
                     style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.9rem', color: 'var(--color-ink)', fontWeight: '600' }}
@@ -268,7 +268,7 @@ export default function Step6Details({
                 APPEARANCE
               </h4>
               <p style={{ color: 'var(--color-gray)', fontSize: '0.88rem', marginBottom: '18px' }}>
-                Define the appearance of your character below.
+                กำหนดรูปลักษณ์ภายนอกและลักษณะทางกายภาพของตัวละครของคุณที่นี่
               </p>
 
               {/* Grid 2: Appearance */}
@@ -502,7 +502,7 @@ export default function Step6Details({
                     BACKGROUND CHARACTERISTICS
                   </h4>
                   <p style={{ color: 'var(--color-gray)', fontSize: '0.85rem', lineHeight: '1.5', marginBottom: '18px' }}>
-                    Fleshing out your character's personality—the array of traits, mannerisms, habits, beliefs, and flaws that give a person a unique identity—will help you bring him or her to life as you play the game.
+                    การเติมเต็มบุคลิกภาพของตัวละคร ทั้งลักษณะนิสัย กิริยาท่าทาง ความเชื่อ อุดมการณ์ และข้อบกพร่อง จะช่วยสร้างเอกลักษณ์เฉพาะตัวและทำให้ตัวละครมีชีวิตชีวาขึ้นมาในการเล่นเกม
                   </p>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', flex: 1 }}>
@@ -512,7 +512,7 @@ export default function Step6Details({
                       </label>
                       <textarea
                         rows={2}
-                        placeholder="I'm always polite and respectful / I judge people by their actions, not words..."
+                        placeholder="e.g. ฉันเป็นคนสุภาพและให้เกียรติผู้อื่นเสมอ / ฉันตัดสินคนจากการกระทำ ไม่ใช่คำพูด..."
                         value={desc.personality || ''}
                         onChange={(e) => handleDescChange('personality', e.target.value)}
                         style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.88rem', color: 'var(--color-ink)', fontFamily: 'inherit', resize: 'vertical' }}
@@ -524,7 +524,7 @@ export default function Step6Details({
                       </label>
                       <textarea
                         rows={2}
-                        placeholder="Charity. I always try to help those in need, no matter the personal cost..."
+                        placeholder="e.g. ความเอื้อเฟื้อ: ฉันพยายามช่วยเหลือผู้เดือดร้อนเสมอ ไม่ว่าจะต้องแลกด้วยสิ่งใด..."
                         value={desc.ideals || ''}
                         onChange={(e) => handleDescChange('ideals', e.target.value)}
                         style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.88rem', color: 'var(--color-ink)', fontFamily: 'inherit', resize: 'vertical' }}
@@ -536,7 +536,7 @@ export default function Step6Details({
                       </label>
                       <textarea
                         rows={2}
-                        placeholder="I owe my life to the priest who took me in when my parents died..."
+                        placeholder="e.g. ฉันติดหนี้บุญคุณผู้มีพระคุณที่คอยดูแลฉันในวัยเยาว์..."
                         value={desc.bonds || ''}
                         onChange={(e) => handleDescChange('bonds', e.target.value)}
                         style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.88rem', color: 'var(--color-ink)', fontFamily: 'inherit', resize: 'vertical' }}
@@ -548,7 +548,7 @@ export default function Step6Details({
                       </label>
                       <textarea
                         rows={2}
-                        placeholder="I am inflexible in my thinking / I place too much trust in those who wield power within my hierarchy..."
+                        placeholder="e.g. ฉันเป็นคนหัวรั้นยึดติดกับความคิดตัวเอง / ฉันไว้ใจผู้อื่นง่ายเกินไป..."
                         value={desc.flaws || ''}
                         onChange={(e) => handleDescChange('flaws', e.target.value)}
                         style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.88rem', color: 'var(--color-ink)', fontFamily: 'inherit', resize: 'vertical' }}
@@ -563,7 +563,7 @@ export default function Step6Details({
                     BACKSTORY
                   </h4>
                   <p style={{ color: 'var(--color-gray)', fontSize: '0.85rem', lineHeight: '1.5', marginBottom: '18px' }}>
-                    Every story has a beginning. Your character's background reveals where you came from, how you became an adventurer, and your place in the world.
+                    ทุกเรื่องราวย่อมมีจุดเริ่มต้น เรื่องราวเบื้องหลังจะบอกเล่าว่าคุณมาจากไหน กลายมาเป็นนักผจญภัยได้อย่างไร และบทบาทของคุณในโลกใบนี้คืออะไร
                   </p>
 
                   <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
@@ -571,7 +571,7 @@ export default function Step6Details({
                       WRITE YOUR STORY
                     </label>
                     <textarea
-                      placeholder="Tell the tale of your character's past, significant events, allies, enemies, and what motivated them to take up the adventuring life..."
+                      placeholder="บอกเล่าเรื่องราวอดีตของตัวละคร เหตุการณ์สำคัญ มิตรสหาย ศัตรู และแรงผลักดันที่ทำให้ก้าวเข้าสู่ชีวิตการเป็นนักผจญภัย..."
                       value={desc.backstory || ''}
                       onChange={(e) => handleDescChange('backstory', e.target.value)}
                       style={{ width: '100%', minHeight: '340px', height: '100%', padding: '12px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem', color: 'var(--color-ink)', fontFamily: 'inherit', lineHeight: '1.6', resize: 'vertical', flex: 1 }}

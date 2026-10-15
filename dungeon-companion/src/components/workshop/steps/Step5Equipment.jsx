@@ -523,7 +523,7 @@ export default function Step5Equipment({
                 Equipment & Inventory Management
               </h3>
               <p className="step-subtitle" style={{ margin: 0, color: 'var(--color-gray)', fontSize: '0.9rem' }}>
-                Equip armor, weapons, manage gear and currency with real-time D&D 2024 Variant Encumbrance tracking.
+                สวมใส่เกราะ อาวุธ จัดการสัมภาระและเงินตรา พร้อมระบบติดตามน้ำหนักบรรทุก (Encumbrance) แบบเรียลไทม์ตามกฎ D&D 2024
               </p>
             </div>
 

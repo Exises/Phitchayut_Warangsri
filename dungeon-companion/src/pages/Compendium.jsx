@@ -173,6 +173,34 @@ const CLASS_ICONS = {
     wizard: "fa-solid fa-hat-wizard"
 };
 
+const CLASS_META = {
+    barbarian: { hit_die: 'd12', primary: ['Strength'] },
+    bard: { hit_die: 'd8', primary: ['Charisma'] },
+    cleric: { hit_die: 'd8', primary: ['Wisdom'] },
+    druid: { hit_die: 'd8', primary: ['Wisdom'] },
+    fighter: { hit_die: 'd10', primary: ['Strength', 'Dexterity'] },
+    monk: { hit_die: 'd8', primary: ['Dexterity', 'Wisdom'] },
+    paladin: { hit_die: 'd10', primary: ['Strength', 'Charisma'] },
+    ranger: { hit_die: 'd10', primary: ['Dexterity', 'Wisdom'] },
+    rogue: { hit_die: 'd8', primary: ['Dexterity'] },
+    sorcerer: { hit_die: 'd6', primary: ['Charisma'] },
+    warlock: { hit_die: 'd8', primary: ['Charisma'] },
+    wizard: { hit_die: 'd6', primary: ['Intelligence'] }
+};
+
+const SPECIES_META = {
+    dragonborn: { size: 'Medium' },
+    dwarf: { size: 'Medium' },
+    elf: { size: 'Medium' },
+    gnome: { size: 'Small' },
+    goliath: { size: 'Medium' },
+    halfling: { size: 'Small' },
+    human: { size: 'Medium' },
+    orc: { size: 'Medium' },
+    tiefling: { size: 'Medium' },
+    aasimar: { size: 'Medium' }
+};
+
 // --- Component หลัก ---
 
 function Compendium() {
@@ -189,6 +217,13 @@ function Compendium() {
     const [searchQuery, setSearchQuery] = useLocalStorageState('compendium_searchQuery', "");
     const [showFilters, setShowFilters] = useState(false);
     const [featFilter, setFeatFilter] = useLocalStorageState('compendium_featFilter', "All");
+    const [itemFilter, setItemFilter] = useLocalStorageState('compendium_itemFilter', "All");
+    const [itemRarityFilter, setItemRarityFilter] = useLocalStorageState('compendium_itemRarityFilter', "All");
+    const [spellLevelFilter, setSpellLevelFilter] = useLocalStorageState('compendium_spellLevelFilter', "All");
+    const [spellSchoolFilter, setSpellSchoolFilter] = useLocalStorageState('compendium_spellSchoolFilter', "All");
+    const [classFilter, setClassFilter] = useLocalStorageState('compendium_classFilter', "All");
+    const [speciesFilter, setSpeciesFilter] = useLocalStorageState('compendium_speciesFilter', "All");
+    const [bgFilter, setBgFilter] = useLocalStorageState('compendium_bgFilter', "All");
     
     // (ลบ openCategory ออกเพราะใช้แสดงแค่หมวดหมู่เดียวตาม URL)
 
@@ -224,7 +259,7 @@ function Compendium() {
                 // ใส่ไอคอน
                 backgrounds = backgrounds.map(b => ({ ...b, icon: "fa-solid fa-tree" }));
                 species = species.map(s => ({ ...s, icon: "fa-solid fa-users" }));
-                feats = feats.map(f => ({ ...f, icon: "fa-solid fa-medal" }));
+                feats = feats.map(f => ({ ...f, type: f.feat_type || f.type, icon: "fa-solid fa-medal" }));
                 items = items.map(i => ({ ...i, id: i.item_id || i.id, name: i.item_name || i.name, icon: "fa-solid fa-shield-halved" }));
                 spells = spells.map(s => ({ ...s, id: s.spell_id || s.id, name: s.spell_name || s.name, icon: "fa-solid fa-wand-sparkles" }));
 
@@ -461,7 +496,7 @@ function Compendium() {
                             />
                             <i className="fa-solid fa-search search-icon"></i>
                         </div>
-                        {category === 'feats' && (
+                        {['classes', 'backgrounds', 'species', 'feats', 'items', 'spells'].includes(category) && (
                             <button 
                                 onClick={() => setShowFilters(!showFilters)}
                                 className="filter-btn"
@@ -472,6 +507,61 @@ function Compendium() {
                         )}
                     </div>
 
+                    {/* Classes Filter Panel */}
+                    {category === 'classes' && showFilters && (
+                        <div className="filter-panel animate-fade-in" style={{ padding: '15px', borderBottom: '2px solid #eee', backgroundColor: '#fdfbf7', margin: '0 10px 10px 10px', borderRadius: '8px', border: '1px solid #e8e1d5', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                <div style={{ fontWeight: 'bold', color: '#8b0000', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>ค่าพลังหลัก (Primary Ability)</div>
+                                <button onClick={() => setClassFilter('All')} style={{ fontSize: '0.75rem', color: '#666', background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>Reset</button>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                {['All', 'Strength', 'Dexterity', 'Intelligence', 'Wisdom', 'Charisma'].map(ability => (
+                                    <label key={ability} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '6px 10px', borderRadius: '4px', backgroundColor: classFilter === ability ? '#f0ebe0' : 'transparent', fontSize: '0.85rem' }}>
+                                        <input type="radio" name="classAbility" checked={classFilter === ability} onChange={() => setClassFilter(ability)} style={{ cursor: 'pointer', accentColor: '#8b0000' }} />
+                                        <span style={{ color: classFilter === ability ? '#8b0000' : '#444', fontWeight: classFilter === ability ? 'bold' : 'normal' }}>{ability === 'All' ? 'ทั้งหมด' : ability}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Backgrounds Filter Panel */}
+                    {category === 'backgrounds' && showFilters && (
+                        <div className="filter-panel animate-fade-in" style={{ padding: '15px', borderBottom: '2px solid #eee', backgroundColor: '#fdfbf7', margin: '0 10px 10px 10px', borderRadius: '8px', border: '1px solid #e8e1d5', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                <div style={{ fontWeight: 'bold', color: '#8b0000', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>เพิ่มค่าสถานะ (Ability Boost)</div>
+                                <button onClick={() => setBgFilter('All')} style={{ fontSize: '0.75rem', color: '#666', background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>Reset</button>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                {['All', 'Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'].map(ability => (
+                                    <label key={ability} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '6px 10px', borderRadius: '4px', backgroundColor: bgFilter === ability ? '#f0ebe0' : 'transparent', fontSize: '0.85rem' }}>
+                                        <input type="radio" name="bgAbility" checked={bgFilter === ability} onChange={() => setBgFilter(ability)} style={{ cursor: 'pointer', accentColor: '#8b0000' }} />
+                                        <span style={{ color: bgFilter === ability ? '#8b0000' : '#444', fontWeight: bgFilter === ability ? 'bold' : 'normal' }}>{ability === 'All' ? 'ทั้งหมด' : ability}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Species Filter Panel */}
+                    {category === 'species' && showFilters && (
+                        <div className="filter-panel animate-fade-in" style={{ padding: '15px', borderBottom: '2px solid #eee', backgroundColor: '#fdfbf7', margin: '0 10px 10px 10px', borderRadius: '8px', border: '1px solid #e8e1d5', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                <div style={{ fontWeight: 'bold', color: '#8b0000', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>ขนาดรูปร่าง (Size)</div>
+                                <button onClick={() => setSpeciesFilter('All')} style={{ fontSize: '0.75rem', color: '#666', background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>Reset</button>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                {['All', 'Medium', 'Small'].map(size => (
+                                    <label key={size} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '6px 10px', borderRadius: '4px', backgroundColor: speciesFilter === size ? '#f0ebe0' : 'transparent', fontSize: '0.85rem' }}>
+                                        <input type="radio" name="speciesSize" checked={speciesFilter === size} onChange={() => setSpeciesFilter(size)} style={{ cursor: 'pointer', accentColor: '#8b0000' }} />
+                                        <span style={{ color: speciesFilter === size ? '#8b0000' : '#444', fontWeight: speciesFilter === size ? 'bold' : 'normal' }}>{size === 'All' ? 'ทั้งหมด' : size}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Feats Filter Panel */}
                     {category === 'feats' && showFilters && (
                         <div className="filter-panel animate-fade-in" style={{ padding: '15px', borderBottom: '2px solid #eee', backgroundColor: '#fdfbf7', margin: '0 10px 10px 10px', borderRadius: '8px', border: '1px solid #e8e1d5', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
@@ -504,10 +594,76 @@ function Compendium() {
                             </div>
                         </div>
                     )}
+
+                    {/* Items Filter Panel */}
+                    {category === 'items' && showFilters && (
+                        <div className="filter-panel animate-fade-in" style={{ padding: '15px', borderBottom: '2px solid #eee', backgroundColor: '#fdfbf7', margin: '0 10px 10px 10px', borderRadius: '8px', border: '1px solid #e8e1d5', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                <div style={{ fontWeight: 'bold', color: '#8b0000', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>ประเภทไอเทม</div>
+                                <button onClick={() => { setItemFilter('All'); setItemRarityFilter('All'); }} style={{ fontSize: '0.75rem', color: '#666', background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>Reset</button>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '14px' }}>
+                                {['All', 'Weapon', 'Armor', 'Magic Item', 'Gear', 'Tool', 'Mount / Vehicle'].map(type => (
+                                    <label key={type} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '6px 10px', borderRadius: '4px', backgroundColor: itemFilter === type ? '#f0ebe0' : 'transparent', transition: 'background 0.2s', fontSize: '0.85rem' }}>
+                                        <input type="radio" name="itemType" checked={itemFilter === type} onChange={() => setItemFilter(type)} style={{ cursor: 'pointer', accentColor: '#8b0000' }} />
+                                        <span style={{ color: itemFilter === type ? '#8b0000' : '#444', fontWeight: itemFilter === type ? 'bold' : 'normal' }}>{type === 'All' ? 'ทั้งหมด' : type}</span>
+                                    </label>
+                                ))}
+                            </div>
+                            <div style={{ borderTop: '1px solid #e8e1d5', paddingTop: '10px' }}>
+                                <div style={{ fontSize: '0.8rem', fontWeight: '600', color: '#666', marginBottom: '6px' }}>ระดับความหายาก (Rarity)</div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                                    {['All', 'Common', 'Uncommon', 'Rare', 'Very Rare', 'Legendary'].map(rarity => (
+                                        <label key={rarity} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', backgroundColor: itemRarityFilter === rarity ? '#f0ebe0' : 'transparent', fontSize: '0.8rem' }}>
+                                            <input type="radio" name="itemRarity" checked={itemRarityFilter === rarity} onChange={() => setItemRarityFilter(rarity)} style={{ cursor: 'pointer', accentColor: '#8b0000' }} />
+                                            <span style={{ color: itemRarityFilter === rarity ? '#8b0000' : '#444', fontWeight: itemRarityFilter === rarity ? 'bold' : 'normal' }}>{rarity === 'All' ? 'ทั้งหมด' : rarity}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Spells Filter Panel */}
+                    {category === 'spells' && showFilters && (
+                        <div className="filter-panel animate-fade-in" style={{ padding: '15px', borderBottom: '2px solid #eee', backgroundColor: '#fdfbf7', margin: '0 10px 10px 10px', borderRadius: '8px', border: '1px solid #e8e1d5', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                <div style={{ fontWeight: 'bold', color: '#8b0000', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>กรองเวทมนตร์</div>
+                                <button onClick={() => { setSpellLevelFilter('All'); setSpellSchoolFilter('All'); }} style={{ fontSize: '0.75rem', color: '#666', background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>Reset</button>
+                            </div>
+                            <div style={{ marginBottom: '10px' }}>
+                                <div style={{ fontSize: '0.8rem', fontWeight: '600', color: '#666', marginBottom: '6px' }}>ระดับเวทมนตร์ (Spell Level)</div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                    {['All', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].map(lvl => (
+                                        <button key={lvl} onClick={() => setSpellLevelFilter(lvl)} style={{ padding: '4px 10px', borderRadius: '14px', border: '1px solid #e8e1d5', fontSize: '0.78rem', fontWeight: spellLevelFilter === lvl ? 'bold' : 'normal', backgroundColor: spellLevelFilter === lvl ? '#8b0000' : '#fdfbf7', color: spellLevelFilter === lvl ? '#fff' : '#444', cursor: 'pointer', transition: 'all 0.2s' }}>
+                                            {lvl === 'All' ? 'ทั้งหมด' : lvl === '0' ? 'Cantrip' : `Lv.${lvl}`}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <div style={{ fontSize: '0.8rem', fontWeight: '600', color: '#666', marginBottom: '6px' }}>สำนัก (School)</div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                                    {['All', 'Abjuration', 'Conjuration', 'Divination', 'Enchantment', 'Evocation', 'Illusion', 'Necromancy', 'Transmutation'].map(school => (
+                                        <label key={school} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', backgroundColor: spellSchoolFilter === school ? '#f0ebe0' : 'transparent', fontSize: '0.8rem' }}>
+                                            <input type="radio" name="spellSchool" checked={spellSchoolFilter === school} onChange={() => setSpellSchoolFilter(school)} style={{ cursor: 'pointer', accentColor: '#8b0000' }} />
+                                            <span style={{ color: spellSchoolFilter === school ? '#8b0000' : '#444', fontWeight: spellSchoolFilter === school ? 'bold' : 'normal' }}>{school === 'All' ? 'ทั้งหมด' : school}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     
                     <div id="compendium-nav" className="sidebar-nav pt-4">
                         {category === 'classes' && categories.classes
-                            .filter(c => c.name.toLowerCase().includes(searchQuery))
+                            .filter(c => {
+                                const matchesSearch = c.name.toLowerCase().includes(searchQuery);
+                                const meta = CLASS_META[c.id] || {};
+                                const primaryList = c.primary_ability ? c.primary_ability.split(/,|and|or/).map(s=>s.trim()) : (meta.primary || []);
+                                const matchesClass = classFilter === 'All' || primaryList.some(p => p.toLowerCase().includes(classFilter.toLowerCase()));
+                                return matchesSearch && matchesClass;
+                            })
                             .map(c => (
                                 <div key={c.id} 
                                     className={`sidebar-item ${selectedItem?.data?.class_id === c.id ? 'active' : ''}`} 
@@ -519,7 +675,11 @@ function Compendium() {
                         }
 
                         {category === 'backgrounds' && categories.backgrounds
-                            .filter(b => b.name.toLowerCase().includes(searchQuery))
+                            .filter(b => {
+                                const matchesSearch = b.name.toLowerCase().includes(searchQuery);
+                                const matchesBg = bgFilter === 'All' || (b.ability_scores && b.ability_scores.toLowerCase().includes(bgFilter.toLowerCase()));
+                                return matchesSearch && matchesBg;
+                            })
                             .map(b => (
                                 <div key={b.id} 
                                     className={`sidebar-item ${selectedItem?.data?.background_id === b.id ? 'active' : ''}`} 
@@ -531,7 +691,13 @@ function Compendium() {
                         }
 
                         {category === 'species' && categories.species
-                            .filter(s => s.name.toLowerCase().includes(searchQuery))
+                            .filter(s => {
+                                const matchesSearch = s.name.toLowerCase().includes(searchQuery);
+                                const meta = SPECIES_META[s.id] || {};
+                                const size = s.size || meta.size || 'Medium';
+                                const matchesSpecies = speciesFilter === 'All' || size.toLowerCase().includes(speciesFilter.toLowerCase());
+                                return matchesSearch && matchesSpecies;
+                            })
                             .map(s => (
                                 <div key={s.id} 
                                     className={`sidebar-item ${selectedItem?.data?.species_id === s.id ? 'active' : ''}`} 
@@ -545,7 +711,8 @@ function Compendium() {
                         {category === 'feats' && categories.feats
                             .filter(f => {
                                 const matchesSearch = f.name.toLowerCase().includes(searchQuery);
-                                const matchesType = featFilter === 'All' || f.type === featFilter;
+                                const featType = (f.type || f.feat_type || '').toLowerCase();
+                                const matchesType = featFilter === 'All' || featType.includes(featFilter.toLowerCase());
                                 return matchesSearch && matchesType;
                             })
                             .map(f => (
@@ -562,13 +729,13 @@ function Compendium() {
                                         <span style={{ 
                                             fontSize: '0.65rem', 
                                             padding: '2px 6px', 
-                                            backgroundColor: f.type === 'Origin' ? '#e8f5e9' : f.type === 'Fighting Style' ? '#e3f2fd' : '#f5f5f5',
-                                            color: f.type === 'Origin' ? '#2e7d32' : f.type === 'Fighting Style' ? '#1565c0' : '#666',
+                                            backgroundColor: f.type.toLowerCase().includes('origin') ? '#e8f5e9' : f.type.toLowerCase().includes('fighting style') ? '#e3f2fd' : f.type.toLowerCase().includes('epic boon') ? '#f3e5f5' : '#f5f5f5',
+                                            color: f.type.toLowerCase().includes('origin') ? '#2e7d32' : f.type.toLowerCase().includes('fighting style') ? '#1565c0' : f.type.toLowerCase().includes('epic boon') ? '#7b1fa2' : '#666',
                                             borderRadius: '10px',
                                             fontWeight: 'bold',
                                             textTransform: 'uppercase'
                                         }}>
-                                            {f.type}
+                                            {f.type.replace(/\s*feat$/i, '')}
                                         </span>
                                     )}
                                 </div>
@@ -582,7 +749,19 @@ function Compendium() {
                             </div>
                         )}
                         {category === 'items' && categories.items
-                            .filter(i => i.name.toLowerCase().includes(searchQuery))
+                            .filter(i => {
+                                const matchesSearch = i.name.toLowerCase().includes(searchQuery);
+                                let matchesType = itemFilter === 'All';
+                                if (!matchesType) {
+                                    if (itemFilter === 'Mount / Vehicle') {
+                                        matchesType = i.item_type === 'Mount' || i.item_type === 'Vehicle';
+                                    } else {
+                                        matchesType = i.item_type?.toLowerCase() === itemFilter.toLowerCase();
+                                    }
+                                }
+                                const matchesRarity = itemRarityFilter === 'All' || i.rarity?.toLowerCase() === itemRarityFilter.toLowerCase();
+                                return matchesSearch && matchesType && matchesRarity;
+                            })
                             .map(i => (
                                 <div key={i.id} 
                                     className={`sidebar-item ${selectedItem?.data?.item_id === i.id ? 'active' : ''}`}
@@ -592,7 +771,7 @@ function Compendium() {
                                         <i className={i.icon || "fa-solid fa-circle"} style={{ fontSize: '0.8rem', color: '#607d8b' }}></i>
                                         <span style={{ fontWeight: '500' }}>{i.name}</span>
                                     </div>
-                                    <span style={{ color: '#b89c72', fontSize: '0.75rem', fontWeight: 'bold' }}>{i.cost || '—'}</span>
+                                    <span style={{ color: '#b89c72', fontSize: '0.75rem', fontWeight: 'bold' }}>{i.cost || (i.rarity && i.rarity !== 'None' ? i.rarity : '—')}</span>
                                 </div>
                             ))
                         }
@@ -604,7 +783,12 @@ function Compendium() {
                             </div>
                         )}
                         {category === 'spells' && categories.spells
-                            .filter(s => s.name.toLowerCase().includes(searchQuery))
+                            .filter(s => {
+                                const matchesSearch = s.name.toLowerCase().includes(searchQuery);
+                                const matchesLevel = spellLevelFilter === 'All' || String(s.level) === String(spellLevelFilter);
+                                const matchesSchool = spellSchoolFilter === 'All' || s.school?.toLowerCase() === spellSchoolFilter.toLowerCase();
+                                return matchesSearch && matchesLevel && matchesSchool;
+                            })
                             .map(s => (
                                 <div key={s.id} 
                                     className={`sidebar-item ${selectedItem?.data?.spell_id === s.id ? 'active' : ''}`}
@@ -1017,9 +1201,12 @@ function Compendium() {
                                 <div style={{ fontStyle: 'italic', color: '#666', fontSize: '1.2rem', marginTop: '5px', fontWeight: '500' }}>
                                     {selectedItem.data.item_type} {selectedItem.data.subcategory && <span style={{ opacity: 0.7 }}>— {selectedItem.data.subcategory}</span>}
                                 </div>
-                                <div style={{ color: '#333', fontSize: '1.1rem', marginTop: '10px', fontWeight: 'bold', borderTop: '1px solid #eee', paddingTop: '10px' }}>
-                                    {selectedItem.data.cost}
-                                    {selectedItem.data.weight && <span style={{ marginLeft: '15px', color: '#777', fontWeight: 'normal' }}>{selectedItem.data.weight} lb.</span>}
+                                <div style={{ color: '#333', fontSize: '1.1rem', marginTop: '10px', fontWeight: 'bold', borderTop: '1px solid #eee', paddingTop: '10px', display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+                                    <span><span style={{ color: '#666', fontWeight: 'normal' }}>Cost: </span>{selectedItem.data.cost || (selectedItem.data.item_type === 'Magic Item' ? (selectedItem.data.rarity && selectedItem.data.rarity !== 'None' ? `ตามระดับความหายาก (${selectedItem.data.rarity})` : '—') : '—')}</span>
+                                    {selectedItem.data.weight && <span><span style={{ color: '#666', fontWeight: 'normal' }}>Weight: </span>{selectedItem.data.weight} lb.</span>}
+                                    {selectedItem.data.rarity && selectedItem.data.rarity !== 'None' && selectedItem.data.item_type === 'Magic Item' && (
+                                        <span style={{ backgroundColor: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: '4px', fontSize: '0.9rem', fontWeight: '600' }}>{selectedItem.data.rarity}</span>
+                                    )}
                                 </div>
                             </div>
                             

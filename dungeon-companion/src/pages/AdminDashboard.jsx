@@ -1372,8 +1372,7 @@ return (
                 >
                   <option value="all">สถานะทั้งหมด (All Status)</option>
                   <option value="active">ปกติ (Active)</option>
-                  <option value="suspended">ระงับชั่วคราว (Suspended)</option>
-                  <option value="banned">ระงับถาวร (Banned)</option>
+                  <option value="suspended">ระงับบัญชี (Suspended)</option>
                 </select>
               </div>
 
@@ -1835,8 +1834,20 @@ return (
       {modalType && modalType.endsWith('_form') && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
           <div style={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '12px', width: '100%', maxWidth: '600px', padding: '24px', maxHeight: '90vh', overflowY: 'auto' }}>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 16px 0', color: '#f8fafc' }}>
-              {selectedItem ? '<i className="fa-solid fa-pen-to-square" style={{marginRight:"4px"}}></i>แก้ไขรายการ' : 'เพิ่มรายการใหม่'} ({catalogSubTab.toUpperCase()})
+            <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 16px 0', color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {selectedItem ? (
+                <>
+                  <i className="fa-solid fa-pen-to-square" style={{ color: '#38bdf8' }}></i>
+                  <span>
+                    แก้ไขรายการ: {selectedItem.item_name || selectedItem.spell_name || selectedItem.species_name || selectedItem.class_name || selectedItem.background_name || selectedItem.feat_name || selectedItem.subclass_name || selectedItem.name || ''} ({catalogSubTab.toUpperCase()})
+                  </span>
+                </>
+              ) : (
+                <>
+                  <i className="fa-solid fa-plus" style={{ color: '#22c55e' }}></i>
+                  <span>เพิ่มรายการใหม่ ({catalogSubTab.toUpperCase()})</span>
+                </>
+              )}
             </h3>
             {catalogSubTab === 'races' && <SpeciesForm initialData={selectedItem} availableFeats={ccData.feats || []} onSave={(data) => handleSaveCatalogItem({ preventDefault: () => {} }, 'races', selectedItem ? 'edit' : 'add', data)} onCancel={() => setModalType(null)} />}
             {catalogSubTab === 'classes' && <ClassForm initialData={selectedItem} availableFeats={ccData.feats || []} onSave={(data) => handleSaveCatalogItem({ preventDefault: () => {} }, 'classes', selectedItem ? 'edit' : 'add', data)} onCancel={() => setModalType(null)} />}

@@ -183,7 +183,7 @@ export default function Step1Race({
   return (
     <div className="builder-step-content animate-fade-in">
       <h3 className="step-title">Choose Species (Race)</h3>
-      <p className="step-subtitle" style={{ marginBottom: '12px' }}>Your species determines your fundamental physical traits, innate talents, and heritage.</p>
+      <p className="step-subtitle" style={{ marginBottom: '12px' }}>เผ่าพันธุ์ (Species) จะเป็นตัวกำหนดลักษณะทางกายภาพพื้นฐาน ความสามารถแต่กำเนิด และสายเลือดมรดกตกทอดของตัวละครคุณ</p>
 
       {/* 💡 Beginner Guide Banner for Step 1 (Only visible BEFORE selecting a race) */}
       {!selectedRace && (
