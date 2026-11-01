@@ -80,7 +80,7 @@
 | | Bcrypt.js | การเข้ารหัสแฮชรหัสผ่านเพื่อความปลอดภัย |
 | | Multer | ระบบจัดการอัปโหลดไฟล์ภาพ Avatar |
 | | Nodemailer | ระบบส่งอีเมลแจ้งเตือนและรีเซ็ตรหัสผ่าน |
-| | Google Generative AI | `@google/generative-ai` SDK เชื่อมต่อ Gemini 1.5 Flash สำหรับ AI DM |
+| | Google Generative AI | `@google/generative-ai` SDK เชื่อมต่อ Gemini 3.5 Flash สำหรับ AI DM |
 | **Database** | MySQL 8.x / MariaDB | ระบบจัดการฐานข้อมูลเชิงสัมพันธ์ (จัดเก็บ 16 ตารางหลัก) |
 
 ---
