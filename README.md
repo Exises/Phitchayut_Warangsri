@@ -54,9 +54,9 @@
   * ให้ผู้เล่นส่งคะแนนความพึงพอใจและข้อเสนอแนะ พร้อมติดตามสถานะการตอบกลับจากผู้ดูแลระบบ
 
 ### 2. ระบบส่วนประมวลผลและหลังบ้าน (Backend & Database Functions)
-* ** Calculation & Rule Validation Engine:** ตรวจสอบความถูกต้องของข้อมูลตามกฎกติกาก่อนบันทึก
-* ** Relational Database (MySQL):** โครงสร้าง 16 ตาราง ออกแบบตามหลัก Normalization รองรับความสัมพันธ์แบบ One-to-Many และ Many-to-Many
-* ** ระบบผู้ดูแลระบบ (Admin Operations):**
+* **Calculation & Rule Validation Engine:** ตรวจสอบความถูกต้องของข้อมูลตามกฎกติกาก่อนบันทึก
+* **Relational Database (MySQL):** โครงสร้าง 16 ตาราง ออกแบบตามหลัก Normalization รองรับความสัมพันธ์แบบ One-to-Many และ Many-to-Many
+* **ระบบผู้ดูแลระบบ (Admin Operations):**
   * **Admin Dashboard:** สรุปสถิติผู้ใช้งาน สถานะบัญชี และสัดส่วนสายอาชีพยอดนิยม
   * **User Management:** จัดการรายชื่อสมาชิก ตรวจสอบสถานะ ระงับ (Suspend) หรือแบนบัญชีผู้ใช้
   * **Master Data Management:** ระบบ CRUD เพิ่ม ลบ แก้ไขข้อมูลกฎกติกา เวทมนตร์ และไอเทมในคลังข้อมูลกลาง
