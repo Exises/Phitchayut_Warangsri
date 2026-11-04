@@ -1,4 +1,4 @@
-# 🐉 กล่องเครื่องมือดันเจียนออนไลน์ (Dungeon Toolkit)
+# กล่องเครื่องมือดันเจียนออนไลน์ (Dungeon Toolkit)
 ### A Web Application for Tabletop RPGs (D&D 5th Edition)
 
 ![React](https://img.shields.io/badge/React-18%2F19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
@@ -11,7 +11,7 @@
 
 ---
 
-## 📖 เกี่ยวกับโครงงาน (About The Project)
+## เกี่ยวกับโครงงาน (About The Project)
 
 **กล่องเครื่องมือดันเจียนออนไลน์ (Dungeon Toolkit)** เป็นเว็บแอปพลิเคชันสำหรับอำนวยความสะดวกในการเล่นเกมสวมบทบาทบนโต๊ะ (Tabletop Role-Playing Games: TRPGs) โดยเฉพาะระบบกติกา **Dungeons & Dragons 5th Edition (D&D 5e)** พัฒนาขึ้นเพื่อแก้ไขปัญหาความยุ่งยากในการเปิดค้นหากฎจากหนังสือคู่มือหนาหลายร้อยหน้า ลดข้อผิดพลาดในการคำนวณค่าสถานะและสเตตัส และทดแทนการจดบันทึกลงบนแผ่นตัวละครกระดาษที่ฉีกขาดหรือสูญหายง่าย
 
@@ -25,38 +25,38 @@
 
 ---
 
-## ✨ ฟังก์ชันและความสามารถเด่นของระบบ (Core Features)
+## ฟังก์ชันและความสามารถเด่นของระบบ (Core Features)
 
 ### 1. ระบบส่วนติดต่อผู้ใช้งาน (Frontend Functions)
-* **🔐 ยืนยันตัวตนและจัดการสิทธิ์ (Authentication & Roles):**
+* ** ยืนยันตัวตนและจัดการสิทธิ์ (Authentication & Roles):**
   * ระบบลงทะเบียนและเข้าสู่ระบบ แยกแยะสิทธิ์ความเป็นเจ้าของข้อมูลตัวละคร
   * ระบบกู้คืนรหัสผ่านผ่านอีเมล (SMTP Nodemailer)
   * หน้าโปรไฟล์แก้ไขข้อมูลส่วนตัว อัปโหลดภาพ Avatar และเปลี่ยนรหัสผ่าน
-* **🧙‍♂️ ผู้ช่วยสร้างตัวละคร 7 ขั้นตอน (Character Creation Wizard):**
+* ** ผู้ช่วยสร้างตัวละคร 7 ขั้นตอน (Character Creation Wizard):**
   * นำทางสร้างตัวละครทีละขั้นตอนตามกฎ D&D 5e (เผ่าพันธุ์ Race, อาชีพ Class, ภูมิหลัง Background, อุปกรณ์)
   * **Rule Engine คำนวณอัตโนมัติ:** คำนวณ Ability Modifiers $\lfloor(Score - 10) / 2\rfloor$, พลังชีวิตเริ่มต้น (Base HP), Armor Class (AC), และความชำนาญ (Skills/Proficiencies)
-* **📜 แผ่นข้อมูลตัวละครแบบพลวัต (Dynamic Character Sheet):**
+* ** แผ่นข้อมูลตัวละครแบบพลวัต (Dynamic Character Sheet):**
   * **Live Status Tracking:** ปรับเพิ่ม/ลดพลังชีวิตปัจจุบัน (Current HP), Temporary HP
   * **Death Saving Throws:** เมื่อ HP $\le 0$ ระบบจะสลับเข้าสู่โหมดลุ้นรอดชีวิต ทอยเต๋า d20 บันทึกผล Success / Failure อย่างละ 3 ช่องอัตโนมัติ
   * **Resource Management:** จัดการช่องเวทมนตร์ (Spell Slots Level 1–9) และฟังก์ชันพักผ่อน (Short Rest / Long Rest) เพื่อรีเซ็ตค่าสถานะ
   * **Inventory & Encumbrance:** จัดการสิ่งของในกระเป๋า พร้อมคำนวณน้ำหนักรวมเทียบกับขีดจำกัดพลังกาย ($STR \times 15$ lbs)
   * **Digital Journal:** สมุดบันทึกดิจิทัลสำหรับจดบันทึกเหตุการณ์และเควสต์ (Quest) ระหว่างเล่น
-* **🎲 ลูกเต๋า 3 มิติเสมือนจริง (3D Physics Dice Roller):**
+* ** ลูกเต๋า 3 มิติเสมือนจริง (3D Physics Dice Roller):**
   * จำลองการทอยลูกเต๋า 3 มิติ (d4, d6, d8, d10, d12, d20, d100) ผ่าน WebGL Canvas ด้วยความเร็ว 60 FPS
   * มีระบบฟิสิกส์จำลองแรงกระทบ แรงหมุน และอ่านค่าหน้าเต๋าที่หงายขึ้นมาประมวลผลการโจมตีอัตโนมัติ
-* **🤖 ระบบแนะนำอาชีพ 2 รูปแบบ (Class Recommendation):**
+* ** ระบบแนะนำอาชีพ 2 รูปแบบ (Class Recommendation):**
   * **Personality Quiz:** แบบทดสอบจิตวิทยา 6 หมวดคำถาม ประมวลผลด้วยคะแนนถ่วงน้ำหนัก (Weighted Scoring) แนะนำอาชีพที่เหมาะที่สุด 3 อันดับแรก
   * **AI Dungeon Master (Gemini):** คุยโต้ตอบกับ AI DM จำลองสถานการณ์การผจญภัย เพื่อวิเคราะห์คลาสที่เข้ากับบุคลิกของผู้เล่นอย่างลึกซึ้ง
-* **📚 คลังข้อมูลสารสนเทศกฎมาตรฐาน (SRD Compendium):**
+* ** คลังข้อมูลสารสนเทศกฎมาตรฐาน (SRD Compendium):**
   * รวบรวมข้อมูลมาตรฐาน 5e มากกว่า 840 รายการ (Spells, Items, Monsters, Classes, Species, Feats)
   * ค้นหาทันใจแบบ **Live Search** พร้อมระบบ **Advanced Filtering** คัดกรองตามระดับเลเวลและความหายาก
-* **💬 ระบบรับฟังความคิดเห็น (Feedback System):**
+* ** ระบบรับฟังความคิดเห็น (Feedback System):**
   * ให้ผู้เล่นส่งคะแนนความพึงพอใจและข้อเสนอแนะ พร้อมติดตามสถานะการตอบกลับจากผู้ดูแลระบบ
 
 ### 2. ระบบส่วนประมวลผลและหลังบ้าน (Backend & Database Functions)
-* **⚙️ Calculation & Rule Validation Engine:** ตรวจสอบความถูกต้องของข้อมูลตามกฎกติกาก่อนบันทึก
-* **🗄️ Relational Database (MySQL):** โครงสร้าง 16 ตาราง ออกแบบตามหลัก Normalization รองรับความสัมพันธ์แบบ One-to-Many และ Many-to-Many
-* **🛡️ ระบบผู้ดูแลระบบ (Admin Operations):**
+* ** Calculation & Rule Validation Engine:** ตรวจสอบความถูกต้องของข้อมูลตามกฎกติกาก่อนบันทึก
+* ** Relational Database (MySQL):** โครงสร้าง 16 ตาราง ออกแบบตามหลัก Normalization รองรับความสัมพันธ์แบบ One-to-Many และ Many-to-Many
+* ** ระบบผู้ดูแลระบบ (Admin Operations):**
   * **Admin Dashboard:** สรุปสถิติผู้ใช้งาน สถานะบัญชี และสัดส่วนสายอาชีพยอดนิยม
   * **User Management:** จัดการรายชื่อสมาชิก ตรวจสอบสถานะ ระงับ (Suspend) หรือแบนบัญชีผู้ใช้
   * **Master Data Management:** ระบบ CRUD เพิ่ม ลบ แก้ไขข้อมูลกฎกติกา เวทมนตร์ และไอเทมในคลังข้อมูลกลาง
@@ -64,7 +64,7 @@
 
 ---
 
-## 🛠️ เทคโนโลยีที่ใช้ในการพัฒนา (Tech Stack)
+##  เทคโนโลยีที่ใช้ในการพัฒนา (Tech Stack)
 
 | ส่วนของระบบ | เทคโนโลยี / เครื่องมือ | รายละเอียด |
 | :--- | :--- | :--- |
@@ -85,7 +85,7 @@
 
 ---
 
-## 📋 สิ่งที่ต้องติดตั้งล่วงหน้า (Prerequisites)
+##  สิ่งที่ต้องติดตั้งล่วงหน้า (Prerequisites)
 
 ก่อนเริ่มการติดตั้ง กรุณาตรวจสอบและติดตั้งโปรแกรมเหล่านี้บนเครื่องคอมพิวเตอร์ของคุณ:
 
@@ -105,7 +105,7 @@
 
 ---
 
-## 🚀 ขั้นตอนการติดตั้งอย่างละเอียดทีละขั้นตอน (Step-by-Step Installation)
+##  ขั้นตอนการติดตั้งอย่างละเอียดทีละขั้นตอน (Step-by-Step Installation)
 
 ### ขั้นตอนที่ 1: การนำเข้าฐานข้อมูล MySQL (Database Setup)
 
@@ -127,7 +127,7 @@
    * เลื่อนลงมาด้านล่างสุด แล้วกดปุ่ม **Import (นำเข้า / Go)**
    * รอระบบประมวลผลจนขึ้นข้อความสำเร็จสีเขียว (จะได้รับตารางข้อมูลทั้งหมด 16 ตาราง เช่น `users`, `characters`, `classes`, `spells`, `items`, `feedbacks` ฯลฯ)
 
-> 💡 **ทางเลือกสำหรับผู้ที่ใช้ MySQL Command-Line:**
+>  **ทางเลือกสำหรับผู้ที่ใช้ MySQL Command-Line:**
 > ```bash
 > mysql -u root -p -e "CREATE DATABASE dnd_project CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 > mysql -u root -p dnd_project < dnd-companion/dnd_project.sql
@@ -188,7 +188,7 @@
    ```bash
    npm install
    ```
-   > ⚙️ **หมายเหตุสำคัญเรื่องระบบลูกเต๋า 3D:**  
+   >  **หมายเหตุสำคัญเรื่องระบบลูกเต๋า 3D:**  
    > ในระหว่างขั้นตอน `npm install` ระบบจะเรียกคำสั่ง `postinstall` อัตโนมัติ เพื่อรันสคริปต์ `node scripts/patch-dice-box.cjs` ซึ่งทำหน้าที่ปรับแต่งวิถีแรงหมุนของเอนจินลูกเต๋า 3D ให้ตกสู่มุมล่างขวาของหน้าจออย่างสวยงาม หากขึ้นข้อความ `[patch-dice-box] ... patched successfully` แสดงว่าระบบลูกเต๋าพร้อมทำงาน 100%
 
 4. เริ่มต้นรันเซิร์ฟเวอร์ Vite Development:
@@ -207,7 +207,7 @@
 
 ---
 
-## 🔑 ข้อมูลบัญชีผู้ใช้เริ่มต้นสำหรับทดสอบระบบ (Default Credentials)
+##  ข้อมูลบัญชีผู้ใช้เริ่มต้นสำหรับทดสอบระบบ (Default Credentials)
 
 ในฐานข้อมูล `dnd_project.sql` มีการเตรียมบัญชีตัวอย่างไว้สำหรับทดสอบฟังก์ชันต่างๆ:
 
@@ -226,7 +226,7 @@
 
 ---
 
-## 📁 โครงสร้างไฟล์และโฟลเดอร์ของโครงงาน (Project Directory Structure)
+##  โครงสร้างไฟล์และโฟลเดอร์ของโครงงาน (Project Directory Structure)
 
 ```text
 dnd-companion/
@@ -283,7 +283,7 @@ dnd-companion/
 
 ---
 
-## 🛠️ แนวทางการแก้ไขปัญหาที่พบบ่อย (Troubleshooting)
+##  แนวทางการแก้ไขปัญหาที่พบบ่อย (Troubleshooting)
 
 | ปัญหาที่พบ | สาเหตุ | วิธีแก้ไข |
 | :--- | :--- | :--- |
@@ -296,7 +296,7 @@ dnd-companion/
 
 ---
 
-## 📦 การบิลด์ระบบสำหรับสภาพแวดล้อมจริง (Production Build)
+##  การบิลด์ระบบสำหรับสภาพแวดล้อมจริง (Production Build)
 
 หากต้องการนำระบบขึ้นโฮสติ้งจริงเพื่อใช้งานแบบ Production:
 
@@ -314,7 +314,7 @@ npm run preview
 
 ---
 
-## ⚖️ ข้อกำหนดสิทธิ์และข้อจำกัดความรับผิดชอบ (Legal Notice & License)
+##  ข้อกำหนดสิทธิ์และข้อจำกัดความรับผิดชอบ (Legal Notice & License)
 
 โครงงานนี้เป็นผลงานเพื่อการศึกษา (Educational Purpose) ภายใต้นโยบาย **Fan Content Policy** ของบริษัท **Wizards of the Coast**:
 * ไม่ได้รับการอนุมัติ สนับสนุน หรือมีส่วนเกี่ยวข้องอย่างเป็นทางการจาก Wizards of the Coast LLC
