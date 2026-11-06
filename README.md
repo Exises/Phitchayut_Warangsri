@@ -25,6 +25,15 @@
 
 ---
 
+## วิดีโอแนะนำโครงงาน (Project Demonstration)
+
+สามารถรับชมคลิปวิดีโอแนะนำโครงงานและการสาธิตการใช้งานระบบจริงได้ที่:
+
+* **YouTube:** [https://youtu.be/p1R9tDQHSSI](https://youtu.be/p1R9tDQHSSI)
+* **Google Drive:** [https://drive.google.com/file/d/1yvH5ao3lPDD7TZVEg3bVgSyPvAI4iWpK/view?usp=sharing](https://drive.google.com/file/d/1yvH5ao3lPDD7TZVEg3bVgSyPvAI4iWpK/view?usp=sharing)
+
+---
+
 ## ฟังก์ชันและความสามารถเด่นของระบบ (Core Features)
 
 ### 1. ระบบส่วนติดต่อผู้ใช้งาน (Frontend Functions)
