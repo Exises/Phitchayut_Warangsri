@@ -17,13 +17,9 @@
 
 เว็บแอปพลิเคชันนี้ทำงานในรูปแบบ **Single Page Application (SPA)** บนเครื่องคอมพิวเตอร์และเบราว์เซอร์ รวมศูนย์เครื่องมือช่วยเล่นแบบดิจิทัลครบวงจร ตั้งแต่การแนะนำอาชีพด้วย AI, ผู้ช่วยสร้างตัวละครตามลำดับขั้นตอน, แผ่นตัวละครแบบพลวัต (Live Character Sheet) ที่ปรับค่าพลังชีวิตและสเปลสล็อตได้แบบเรียลไทม์, ระบบจำลองลูกเต๋า 3 มิติพร้อมฟิสิกส์เสมือนจริง 60 FPS, คลังข้อมูลสารสนเทศกฎมาตรฐาน (SRD) ตลอดจนระบบจัดการหลังบ้านสำหรับผู้ดูแลระบบ (Admin Dashboard)
 
-**วิดีโอแนะนำโปรเจต**
-
-Google Drive
-https://drive.google.com/file/d/1yvH5ao3lPDD7TZVEg3bVgSyPvAI4iWpK/view?usp=sharing
-
-Youtube
-https://youtu.be/p1R9tDQHSSI
+* **วิดีโอแนะนำโปรเจต**
+*Google Drive : https://drive.google.com/file/d/1yvH5ao3lPDD7TZVEg3bVgSyPvAI4iWpK/view?usp=sharing
+*Youtube : https://youtu.be/p1R9tDQHSSI
 
 >  **โครงงานปริญญานิพนธ์ระดับปริญญาตรี**  
 > **ผู้จัดทำ:** นายพิชญุตม์ วะรังศรี (รหัสนิสิต 6640206709)  
